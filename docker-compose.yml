@@ -11,8 +11,8 @@ services:
   backend:
     build: ./src/backend
     restart: on-failure
-    volumes:
-      - ./src/backend:/home/node/app  
+    # volumes:
+    #   - ./src/backend:/home/node/app
     ports:
       - "3000:3000"
     container_name: backend
@@ -22,8 +22,8 @@ services:
   frontend:
     image: node
     restart: on-failure
-    volumes:
-      - ./src/frontend:/home/node/app
+    # volumes:
+    #   - ./src/frontend:/home/node/app
     ports:
       - '5173:5173'
     container_name: frontend

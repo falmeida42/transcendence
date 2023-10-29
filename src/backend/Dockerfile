@@ -5,17 +5,12 @@ RUN apt-get update && apt-get upgrade -y
 RUN node -v
 
 RUN npm install -g n
-
 RUN n latest
 
-RUN node -v
+WORKDIR /home/node/app
 
-RUN npm i -g @nestjs/cli
-
-RUN mkdir backend
-
+COPY package*.json ./
+RUN npm install
 COPY . .
-
-WORKDIR /backend
 
 CMD ["npm", "run", "start"]
