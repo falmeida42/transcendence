@@ -11,3 +11,25 @@ services:
       - "3000:3000"
     container_name: backend
     user: root
+    env_file:
+      - ./src/backend/.env
+    environment:
+      - DATABASE_URL
+  database:
+    image: postgres:latest
+    restart: on-failure
+    networks:
+      - db
+    env_file:
+      - .env
+      - ./src/backend/.env
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    ports:
+      - "5432:5432"
+
+networks:
+  db:
+    driver: bridge
