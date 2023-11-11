@@ -1,12 +1,6 @@
 version: '3'
 
 services:
-  #postgres:
-  #  image: postgres
-  #  restart: on-failure  
-  #  ports:
-  #    - "5432:5432"
-  #  container_name: db
 
   backend:
     build: ./src/backend
@@ -16,5 +10,4 @@ services:
     ports:
       - "3000:3000"
     container_name: backend
-    working_dir: /home/node/app
     user: root
