@@ -16,3 +16,5 @@ services:
     ports:
       - "3000:3000"
     container_name: backend
+    working_dir: /home/node/app
+    user: root
