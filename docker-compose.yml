@@ -6,7 +6,7 @@ services:
     build: ./src/backend
     restart: on-failure
     volumes:
-      - ./src/backend/nest:/home/node/app  
+      - ./src/backend/nest:/home/node/app
     ports:
       - "3000:3000"
     container_name: backend
@@ -16,6 +16,7 @@ services:
     environment:
       - DATABASE_URL
   database:
+    container_name: database
     image: postgres:latest
     restart: on-failure
     networks:
