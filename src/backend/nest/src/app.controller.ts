@@ -8,7 +8,8 @@ export class AppController {
 
   @Get()
   get42(@Res() res: Response): string {
-    res.send("Wellcome to transcendence #Api response");
-    return "Wellcome to transcendence #Api response"
+    const responseWellcome = "Wellcome to transcendence #Api response"
+    res.send(responseWellcome);
+    return responseWellcome
   }
 }

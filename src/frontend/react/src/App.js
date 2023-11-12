@@ -11,6 +11,7 @@ const App = ({ customText }) => {
     const fetchData = async () => {
       try {
         const response = await customText();
+        console.log('customText Response Data:', response)
         setResponseData(response);
       } catch (error) {
         console.error('Error fetching data:', error);

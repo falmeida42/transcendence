@@ -5,18 +5,16 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 
-const url = 'http://localhost:3000/home'
-
 const nestApi = axios.create(
   {
-    baseURL: url,
+    baseURL: 'http://localhost:3000',
     withCredentials: true
   }
 );
 
 const getResponse = async () => {
   try {
-    const response = await nestApi.get()
+    const response = await nestApi.get('/home')
     console.log("Response", response.data)
     return response.data
   } catch (error) {
