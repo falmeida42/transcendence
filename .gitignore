@@ -1,1 +1,2 @@
 .devcontainer
+./**/node_modules/
