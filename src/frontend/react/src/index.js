@@ -3,22 +3,33 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import axios from 'axios';
 
-const axios = require('axios')
+const url = 'http://localhost:3000/home'
 
-const url = 'http://localhost:3000'
+const nestApi = axios.create(
+  {
+    baseURL: url,
+    withCredentials: true
+  }
+);
 
-async function getResponse()
-{
-  let response = await axios.get(url)
-  console.log(response.data)
+const getResponse = async () => {
+  try {
+    const response = await nestApi.get()
+    console.log("Response", response.data)
+    return response.data
+  } catch (error) {
+    console.error("Error geting the nest response", error)
+    return "Wellcome to Transcendence #Mocked"
+  }
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
-    <App customText="Wellcome to Transcendence"/>
+    <App customText={getResponse}/>
   </React.StrictMode>
 );
 

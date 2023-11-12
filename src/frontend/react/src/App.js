@@ -1,14 +1,31 @@
 import logo from './logo.svg';
 import './App.css';
+import React, { useEffect, useState } from 'react';
 
-function App({ customText }) {
+
+const App = ({ customText }) => {
+
+  const [responseData, setResponseData] = useState(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await customText();
+        setResponseData(response);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, [customText])
+
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          {customText ? (
-            customText
+          {responseData ? (
+            responseData
           ) : (
             <>
               Edit <code>src/App.js</code> and save to reload

@@ -1,12 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
 import { AppService } from './app.service';
+import { Response } from 'express';
 
-@Controller()
+@Controller("home")
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  get42(): string {
-    return this.appService.get42();
+  get42(@Res() res: Response): string {
+    res.send("Wellcome to transcendence #Api response");
+    return "Wellcome to transcendence #Api response"
   }
 }
