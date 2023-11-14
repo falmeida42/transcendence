@@ -15,6 +15,23 @@ services:
       - ./src/backend/.env
     environment:
       - DATABASE_URL
+    networks:
+      - transcendence
+
+  frontend:
+    build: ./src/frontend
+    restart: on-failure
+    volumes:
+    - ./src/frontend/react:/home/node/app
+    ports:
+      - "5173:5173"
+    container_name: frontend
+    depends_on:
+      - backend
+    user: root
+    networks:
+      - transcendence
+
   database:
     container_name: database
     image: postgres:latest
@@ -32,5 +49,7 @@ services:
       - "5432:5432"
 
 networks:
+  transcendence:
+    driver: bridge
   db:
     driver: bridge
