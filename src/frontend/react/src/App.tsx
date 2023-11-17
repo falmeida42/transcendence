@@ -1,11 +1,12 @@
-import Game from "./game/Game"
+import "./App.css";
+import Game from "./game/Game";
 
 function App() {
   return (
-    <div>
-      <Game/>
+    <div className="game">
+      <Game width={1080} height={720} />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
