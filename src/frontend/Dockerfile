@@ -8,4 +8,4 @@ RUN chmod +x /script.sh
 
 ENTRYPOINT [ "/script.sh" ]
 
-CMD ["npm", "start", "--port 5173"]
+CMD ["npm", "run", "dev"]
