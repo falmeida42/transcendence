@@ -12,7 +12,7 @@ services:
     container_name: backend
     user: root
     env_file:
-      - ./src/backend/.env
+      - ./src/backend/nest/.env
     environment:
       - DATABASE_URL
     networks:
@@ -33,14 +33,14 @@ services:
       - transcendence
 
   database:
-    container_name: database
     image: postgres:latest
+    container_name: database
     restart: on-failure
     networks:
       - db
     env_file:
       - .env
-      - ./src/backend/.env
+      - ./src/backend/nest/.env
     environment:
       - POSTGRES_DB
       - POSTGRES_USER
