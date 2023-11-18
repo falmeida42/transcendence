@@ -4,10 +4,16 @@ WORKDIR /home/node/app
 
 RUN npm i -g @nestjs/cli
 
-COPY ./script.sh /
+COPY script.sh /usr/local/bin/
+# COPY package.json .
+# COPY package-lock.json .
+COPY nest/prisma ./prisma/
 
-RUN chmod +x /script.sh
+RUN npx prisma migrate
+RUN npx prisma generate
 
-ENTRYPOINT [ "/script.sh" ]
+RUN chmod +x /usr/local/bin/script.sh
+
+ENTRYPOINT [ "script.sh" ]
 
 CMD ["npm", "run", "start:dev"]

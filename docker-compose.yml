@@ -2,18 +2,23 @@ version: '3'
 
 services:
 
-  # backend:
-  #   build: ./src/backend
-  #   restart: on-failure
-  #   volumes:
-  #     - ./src/backend/nest:/home/node/app
-  #   ports:
-  #     - "3000:3000"
-  #   container_name: backend
-  #   user: root
-  #   networks:
-  #     - transcendence
-
+  backend:
+    build: ./src/backend
+    restart: on-failure
+    volumes:
+      - ./src/backend/nest:/home/node/app
+    ports:
+      - "3000:3000"
+    container_name: backend
+    user: root
+    env_file:
+      - ./src/backend/nest/.env
+    environment:
+      - DATABASE_URL
+    networks:
+      - transcendence
+    depends_on:
+      - database
 
   frontend:
     build: ./src/frontend
@@ -29,6 +34,25 @@ services:
     networks:
       - transcendence
 
+  database:
+    image: postgres:latest
+    container_name: database
+    restart: on-failure
+    networks:
+      - db
+    env_file:
+      - .env
+      - ./src/backend/nest/.env
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - DATABASE_URL
+    ports:
+      - "5432:5432"
+
 networks:
-    transcendence:
-      driver: bridge
+  transcendence:
+    driver: bridge
+  db:
+    driver: bridge
