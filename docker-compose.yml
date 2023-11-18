@@ -17,6 +17,8 @@ services:
       - DATABASE_URL
     networks:
       - transcendence
+    depends_on:
+      - database
 
   frontend:
     build: ./src/frontend
@@ -26,8 +28,8 @@ services:
     ports:
       - "5173:5173"
     container_name: frontend
-    depends_on:
-      - backend
+    # depends_on:
+    #   - backend
     user: root
     networks:
       - transcendence
