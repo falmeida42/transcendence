@@ -1,5 +1,7 @@
 import Mute from "../../assets/Mute.png"
 import Block from "../../assets/Block.png"
+import Messages from "./Messages"
+import Input from "./Input"
 
 
 const Chat = () => {
@@ -12,6 +14,8 @@ const Chat = () => {
                     <img src={Block} alt=""/>
                 </div>
             </div>
+            <Messages/>
+            <Input/>
         </div>
     )
 }

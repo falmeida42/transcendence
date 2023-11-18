@@ -86,32 +86,138 @@
 
                 .userChatInfo {
                     span { font-size: 18px; font-weight: 500;}
-                    p { font-size: 14px; color: lightgray;}
+                    padding: 15px;
                 }
             }   
         }
 
         .chat {
             flex: 2;
+            background-color: lightgray;
 
             .chatInfo{
                 height: 50px;
-                background-color: #585858;
+                background-color: gray;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 padding: 10px;
                 color: white;
+               
+                
             }
 
             .chatIcons{
                 display: flex;
                 gap: 10px;
+                cursor: pointer;
 
                 img{
                     height: 24px;
                     width: 24px;
                 }
+            }
+
+            
+
+            .messages{
+                background-color: #585858;
+                padding: 10px;
+                height: calc(100% - 160px);
+                overflow: scroll;
+
+                .message{
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 15px;
+
+                    .messageInfo{
+                        display: flex;
+                        flex-direction: column;
+                        color: darkgray;
+
+                        img{
+                            height: 40px;
+                            width: 40px;
+                            border-radius: 50%;
+                            object-fit: cover;
+                        }
+                    }
+
+                    .messageContent {
+                        max-width: 80%;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+
+                        p {
+                            background-color: gray;
+                            color: white;
+                            padding: 10px;
+                            border-radius: 0px 10px 10px 10px;
+                            max-width: max-content;
+                        }
+                    }
+
+                    &.owner{
+                        flex-direction: row-reverse;
+                        .messageContent {
+                            align-items: flex-end;
+
+                            p {
+                                background-color: white;
+                                color: #585858;
+                                padding: 10px;
+                                border-radius: 10px 0px 10px 10px;
+                            }
+                        }
+                       
+                    }
+
+                    
+                }
+            }
+
+            .input{
+                height: 50px;
+                background-color: darkgray;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                input {
+                    width: 100%;
+                    background-color: darkgray;
+                    border: none;
+                    outline: none;
+                    color: white;
+                    font-size: 18px;
+
+             
+                }
+
+                .send{
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                    img{
+                        height: 24px;
+                        width: 24px;
+                        cursor: pointer;
+                    }
+
+                    button{
+                        border: none;
+                        padding: 10px 15px;
+                        color: lightgray;
+                        background-color: #585858;
+                        cursor: pointer;
+                    }
+                }
+
+
             }
         }
     }
