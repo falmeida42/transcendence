@@ -7,7 +7,7 @@ RUN npm i -g @nestjs/cli
 COPY script.sh /usr/local/bin/
 # COPY package.json .
 # COPY package-lock.json .
-COPY prisma/ ./nest/prisma/
+COPY nest/prisma ./prisma/
 
 RUN npx prisma migrate
 RUN npx prisma generate
