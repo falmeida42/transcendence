@@ -6,10 +6,7 @@ const Input = () => {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const socket = io("http://localhost:3000", {
-    withCredentials: true,
-    extraHeaders: {
-      "Access-Control-Allow-Origin": "http://localhost:3000",
-    },
+    withCredentials: true
   });
 
   useEffect(() => {
