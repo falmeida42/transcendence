@@ -2,26 +2,46 @@ import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import Play from "../../assets/Play.png";
 
+interface Message {
+  name: string;
+  text: string;
+}
+
+interface Payload {
+  name: string;
+  text: string;
+}
+
 const Input = () => {
   const [text, setText] = useState("");
-  const [messages, setMessages] = useState([]);
-  const socket = io("http://localhost:3000", {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const socket = io("http://localhost:3000/chat", {
     withCredentials: true
   });
 
   useEffect(() => {
-    socket.on("message", (message) => {
+
+    function receivedMessage(message: Payload) {
+      const newMessage: Message = {
+        name: message.name,
+        text: message.text
+      };
+
+      setMessages([... messages, newMessage])
+    }
+
+    socket.on("messageToClient", (message: Payload) => {
       console.log("Received message:", message);
-      setMessages((prevMessages) => [...prevMessages, message]);
+      receivedMessage(message)
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [socket]);
+  }, [messages, text]);
 
-  const handleSend = () => {
-    socket.emit("message", { data: text });
+  const sendSend = () => {
+    socket.emit("messageToServer", { message: text });
     setText("");
   };
 
@@ -43,7 +63,7 @@ const Input = () => {
         />
         <div className="send">
           <img src={Play} alt="" />
-          <button onClick={handleSend}>Send</button>
+          <button onClick={() => sendSend()}>Send</button>
         </div>
       </div>
     </div>
