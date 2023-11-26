@@ -6,6 +6,12 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "database:rm": "docker compose rm database -s -f -v",
+    "database:up": "docker compose up database -d",
+    "database:restart": "npm run database:rm && npm run database:up",
+    "backend:rm": "docker compose rm backend -s -f -v",
+    "backend:up": "docker compose up backend -d",
+    "backend:restart": "npm run backend:rm && npm run backend:up",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
