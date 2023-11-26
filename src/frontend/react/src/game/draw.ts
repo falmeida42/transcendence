@@ -1,13 +1,13 @@
-import Player from "./Player";
+import Player from "./Paddle";
 
-const draw_field = (
+export const draw_field = (
   ctx: CanvasRenderingContext2D,
   windowWidth: number,
   windowHeight: number
 ) => {
   // Background
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, windowWidth, windowHeight);
+  // ctx.fillStyle = "black";
+  // ctx.fillRect(0, 0, windowWidth, windowHeight);
 
   // Middle line
   ctx.beginPath();
@@ -29,9 +29,15 @@ const draw_field = (
   ctx.stroke();
 };
 
-const draw_player = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
+const draw_player = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  playerHeight: number,
+  playerWidth: number
+) => {
   ctx.fillStyle = "white";
-  ctx.fillRect(x, y, 20, 150);
+  ctx.fillRect(x, y, playerWidth, playerHeight);
 };
 
 export const draw = (
@@ -43,9 +49,11 @@ export const draw = (
 ) => {
   draw_field(ctx, windowWidth, windowHeight);
 
+  const playerHeight = windowHeight / 5;
+  const playerWidth = windowWidth / 54;
   // left player
-  draw_player(ctx, player1.x, player1.y);
+  draw_player(ctx, player1.x, player1.y, playerHeight, playerWidth);
 
   // Right player
-  draw_player(ctx, player2.x, player2.y);
+  draw_player(ctx, player2.x, player2.y, playerHeight, playerWidth);
 };
