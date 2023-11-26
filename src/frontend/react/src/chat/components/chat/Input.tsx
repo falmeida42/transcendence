@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Play from "../../assets/Play.png";
+import Play from "../../../assets/Play.png";
 import { socketConnection } from "../../ChatPage";
 
 function validInput(str: string) {
