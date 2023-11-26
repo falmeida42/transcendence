@@ -1,10 +1,9 @@
 
 .chatPage {
-    background-color: dimgrey;
     height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: end;
+    justify-content: bottom;
 
     .container {
         border: 1px solid white;
@@ -17,6 +16,7 @@
         .sidebar {
             flex: 1;
             background-color: dimgrey;
+            cursor: pointer;
 
 
             .navbar {
@@ -156,6 +156,7 @@
                             padding: 10px;
                             border-radius: 0px 10px 10px 10px;
                             max-width: max-content;
+                            margin: 0;
                         }
                     }
 

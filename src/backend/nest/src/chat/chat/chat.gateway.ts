@@ -13,7 +13,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
   @SubscribeMessage('messageToServer')
-  handleMessage(client: Socket, payload: string): void {
+  handleMessage(client: Socket, payload: Payload<string>): void {
     this.logger.log(`message received ${JSON.stringify(payload)}`)
     this.server.emit('messageToClient', payload, client.id)
   }

@@ -1,6 +1,6 @@
 
-const Message = ({ text }) => {
-    
+const Message = ({ text }: {text: string}   ) => {
+    console.log(`Message received: ${text}`)
     return (
         <div className="message owner">
             <div className="messageInfo">

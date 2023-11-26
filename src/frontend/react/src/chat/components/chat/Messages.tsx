@@ -1,14 +1,16 @@
 import Message from "./Message";
 import { useState, useEffect } from "react";
-import { socketConnection } from "../ChatPage";
+import { socketConnection } from "../../ChatPage";
+import { v4 as uuid } from "uuid";
 
 export interface MessageData {
-  name: string;
+  id: string;
+  username: string;
   text: string;
 }
 
-interface Payload {
-  name: string;
+export interface Payload {
+  username: string;
   text: string;
 }
 
@@ -18,10 +20,12 @@ const Messages = () => {
   useEffect(() => {
     function receivedMessage(message: Payload) {
       const newMessage: MessageData = {
-        name: message.name,
+        id: "123",
+        username: message.username,
         text: message.text,
       };
 
+      console.log("Message until set", newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
 
@@ -31,14 +35,16 @@ const Messages = () => {
     });
 
     return () => {
-      // Clean up socket event listeners if needed
+      // Cleanup or disconnect logic (if needed)
     };
   }, []); // Removed messages and text from the dependency array to avoid unnecessary re-renders
+
+  console.log("Current messages:", messages);
 
   return (
     <div className="messages">
       {messages.map((message, index) => (
-        <Message key={index} text={message.text} />
+        <Message key={message.id} text={message.text} />
       ))}
     </div>
   );
