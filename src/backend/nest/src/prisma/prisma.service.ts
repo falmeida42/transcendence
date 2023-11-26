@@ -13,4 +13,10 @@ export class PrismaService extends PrismaClient {
       },
     });
   }
+
+  async getAll() {}
+
+  async getUserById(id: number) {
+    console.log(id);
+  }
 }
