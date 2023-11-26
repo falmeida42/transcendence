@@ -21,16 +21,11 @@ export default class Ball {
     ctx.stroke();
   }
 
-  colisionWithWalls(canvasWidth: number, canvasHeight: number) {
+  colisionWithWalls(canvasHeight: number) {
     if (
       this.pos.y + this.radius >= canvasHeight ||
       this.pos.y - this.radius <= 0
     )
       this.velocity.y *= -1;
-    if (
-      this.pos.x + this.radius >= canvasWidth ||
-      this.pos.x - this.radius <= 0
-    )
-      this.velocity.x *= -1;
   }
 }

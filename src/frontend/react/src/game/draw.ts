@@ -1,4 +1,4 @@
-import Player from "./Paddle";
+import gameElements from "./gameElements";
 
 export const draw_field = (
   ctx: CanvasRenderingContext2D,
@@ -29,31 +29,11 @@ export const draw_field = (
   ctx.stroke();
 };
 
-const draw_player = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  playerHeight: number,
-  playerWidth: number
-) => {
-  ctx.fillStyle = "white";
-  ctx.fillRect(x, y, playerWidth, playerHeight);
-};
-
 export const draw = (
   ctx: CanvasRenderingContext2D,
-  windowWidth: number,
-  windowHeight: number,
-  player1: Player,
-  player2: Player
+  gameElements: gameElements
 ) => {
-  draw_field(ctx, windowWidth, windowHeight);
-
-  const playerHeight = windowHeight / 5;
-  const playerWidth = windowWidth / 54;
-  // left player
-  draw_player(ctx, player1.x, player1.y, playerHeight, playerWidth);
-
-  // Right player
-  draw_player(ctx, player2.x, player2.y, playerHeight, playerWidth);
+  gameElements.ball.draw(ctx);
+  gameElements.paddleLeft.draw(ctx);
+  gameElements.paddleRight.draw(ctx);
 };
