@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Game.css";
 import { ballPaddleCollision } from "./collision";
 import { draw, draw_field } from "./draw";
@@ -24,7 +24,9 @@ const gameUpdate = (
   gameElements: gameElements,
   canvasWidth: number,
   canvasHeight: number,
-  keysPressed: any
+  keysPressed: any,
+  setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
+  setScoreRight: React.Dispatch<React.SetStateAction<number>>
 ) => {
   if (keysPressed[" "]) {
     gameElements.ball.velocity.x = 5;
@@ -35,8 +37,12 @@ const gameUpdate = (
   gameElements.paddleLeft.colisionWithWalls(canvasHeight);
   gameElements.ball.colisionWithWalls(canvasHeight);
   if (gameElements.ball.pos.x < 0) {
+    gameElements.paddleRightScore += 1;
+    setScoreRight(gameElements.paddleRightScore);
     resetGame(gameElements, canvasWidth, canvasHeight);
   } else if (gameElements.ball.pos.x > canvasWidth) {
+    gameElements.paddleLeftScore += 1;
+    setScoreLeft(gameElements.paddleLeftScore);
     resetGame(gameElements, canvasWidth, canvasHeight);
   }
 
@@ -50,6 +56,8 @@ const Game: any = (props: any) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const width = Number(props.width);
   const height = Number(props.height);
+  let [scoreLeft, setScoreLeft] = useState(0);
+  let [scoreRight, setScoreRight] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,7 +99,14 @@ const Game: any = (props: any) => {
       ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
       ctx.fillRect(0, 0, width, height);
       draw(ctx, gameElements);
-      gameUpdate(gameElements, width, height, keysPressed);
+      gameUpdate(
+        gameElements,
+        width,
+        height,
+        keysPressed,
+        setScoreLeft,
+        setScoreRight
+      );
       animationId = window.requestAnimationFrame(gameLoop);
     };
     gameLoop();
@@ -99,7 +114,13 @@ const Game: any = (props: any) => {
     return () => window.cancelAnimationFrame(animationId);
   }, [draw]);
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div>
+      <canvas ref={canvasRef} />
+      <h1 id="scoreLeft">{scoreLeft}</h1>
+      <h1 id="scoreRight">{scoreRight}</h1>
+    </div>
+  );
 };
 
 export default Game;
