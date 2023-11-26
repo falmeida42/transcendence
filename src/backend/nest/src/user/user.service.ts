@@ -13,6 +13,10 @@ export class UserService {
     return this.prisma.user.findUnique({ where: { id: +id } });
   }
 
+  async getUserByLogin(userLogin: string): Promise<UserDto | null> {
+    return this.prisma.user.findUnique({ where: { login: userLogin } });
+  }
+
   async create(user: UserDto) {
     return this.prisma.user.create({
       data: user,

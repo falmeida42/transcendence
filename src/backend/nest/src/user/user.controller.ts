@@ -12,7 +12,7 @@ export class UserController {
   }
 
   @Post()
-//   @UseGuards()
+  //   @UseGuards()
   async create(@Body() user: UserDto) {
     if (!user) {
       return 'No value inserted';
@@ -22,7 +22,7 @@ export class UserController {
   }
 
   @Delete('/:login')
-//   @UseGuards()
+  //   @UseGuards()
   async delete(@Param('login') login: string) {
     if (!login) {
       return 'No value inserted';
