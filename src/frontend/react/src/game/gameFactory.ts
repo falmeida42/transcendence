@@ -25,6 +25,7 @@ const gameFactory = (
     paddleRight,
     paddleRightScore: 0,
     ball,
+    ballSide: "left",
   };
 };
 

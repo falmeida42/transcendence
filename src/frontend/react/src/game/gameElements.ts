@@ -7,4 +7,5 @@ export default interface gameElements {
   paddleRight: Paddle;
   paddleRightScore: number;
   ball: Ball;
+  ballSide: string;
 }

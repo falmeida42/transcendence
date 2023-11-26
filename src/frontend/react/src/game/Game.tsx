@@ -28,9 +28,32 @@ const gameUpdate = (
   setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
   setScoreRight: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  if (keysPressed[" "]) {
-    gameElements.ball.velocity.x = 5;
-    gameElements.ball.velocity.y = 5;
+  if (keysPressed[" "] && gameElements.ball.velocity.x === 0) {
+    let choice = Math.round(Math.random());
+    if (gameElements.ballSide === "right") {
+      if (choice === 0) {
+        gameElements.ball.velocity.x = 5;
+        gameElements.ball.velocity.y = 5;
+      } else {
+        gameElements.ball.velocity.x = 5;
+        gameElements.ball.velocity.y = -5;
+      }
+    } else {
+      if (choice === 0) {
+        gameElements.ball.velocity.x = 5;
+        gameElements.ball.velocity.y = 5;
+      } else {
+        gameElements.ball.velocity.x = 5;
+        gameElements.ball.velocity.y = -5;
+      }
+      if (choice === 0) {
+        gameElements.ball.velocity.x = -5;
+        gameElements.ball.velocity.y = 5;
+      } else {
+        gameElements.ball.velocity.x = -5;
+        gameElements.ball.velocity.y = -5;
+      }
+    }
   }
   gameElements.ball.update();
   gameElements.paddleLeft.update(keysPressed, gameElements.ball);
@@ -39,10 +62,12 @@ const gameUpdate = (
   if (gameElements.ball.pos.x < 0) {
     gameElements.paddleRightScore += 1;
     setScoreRight(gameElements.paddleRightScore);
+    gameElements.ballSide = "left";
     resetGame(gameElements, canvasWidth, canvasHeight);
   } else if (gameElements.ball.pos.x > canvasWidth) {
     gameElements.paddleLeftScore += 1;
     setScoreLeft(gameElements.paddleLeftScore);
+    gameElements.ballSide = "right";
     resetGame(gameElements, canvasWidth, canvasHeight);
   }
 
