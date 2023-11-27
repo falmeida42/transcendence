@@ -1,34 +1,32 @@
-version: '3'
+version: "3"
 
 services:
-
-  # backend:
-  #   build: ./src/backend
-  #   restart: on-failure
-  #   volumes:
-  #     - ./src/backend/nest:/home/node/app
-  #   ports:
-  #     - "3000:3000"
-  #   container_name: backend
-  #   user: root
-  #   networks:
-  #     - transcendence
-
+  backend:
+    build: ./src/backend
+    restart: on-failure
+    volumes:
+      - ./src/backend/nest:/home/node/app
+    ports:
+      - "3000:3000"
+    container_name: backend
+    user: root
+    networks:
+      - transcendence
 
   frontend:
     build: ./src/frontend
     restart: on-failure
     volumes:
-    - ./src/frontend/react:/home/node/app
+      - ./src/frontend/react:/home/node/app
     ports:
       - 5173:5173
     container_name: frontend
-    # depends_on:
-    #   - backend
+    depends_on:
+      - backend
     user: root
     networks:
       - transcendence
 
 networks:
-    transcendence:
-      driver: bridge
+  transcendence:
+    driver: bridge
