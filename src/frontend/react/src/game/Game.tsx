@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Ball from "./Ball";
 import "./Game.css";
 import { ballPaddleCollision } from "./collision";
 import { draw, draw_field } from "./draw";
@@ -20,6 +21,33 @@ const resetGame = (
   gameElements.ball.velocity.y = 0;
 };
 
+const launchBall = (ball: Ball, ballSide: string) => {
+  let choice = Math.round(Math.random());
+  ball.velocity.y = choice === 0 ? 5 : -5;
+  ball.velocity.x = ballSide === "right" ? 5 : -5;
+};
+
+const score = (
+  whoScored: string,
+  gameElements: gameElements,
+  setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
+  setScoreRight: React.Dispatch<React.SetStateAction<number>>,
+  canvasWidth: number,
+  canvasHeight: number
+) => {
+  if (whoScored === "right") {
+    gameElements.paddleRightScore += 1;
+    setScoreRight(gameElements.paddleRightScore);
+    gameElements.ballSide = "left";
+    resetGame(gameElements, canvasWidth, canvasHeight);
+  } else {
+    gameElements.paddleLeftScore += 1;
+    setScoreLeft(gameElements.paddleLeftScore);
+    gameElements.ballSide = "right";
+    resetGame(gameElements, canvasWidth, canvasHeight);
+  }
+};
+
 const gameUpdate = (
   gameElements: gameElements,
   canvasWidth: number,
@@ -28,47 +56,32 @@ const gameUpdate = (
   setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
   setScoreRight: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  if (keysPressed[" "] && gameElements.ball.velocity.x === 0) {
-    let choice = Math.round(Math.random());
-    if (gameElements.ballSide === "right") {
-      if (choice === 0) {
-        gameElements.ball.velocity.x = 5;
-        gameElements.ball.velocity.y = 5;
-      } else {
-        gameElements.ball.velocity.x = 5;
-        gameElements.ball.velocity.y = -5;
-      }
-    } else {
-      if (choice === 0) {
-        gameElements.ball.velocity.x = 5;
-        gameElements.ball.velocity.y = 5;
-      } else {
-        gameElements.ball.velocity.x = 5;
-        gameElements.ball.velocity.y = -5;
-      }
-      if (choice === 0) {
-        gameElements.ball.velocity.x = -5;
-        gameElements.ball.velocity.y = 5;
-      } else {
-        gameElements.ball.velocity.x = -5;
-        gameElements.ball.velocity.y = -5;
-      }
-    }
-  }
+  if (keysPressed[" "] && gameElements.ball.velocity.x === 0)
+    launchBall(gameElements.ball, gameElements.ballSide);
+
   gameElements.ball.update();
   gameElements.paddleLeft.update(keysPressed, gameElements.ball);
   gameElements.paddleLeft.colisionWithWalls(canvasHeight);
   gameElements.ball.colisionWithWalls(canvasHeight);
+
   if (gameElements.ball.pos.x < 0) {
-    gameElements.paddleRightScore += 1;
-    setScoreRight(gameElements.paddleRightScore);
-    gameElements.ballSide = "left";
-    resetGame(gameElements, canvasWidth, canvasHeight);
+    score(
+      "right",
+      gameElements,
+      setScoreLeft,
+      setScoreRight,
+      canvasWidth,
+      canvasHeight
+    );
   } else if (gameElements.ball.pos.x > canvasWidth) {
-    gameElements.paddleLeftScore += 1;
-    setScoreLeft(gameElements.paddleLeftScore);
-    gameElements.ballSide = "right";
-    resetGame(gameElements, canvasWidth, canvasHeight);
+    score(
+      "left",
+      gameElements,
+      setScoreLeft,
+      setScoreRight,
+      canvasWidth,
+      canvasHeight
+    );
   }
 
   gameElements.paddleRight.update(keysPressed, gameElements.ball);

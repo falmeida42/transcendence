@@ -4,8 +4,10 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { RoomsService } from './rooms.service';
 
 @WebSocketGateway({
+  namespace: 'room',
   cors: {
-    origin: '*',
+    origin: 'http://localhost:5173',
+    credentials: true,
   },
 })
 export class RoomsGateway {

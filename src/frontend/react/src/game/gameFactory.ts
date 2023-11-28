@@ -9,15 +9,15 @@ const gameFactory = (
   ballPos: Vec2,
   againstAi: Boolean
 ): gameElements => {
-  const paddleLeft = new Paddle(paddleLeftPos, { x: 5, y: 5 }, 20, 160, "left");
+  const paddleLeft = new Paddle(paddleLeftPos, { x: 5, y: 5 }, 15, 100, "left");
   const paddleRight = new Paddle(
     paddleRightPos,
     { x: 5, y: 5 },
-    20,
-    160,
+    15,
+    100,
     againstAi ? "ai" : "right"
   );
-  const ball = new Ball(ballPos, 20, { x: 0, y: 0 });
+  const ball = new Ball(ballPos, 12, { x: 0, y: 0 });
 
   return {
     paddleLeft,
