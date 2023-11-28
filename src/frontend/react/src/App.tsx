@@ -4,11 +4,7 @@ import Game from "./game/Game";
 function App() {
   return (
     <div className="game">
-      <Game
-        width={window.innerWidth}
-        height={window.innerHeight}
-        againstAi={false}
-      />
+      <Game width={800} height={500} againstAi={false} />
     </div>
   );
 }
