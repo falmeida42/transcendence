@@ -1,17 +1,16 @@
 import Message from "./Message";
 import { useState, useEffect } from "react";
 import { socketConnection } from "../../ChatPage";
-import { v4 as uuid } from "uuid";
 
 export interface MessageData {
   id: string;
   username: string;
-  text: string;
+  message: string;
 }
 
 export interface Payload {
   username: string;
-  text: string;
+  message: string;
 }
 
 const Messages = () => {
@@ -20,20 +19,20 @@ const Messages = () => {
   useEffect(() => {
     function receivedMessage(message: Payload) {
       const newMessage: MessageData = {
-        id: "123",
+        id: crypto.randomUUID(),
         username: message.username,
-        text: message.text,
+        message: message.message,
       };
 
+      console.log("real message: ", message)
       console.log("Message until set", newMessage);
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setMessages((prevMessages) => [...prevMessages, newMessage]); 
     }
 
     socketConnection.on("messageToClient", (message: Payload) => {
       console.log("Received message:", message);
       receivedMessage(message);
     });
-
     return () => {
       // Cleanup or disconnect logic (if needed)
     };
@@ -43,8 +42,8 @@ const Messages = () => {
 
   return (
     <div className="messages">
-      {messages.map((message, index) => (
-        <Message key={message.id} text={message.text} />
+      {messages.map((message) => (
+        <Message key={message.id} text={message.message} />
       ))}
     </div>
   );

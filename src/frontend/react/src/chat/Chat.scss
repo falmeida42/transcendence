@@ -1,23 +1,28 @@
 
 .chatPage {
-    height: 100vh;
     display: flex;
     align-items: end;
     justify-content: bottom;
+    height: fit-content;
+    width: fit-content;
+    position: absolute;
+    height: 45%;
+    width: 72%;
+    bottom: 0;
 
     .container {
         border: 1px solid white;
         border-radius: 10px;
-        width: 65%;
-        height: 80%;
         display: flex;
         overflow: hidden;
+        height: 100%;
+        width: 100%;
+        //visibility: hidden;
 
         .sidebar {
             flex: 1;
             background-color: dimgrey;
             cursor: pointer;
-
 
             .navbar {
                 display: flex;
@@ -35,8 +40,8 @@
 
                     img {
                         background-color: white;
-                        height: 24px;
-                        width: 24px;
+                        height: 30px;
+                        width: 30px;
                         border-radius: 50%;
                         object-fit: cover;
                     }
@@ -94,6 +99,7 @@
         .chat {
             flex: 2;
             background-color: lightgray;
+            // visibility: hidden; // esconde o chat
 
             .chatInfo{
                 height: 50px;
@@ -137,8 +143,8 @@
                         color: darkgray;
 
                         img{
-                            height: 40px;
-                            width: 40px;
+                            height: 60px;
+                            width: 60px;
                             border-radius: 50%;
                             object-fit: cover;
                         }
@@ -155,6 +161,7 @@
                             color: white;
                             padding: 10px;
                             border-radius: 0px 10px 10px 10px;
+                            height: 37px;
                             max-width: max-content;
                             margin: 0;
                         }
@@ -169,7 +176,10 @@
                                 background-color: white;
                                 color: #585858;
                                 padding: 10px;
+                                height: 37px;
                                 border-radius: 10px 0px 10px 10px;
+                                max-width: max-content;
+                                margin: 0;
                             }
                         }
                        

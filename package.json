@@ -2,5 +2,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.7"
   }
 }

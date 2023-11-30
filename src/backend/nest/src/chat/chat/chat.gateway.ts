@@ -10,8 +10,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('AppGateway');
 
-
-
   @SubscribeMessage('messageToServer')
   handleMessage(client: Socket, payload: Payload<string>): void {
     this.logger.log(`message received ${JSON.stringify(payload)}`)

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import Ball from "./Ball";
-import "./Game.css";
 import { ballPaddleCollision } from "./collision";
 import { draw, draw_field } from "./draw";
 import gameElements from "./gameElements";
 import gameFactory from "./gameFactory";
+import "./Game.scss"
 
 const resetGame = (
   gameElements: gameElements,
@@ -153,10 +153,12 @@ const Game: any = (props: any) => {
   }, [draw]);
 
   return (
-    <div>
-      <canvas ref={canvasRef} />
-      <h1 id="scoreLeft">{scoreLeft}</h1>
-      <h1 id="scoreRight">{scoreRight}</h1>
+    <div className="container">
+      <canvas className="myCanvas" ref={canvasRef} />
+      <div className="score">
+        <h1>{scoreLeft}</h1>
+        <h1>{scoreRight}</h1>
+      </div>
     </div>
   );
 };
