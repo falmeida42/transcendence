@@ -1,11 +1,7 @@
 import Sidebar from "./components/sidebar/Sidebar";
 import Chat from "./components/chat/Chat";
 import "./Chat.scss"
-import io from "socket.io-client";
 
-export const socketConnection = io("http://localhost:3000/chat", {
-  withCredentials: true
-});
 
 const ChatPage = () => {
     return(

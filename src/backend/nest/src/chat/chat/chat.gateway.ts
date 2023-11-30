@@ -3,7 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Payload } from '@prisma/client/runtime/library';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({namespace: 'chat', cors: {origin: 'http://localhost:5173', credentials: true}})
+@WebSocketGateway({namespace: '/', cors: {origin: 'http://localhost:5173', credentials: true}})
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() 
   server: Server;
@@ -13,7 +13,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('messageToServer')
   handleMessage(client: Socket, payload: Payload<string>): void {
     this.logger.log(`message received ${JSON.stringify(payload)}`)
-    this.server.emit('messageToClient', payload, client.id)
+    this.server.emit('messageToClient', payload, client.id.toString())
   }
 
   afterInit(server: Server) {

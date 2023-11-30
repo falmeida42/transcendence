@@ -7,11 +7,14 @@
     width: fit-content;
     position: absolute;
     height: 45%;
-    width: 72%;
+    // width: 72%;
+    // flex-grow: 1;
+    // min-width: 80vh;
+    // max_width: 200px;
     bottom: 0;
 
     .container {
-        border: 1px solid white;
+        // border: 1px solid white;
         border-radius: 10px;
         display: flex;
         overflow: hidden;
@@ -109,7 +112,7 @@
                 justify-content: space-between;
                 padding: 10px;
                 color: white;
-               
+                cursor: pointer;
                 
             }
 

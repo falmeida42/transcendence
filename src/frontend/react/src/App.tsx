@@ -2,7 +2,6 @@ import ChatPage from "./chat/ChatPage";
 import Game from "./game/Game";
 import "./App.scss"
 
-
 function App() {
   return (
     <div className="app">
