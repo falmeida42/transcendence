@@ -39,7 +39,7 @@ services:
     container_name: database
     restart: on-failure
     networks:
-      - db
+      - transcendence
     env_file:
       - .env
       - ./src/backend/nest/.env
@@ -53,6 +53,4 @@ services:
 
 networks:
   transcendence:
-    driver: bridge
-  db:
     driver: bridge

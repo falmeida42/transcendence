@@ -7,4 +7,6 @@ npx prisma generate
 
 npm i cors
 
+npx prisma migrate deploy
+
 exec "$@"
