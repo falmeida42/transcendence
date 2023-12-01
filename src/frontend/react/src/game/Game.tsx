@@ -48,6 +48,33 @@ const score = (
   }
 };
 
+const launchBall = (ball: Ball, ballSide: string) => {
+  const choice = Math.round(Math.random());
+  ball.velocity.y = choice === 0 ? 5 : -5;
+  ball.velocity.x = ballSide === "right" ? 5 : -5;
+};
+
+const score = (
+  whoScored: string,
+  gameElements: gameElements,
+  setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
+  setScoreRight: React.Dispatch<React.SetStateAction<number>>,
+  canvasWidth: number,
+  canvasHeight: number
+) => {
+  if (whoScored === "right") {
+    gameElements.paddleRightScore += 1;
+    setScoreRight(gameElements.paddleRightScore);
+    gameElements.ballSide = "left";
+    resetGame(gameElements, canvasWidth, canvasHeight);
+  } else {
+    gameElements.paddleLeftScore += 1;
+    setScoreLeft(gameElements.paddleLeftScore);
+    gameElements.ballSide = "right";
+    resetGame(gameElements, canvasWidth, canvasHeight);
+  }
+};
+
 const gameUpdate = (
   gameElements: gameElements,
   canvasWidth: number,
