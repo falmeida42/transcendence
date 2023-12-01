@@ -5,7 +5,8 @@ import { UserDto } from './dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
+  // For testing purposes
+  async getUser() {
     return this.prisma.user.findMany();
   }
 

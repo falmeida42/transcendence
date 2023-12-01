@@ -14,9 +14,7 @@ export class PrismaService extends PrismaClient {
     });
   }
 
-  async getAll() {}
-
-  async getUserById(id: number) {
-    console.log(id);
+  clean() {
+    // TODO: clean db
   }
 }

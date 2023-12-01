@@ -1,10 +1,12 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UserDto } from 'src/user/dto';
+import { AuthDto } from './dto/auth.dto';
 import { UserService } from 'src/user/user.service';
+import { FTStrategy } from './strategy/auth.strategy';
 
 @Injectable()
 export class AuthService {
-  constructor(private user: UserService) {}
+  constructor(private user: UserService, private strategy: FTStrategy) {}
 
   async signup(dto: UserDto) {
     const user = await this.user.create({
@@ -23,6 +25,6 @@ export class AuthService {
 
     if (!user) throw new ForbiddenException('Invalid user');
 
-    // ...
+    // TODO: ...
   }
 }
