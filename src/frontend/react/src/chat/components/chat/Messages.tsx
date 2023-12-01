@@ -1,6 +1,6 @@
+import { socketIoRef } from "../../../network/SocketConnection";
 import Message from "./Message";
 import { useState, useEffect } from "react";
-import { socketConnection } from "../../../network/SocketConnection";
 
 export interface MessageData {
   id: string;
@@ -17,7 +17,7 @@ export interface Payload {
 }
 
 function fetchMessageData(setMessages: React.Dispatch<React.SetStateAction<MessageData[]>>) {
-  socketConnection.on("messageToClient", (message: Payload, socketId: string) => {
+  socketIoRef.current.on("messageToClient", (message: Payload, socketId: string) => {
     console.log("Received message:", message);
     receivedMessage(message, socketId, setMessages);
   })
