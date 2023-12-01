@@ -22,7 +22,7 @@ const resetGame = (
 };
 
 const launchBall = (ball: Ball, ballSide: string) => {
-  let choice = Math.round(Math.random());
+  const choice = Math.round(Math.random());
   ball.velocity.y = choice === 0 ? 5 : -5;
   ball.velocity.x = ballSide === "right" ? 5 : -5;
 };
@@ -90,12 +90,12 @@ const gameUpdate = (
   ballPaddleCollision(gameElements.ball, gameElements.paddleRight);
 };
 
-const Game: any = (props: any) => {
+const Game = (props: any) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const width = Number(props.width);
   const height = Number(props.height);
-  let [scoreLeft, setScoreLeft] = useState(0);
-  let [scoreRight, setScoreRight] = useState(0);
+  const [scoreLeft, setScoreLeft] = useState(0);
+  const [scoreRight, setScoreRight] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -123,13 +123,9 @@ const Game: any = (props: any) => {
       " ": false,
     };
 
-    window.addEventListener("keydown", (e) => {
-      keysPressed[e.key] = true;
-    });
+    window.addEventListener("keydown", (e) => (keysPressed[e.key] = true));
 
-    window.addEventListener("keyup", (e) => {
-      keysPressed[e.key] = false;
-    });
+    window.addEventListener("keyup", (e) => (keysPressed[e.key] = false));
 
     const gameLoop = () => {
       // ctx.clearRect(0, 0, canvas.width, canvas.height);

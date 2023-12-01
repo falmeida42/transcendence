@@ -7,7 +7,7 @@ const gameFactory = (
   paddleLeftPos: Vec2,
   paddleRightPos: Vec2,
   ballPos: Vec2,
-  againstAi: Boolean
+  againstAi: boolean
 ): gameElements => {
   const paddleLeft = new Paddle(paddleLeftPos, { x: 5, y: 5 }, 15, 100, "left");
   const paddleRight = new Paddle(
