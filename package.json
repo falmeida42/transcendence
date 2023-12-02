@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@nestjs/websockets": "^10.2.10",
     "cors": "^2.8.5",
+    "socket.io": "^4.7.2",
     "socket.io-client": "^2.5.0",
     "uuid": "^9.0.1"
   },

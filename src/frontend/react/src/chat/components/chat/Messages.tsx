@@ -7,7 +7,6 @@ export interface MessageData {
   username: string;
   userImage: string;
   message: string;
-  socketId: string
 }
 
 export interface Payload {
@@ -17,20 +16,19 @@ export interface Payload {
 }
 
 function fetchMessageData(setMessages: React.Dispatch<React.SetStateAction<MessageData[]>>) {
-  socketIoRef.current.on("messageToClient", (message: Payload, socketId: string) => {
+  socketIoRef.current.on("messageToClient", (message: Payload) => {
     console.log("Received message:", message);
-    receivedMessage(message, socketId, setMessages);
+    receivedMessage(message, setMessages);
   })
   
 };
 
-function receivedMessage(message: Payload, socketId: string, setMessages: React.Dispatch<React.SetStateAction<MessageData[]>>) {
+function receivedMessage(message: Payload, setMessages: React.Dispatch<React.SetStateAction<MessageData[]>>) {
   const newMessage: MessageData = {
     id: crypto.randomUUID(),
     username: message.username,
     userImage: message.userImage,
     message: message.message,
-    socketId: socketId
   };
 
   console.log("Message until set", newMessage);
@@ -54,7 +52,7 @@ const Messages = () => {
   return (
     <div className="messages">
       {messages.map((message) => (
-        <Message key={message.id} text={message.message} imageContent={message.userImage} socketId={message.socketId}/>
+        <Message key={message.id} username={message.username} text={message.message} imageContent={message.userImage}/>
       ))}
     </div>
   );
