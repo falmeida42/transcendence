@@ -24,10 +24,10 @@ export class AuthController {
     return;
   }
 
-  // For testing purposes
   @UseGuards(FTGuard)
   @Get('intra-clbk')
-  callbackIntra(@Req() req: any, @Res() res: any) {
-    return res.json('OLA');
+  callbackIntra(@Req() req: any): any {
+    console.log(req.user);
+    return req.user;
   }
 }

@@ -13,6 +13,7 @@ export class AuthService {
       id: dto.id,
       email: dto.email,
       login: dto.login,
+      image: dto.image,
       username: dto.username,
       first_name: dto.first_name,
       last_name: dto.last_name,

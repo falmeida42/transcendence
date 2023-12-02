@@ -23,7 +23,7 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
     profile: Profile,
   ): Promise<any> {
 
-  const user = await this.userServ.getUserById(Number(profile.id));
+  const user = await this.userServ.getUserById(profile.id);
 
   if (user) {
       return user;
@@ -33,6 +33,7 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       id: profile.id,
       email: profile._json.email,
       login: profile._json.login,
+      image: profile._json.image.link,
       first_name: profile._json.first_name,
       last_name: profile._json.last_name,
       username: 'placeholder',
@@ -40,6 +41,8 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
 
     console.log(newUser);
 
-    return true;
+    const savedUser = this.userServ.create(newUser);
+
+    return savedUser;
   }
 }
