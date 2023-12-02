@@ -15,6 +15,9 @@ services:
       - ./src/backend/nest/.env
     environment:
       - DATABASE_URL
+      - INTRA_CLIENT_ID
+      - INTRA_CLIENT_SECRET
+      - INTRA_CALLBACK_URL
     networks:
       - transcendence
     depends_on:
