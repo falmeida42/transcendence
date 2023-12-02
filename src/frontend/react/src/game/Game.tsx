@@ -48,37 +48,11 @@ const score = (
   }
 };
 
-const launchBall = (ball: Ball, ballSide: string) => {
-  const choice = Math.round(Math.random());
-  ball.velocity.y = choice === 0 ? 5 : -5;
-  ball.velocity.x = ballSide === "right" ? 5 : -5;
-};
-
-const score = (
-  whoScored: string,
-  gameElements: gameElements,
-  setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
-  setScoreRight: React.Dispatch<React.SetStateAction<number>>,
-  canvasWidth: number,
-  canvasHeight: number
-) => {
-  if (whoScored === "right") {
-    gameElements.paddleRightScore += 1;
-    setScoreRight(gameElements.paddleRightScore);
-    gameElements.ballSide = "left";
-    resetGame(gameElements, canvasWidth, canvasHeight);
-  } else {
-    gameElements.paddleLeftScore += 1;
-    setScoreLeft(gameElements.paddleLeftScore);
-    gameElements.ballSide = "right";
-    resetGame(gameElements, canvasWidth, canvasHeight);
-  }
-};
-
 const gameUpdate = (
   gameElements: gameElements,
   canvasWidth: number,
   canvasHeight: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   keysPressed: any,
   setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
   setScoreRight: React.Dispatch<React.SetStateAction<number>>
@@ -117,6 +91,7 @@ const gameUpdate = (
   ballPaddleCollision(gameElements.ball, gameElements.paddleRight);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Game = (props: any) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const width = Number(props.width);
@@ -142,6 +117,7 @@ const Game = (props: any) => {
       props.againstAi
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const keysPressed: any = {
       ArrowUp: false,
       ArrowDown: false,
@@ -173,7 +149,8 @@ const Game = (props: any) => {
     gameLoop();
 
     return () => window.cancelAnimationFrame(animationId);
-  }, [draw]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [height, props.againstAi, width, draw]);
 
   return (
     <div>
