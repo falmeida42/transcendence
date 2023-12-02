@@ -7,7 +7,9 @@ const gameFactory = (
   paddleLeftPos: Vec2,
   paddleRightPos: Vec2,
   ballPos: Vec2,
-  againstAi: boolean
+  againstAi: boolean,
+  leftScore: number,
+  rightScore: number
 ): gameElements => {
   const paddleLeft = new Paddle(paddleLeftPos, { x: 5, y: 5 }, 15, 100, "left");
   const paddleRight = new Paddle(
@@ -21,9 +23,9 @@ const gameFactory = (
 
   return {
     paddleLeft,
-    paddleLeftScore: 0,
+    paddleLeftScore: leftScore,
     paddleRight,
-    paddleRightScore: 0,
+    paddleRightScore: rightScore,
     ball,
     ballSide: "left",
   };

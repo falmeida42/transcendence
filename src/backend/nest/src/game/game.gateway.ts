@@ -15,6 +15,7 @@ import { GameService } from './game.service';
   namespace: '/game',
   cors: {
     origin: 'http://localhost:5173',
+    credentials: true,
   },
 })
 export class GameGateway
@@ -25,10 +26,9 @@ export class GameGateway
 
   constructor(private readonly gameService: GameService) {}
 
-  @SubscribeMessage('msgToServer')
+  @SubscribeMessage('Score')
   handleMessage(@ConnectedSocket() client: Socket, payload: string) {
     this.logger.log(payload);
-    this.server.emit('msgToClient', payload, client.id);
   }
 
   afterInit(server: Server) {

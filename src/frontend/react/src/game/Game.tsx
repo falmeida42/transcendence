@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Ball from "./Ball";
 import "./Game.css";
 import { ballPaddleCollision } from "./collision";
-import { draw, draw_field } from "./draw";
+import { draw, draw_field, draw_score } from "./draw";
 import gameElements from "./gameElements";
 import gameFactory from "./gameFactory";
 
@@ -114,7 +114,9 @@ const Game = (props: any) => {
       { x: 5, y: height / 2 },
       { x: width - 25, y: height / 2 },
       { x: width / 2, y: height / 2 },
-      props.againstAi
+      props.againstAi,
+      scoreLeft,
+      scoreRight
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,11 +133,17 @@ const Game = (props: any) => {
     window.addEventListener("keyup", (e) => (keysPressed[e.key] = false));
 
     const gameLoop = () => {
-      // ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // ctx.clearRect(0, 0, width, height);
       draw_field(ctx, width, height);
       ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
       ctx.fillRect(0, 0, width, height);
       draw(ctx, gameElements);
+      draw_score(
+        gameElements.paddleLeftScore,
+        gameElements.paddleRightScore,
+        ctx,
+        width
+      );
       gameUpdate(
         gameElements,
         width,
@@ -152,13 +160,7 @@ const Game = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height, props.againstAi, width, draw]);
 
-  return (
-    <div>
-      <canvas ref={canvasRef} />
-      <h1 id="scoreLeft">{scoreLeft}</h1>
-      <h1 id="scoreRight">{scoreRight}</h1>
-    </div>
-  );
+  return <canvas ref={canvasRef} />;
 };
 
 export default Game;
