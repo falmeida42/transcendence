@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get('/home')
   get42(@Res() res: Response): string {
     const responseWellcome = this.appService.get42();
     res.send(responseWellcome);

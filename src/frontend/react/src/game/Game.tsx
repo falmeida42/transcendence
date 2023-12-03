@@ -91,8 +91,13 @@ const gameUpdate = (
   ballPaddleCollision(gameElements.ball, gameElements.paddleRight);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Game = (props: any) => {
+type gameProps = {
+  width: number;
+  height: number;
+  againstAi: boolean;
+};
+
+const Game = (props: gameProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const width = Number(props.width);
   const height = Number(props.height);
@@ -119,8 +124,7 @@ const Game = (props: any) => {
       scoreRight
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const keysPressed: any = {
+    const keysPressed: { [index: string]: boolean } = {
       ArrowUp: false,
       ArrowDown: false,
       w: false,
