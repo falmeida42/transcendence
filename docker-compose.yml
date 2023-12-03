@@ -13,11 +13,6 @@ services:
     user: root
     env_file:
       - ./src/backend/nest/.env
-    environment:
-      - DATABASE_URL
-      - INTRA_CLIENT_ID
-      - INTRA_CLIENT_SECRET
-      - INTRA_CALLBACK_URL
     networks:
       - transcendence
     depends_on:
@@ -38,21 +33,15 @@ services:
       - transcendence
 
   database:
-    image: postgres:latest
+    image: postgres:13
     container_name: database
     restart: on-failure
     networks:
       - transcendence
     env_file:
-      - .env
       - ./src/backend/nest/.env
-    environment:
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - DATABASE_URL
     ports:
-      - "5432:5432"
+      - 5432:5432
 
 networks:
   transcendence:
