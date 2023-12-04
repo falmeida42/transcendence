@@ -2,15 +2,15 @@ import { useState } from "react";
 
 interface chatProps {
   sendMessage: (message: string) => void;
+  messages: string;
 }
 
 export const Chat = (props: chatProps) => {
-  const [messages, setMessages] = useState("");
   const [messageToSend, setMessageToSend] = useState("");
 
   return (
     <div style={{ flex: 1 }}>
-      <div>{messages}</div>
+      <div style={{ whiteSpace: "pre-wrap" }}>{props.messages}</div>
       <input
         type="text"
         value={messageToSend}

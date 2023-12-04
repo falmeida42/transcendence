@@ -36,7 +36,8 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody('message') message: string,
   ) {
-    this.logger.log(message);
+    const player = this.game.players[client.id];
+    this.server.emit('receiveMessage', `${player.name}: ${message}\n\n`);
   }
 
   afterInit(server: Server) {
@@ -48,10 +49,15 @@ export class GameGateway
     const name = `player_${client.id.substring(0, 5)}`;
     this.game.players[client.id] = { name };
     this.server.emit('PlayerUpdate', this.game.players);
+    this.server.emit('receiveMessage', `${name}: connected!\n\n`);
     this.logger.log(this.game.players);
   }
 
   handleDisconnect(client: Socket) {
+    this.server.emit(
+      'receiveMessage',
+      `${this.game.players[client.id].name}: disconnected!\n\n`,
+    );
     delete this.game.players[client.id];
     this.server.emit('PlayerUpdate', this.game.players);
     this.logger.log(`Client disconnected ${client.id}`);
