@@ -50,10 +50,10 @@ const Chats = () => {
 
     return (
         <div className="chats" onClick={toggleChatVisibility}>
-            {rooms.map((room) => (
-                <ChatInfo key={room.id} name={room.name} image={room.image}/>
-            ))
-
+            {
+                rooms.map((room) => (
+                    <ChatInfo key={room.id} name={room.name} image={room.image}/>
+                ))
             }
         </div>
     
