@@ -1,32 +1,30 @@
-import { Controller, Get, Param, Post, Body, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto';
+import { AuthenticationGuard} from '../auth/guard';
+
 
 @Controller('user')
 export class UserController {
-  constructor(private usersService: UserService) {}
+  constructor(private userService: UserService) {}
+
+  @Get()
+  @UseGuards(AuthenticationGuard)
+  async getUsers() {
+    return this.userService.getUsers();
+  }
 
   @Get('/:id')
-  async findById(@Param('id') id: number) {
-    return this.usersService.getUserById(id);
+  @UseGuards(AuthenticationGuard)
+  async findById(@Param('id') id: string) {
+    return this.userService.getUserById(id);
   }
 
-  @Post()
-  //   @UseGuards()
-  async create(@Body() user: UserDto) {
-    if (!user) {
-      return 'No value inserted';
-    }
-    console.log(user);
-    return this.usersService.create(user);
-  }
-
-  @Delete('/:login')
-  //   @UseGuards()
+  @Delete('/login')
+  @UseGuards(AuthenticationGuard)
   async delete(@Param('login') login: string) {
     if (!login) {
       return 'No value inserted';
     }
-    return this.usersService.delete(login);
+    return this.userService.delete(login);
   }
 }

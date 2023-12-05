@@ -1,22 +1,10 @@
-import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDto } from 'src/user/dto';
-import { AuthDto } from './dto/auth.dto';
-import { FTGuard } from './strategy';
+import { FTGuard } from '../auth/guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-
-  @Post('signup')
-  signup(@Body() dto: UserDto) {
-    return this.authService.signup(dto);
-  }
-
-  // @Post('login')
-  // login(@Body() dto: UserDto) {
-  //   return this.authService.login(dto);
-  // }
 
   @UseGuards(FTGuard)
   @Get('login')
@@ -27,6 +15,7 @@ export class AuthController {
   @UseGuards(FTGuard)
   @Get('intra-clbk')
   callbackIntra(@Req() req: any): any {
+    console.log('Request user:');
     console.log(req.user);
     return req.user;
   }

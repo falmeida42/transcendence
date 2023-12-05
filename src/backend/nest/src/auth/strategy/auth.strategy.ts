@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-42';
-import { UserDto } from 'src/user/dto';
-import { UserService } from 'src/user/user.service';
+import { UserDto } from '../../user/dto';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class FTStrategy extends PassportStrategy(Strategy, '42') {
@@ -12,8 +12,6 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       clientID: config.get('INTRA_CLIENT_ID'),
       clientSecret: config.get('INTRA_CLIENT_SECRET'),
       callbackURL: config.get('INTRA_CALLBACK_URL'),
-      tokenURL: 'https://api.intra.42.fr/oauth/token',
-      authorizationURL: 'https://api.intra.42.fr/oauth/authorize',
     });
   }
 
@@ -22,10 +20,9 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
     refreshToken: string,
     profile: Profile,
   ): Promise<any> {
+    const user = await this.userServ.getUserById(profile.id);
 
-  const user = await this.userServ.getUserById(profile.id);
-
-  if (user) {
+    if (user) {
       return user;
     }
 
