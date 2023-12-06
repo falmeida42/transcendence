@@ -8,8 +8,8 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
     AuthModule,
     UserModule,
   ],
