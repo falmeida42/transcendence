@@ -33,7 +33,7 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       image: profile._json.image.link,
       first_name: profile._json.first_name,
       last_name: profile._json.last_name,
-      username: 'placeholder',
+      username: profile._json.login,
     };
 
     console.log(newUser);
