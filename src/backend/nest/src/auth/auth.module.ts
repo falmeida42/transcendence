@@ -8,7 +8,11 @@ import { SessionSerializer } from './strategy';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [PrismaModule, UserModule, PassportModule.register({ session: true })],
+  imports: [
+    PrismaModule,
+    UserModule,
+    PassportModule.register({ session: true }),
+  ],
   providers: [AuthService, FTStrategy, SessionSerializer],
   controllers: [AuthController],
 })

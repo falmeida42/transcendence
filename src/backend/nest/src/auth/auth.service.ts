@@ -1,37 +1,35 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { UserDto } from '../user/dto';
+import { Injectable } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
-import { UserService } from '../user/user.service';
-import { FTStrategy } from './strategy/auth.strategy';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private user: UserService, private strategy: FTStrategy) {}
+  constructor(private prisma: PrismaService) {}
 
-  async signup(dto: UserDto) {
+  async signup(dto: AuthDto) {
     try {
-      const user = await this.user.create({
-        id: dto.id,
-        email: dto.email,
-        login: dto.login,
-        image: dto.image,
-        username: dto.username,
-        first_name: dto.first_name,
-        last_name: dto.last_name,
+      const user = this.prisma.user.findUnique({ where: { login: dto.login } });
+
+      if (user) {
+        return user;
+      }
+
+      const newUser = await this.prisma.user.create({
+        data: {
+          id: dto.id,
+          email: dto.email,
+          login: dto.login,
+          image: dto.image,
+          username: dto.username,
+          first_name: dto.first_name,
+          last_name: dto.last_name,
+        },
       });
-      console.log(user);
-      return user;
+      console.log('New user: ', newUser);
+      return newUser;
     } catch (error) {
       console.error(error);
     }
     return null;
-  }
-
-  async login(dto: UserDto) {
-    const user = await this.user.getUserByLogin(dto.login);
-
-    if (!user) throw new ForbiddenException('Invalid user');
-
-    // TODO: ...
   }
 }

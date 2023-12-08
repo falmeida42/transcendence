@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-42';
-import { UserDto } from '../../user/dto';
-import { UserService } from '../../user/user.service';
+import { AuthDto } from '../dto';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class FTStrategy extends PassportStrategy(Strategy, '42') {
-  constructor(private userServ: UserService, config: ConfigService) {
+  constructor(
+    private authService: AuthService,
+    config: ConfigService,
+  ) {
     super({
       clientID: config.get('INTRA_CLIENT_ID'),
       clientSecret: config.get('INTRA_CLIENT_SECRET'),
@@ -19,14 +22,8 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-  ): Promise<any> {
-    const user = await this.userServ.getUserById(profile.id);
-
-    if (user) {
-      return user;
-    }
-
-    const newUser: UserDto = {
+  ): Promise<any | null> {
+    const dto: AuthDto = {
       id: profile.id,
       email: profile._json.email,
       login: profile._json.login,
@@ -36,10 +33,8 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       username: profile._json.login,
     };
 
-    console.log(newUser);
+    const user = await this.authService.signup(dto);
 
-    const savedUser = this.userServ.create(newUser);
-
-    return savedUser;
+    return user;
   }
 }
