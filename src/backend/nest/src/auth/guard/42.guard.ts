@@ -7,7 +7,9 @@ export class FTGuard extends AuthGuard('42') {
     try {
       const result = (await super.canActivate(context)) as boolean;
       const request = context.switchToHttp().getRequest();
+
       await super.logIn(request);
+
       return result;
     } catch (error) {
       console.log(error);

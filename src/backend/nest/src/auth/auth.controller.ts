@@ -1,6 +1,7 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { FTGuard } from '../auth/guard';
+import { FTGuard, JwtAuthGuard } from '../auth/guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
@@ -8,15 +9,20 @@ export class AuthController {
 
   @UseGuards(FTGuard)
   @Get('login')
-  login() {
-    return;
-  }
+  login() {}
 
   @UseGuards(FTGuard)
   @Get('intra-clbk')
-  callbackIntra(@Req() req: any): any {
-    console.log('Request user:');
-    console.log(req.user);
-    return req.user;
+  callbackIntra(@Req() req: any, @Res() res: any): any {
+    console.log('Request user:', req.user);
+    return res.redirect(process.env.FRONTEND_URL);
   }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('logout')
+  // logout(@Req() req: any) {
+  //   // TODO: validate user token
+  //   req.logout();
+  //   return 'Logged out successfully';
+  // }
 }

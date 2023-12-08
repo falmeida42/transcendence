@@ -33,8 +33,8 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       username: profile._json.login,
     };
 
-    const user = await this.authService.signup(dto);
+    await this.authService.signup(dto);
 
-    return user;
+    return dto;
   }
 }

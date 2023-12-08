@@ -17,12 +17,4 @@ export class PrismaService extends PrismaClient {
       console.error('Error initializing PrismaClient', error);
     }
   }
-
-  async onModuleDestroy() {
-    await this.$disconnect();
-  }
-
-  clean() {
-    // TODO: clean db
-  }
 }

@@ -1,10 +1,11 @@
-import { IsDataURI, IsOptional, IsString } from 'class-validator';
+import { IsDataURI, IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class AuthDto {
   @IsString()
   id: string;
 
   @IsString()
+  @IsEmail()
   email: string;
 
   @IsString()
