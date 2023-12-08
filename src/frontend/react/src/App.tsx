@@ -1,15 +1,20 @@
 import "./App.css";
 import Game from "./game/Game";
-import Topbar from './Topbar.tsx'
+import Topbar from './Topbar.tsx';
+import Sidebar from "./Sidebar";
 
 
 function App() {
   return (
-	  <div className="game">
+	  <div>
+		<Sidebar/>
 		<Topbar />
-      <Game width={800} height={500} againstAi={true} />
-    </div>
-  );
+		<div className="game">
+   			<Game width={800} height={500} againstAi={true} />
+
+		</div>
+	  </div>
+	);
 }
 
 export default App;

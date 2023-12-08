@@ -1,6 +1,7 @@
 
 function Topbar() {
 	return (
+		<div id="content">
 		<div className="topbar">
 		<nav className="navbar navbar-expand-lg navbar-light">
 		  <div className="full">
@@ -60,6 +61,7 @@ function Topbar() {
 		  </div>
 		</nav>
 	  </div>	
+	</div>
 	);
 }
 

@@ -63,9 +63,9 @@
     2. import files
 -------------------------------------------------------------------*/
 
-@import url(css/animate.css);
-@import url(css/flaticon.css);
-@import url(css/font-awesome.min.css);
+@import url(./animate.css);
+@import url(./flaticon.css);
+@import url(./font-awesome.min.css);
 
 /*------------------------------------------------------------------
     3. basic
@@ -913,11 +913,11 @@ a[data-toggle="collapse"] {
 
 #content {
     width: 100%;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     transition: ease all 0.3s;
     position: relative;
-    padding: 60px 25px 25px 305px;
-    background: #f8f8f8;
+    /* padding: 60px 25px 25px 305px; */
+    background: #ffffff;
 }
 
 .page_title {
