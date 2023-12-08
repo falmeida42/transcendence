@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Ball from "./Ball";
 import "./Game.css";
 import { ballPaddleCollision } from "./collision";
-import { draw, draw_field } from "./draw";
+import { draw, draw_field, draw_score } from "./draw";
 import gameElements from "./gameElements";
 import gameFactory from "./gameFactory";
 
@@ -22,7 +22,7 @@ const resetGame = (
 };
 
 const launchBall = (ball: Ball, ballSide: string) => {
-  let choice = Math.round(Math.random());
+  const choice = Math.round(Math.random());
   ball.velocity.y = choice === 0 ? 5 : -5;
   ball.velocity.x = ballSide === "right" ? 5 : -5;
 };
@@ -52,6 +52,7 @@ const gameUpdate = (
   gameElements: gameElements,
   canvasWidth: number,
   canvasHeight: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   keysPressed: any,
   setScoreLeft: React.Dispatch<React.SetStateAction<number>>,
   setScoreRight: React.Dispatch<React.SetStateAction<number>>
@@ -90,12 +91,18 @@ const gameUpdate = (
   ballPaddleCollision(gameElements.ball, gameElements.paddleRight);
 };
 
-const Game: any = (props: any) => {
+type gameProps = {
+  width: number;
+  height: number;
+  againstAi: boolean;
+};
+
+const Game = (props: gameProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const width = Number(props.width);
   const height = Number(props.height);
-  let [scoreLeft, setScoreLeft] = useState(0);
-  let [scoreRight, setScoreRight] = useState(0);
+  const [scoreLeft, setScoreLeft] = useState(0);
+  const [scoreRight, setScoreRight] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -112,10 +119,12 @@ const Game: any = (props: any) => {
       { x: 5, y: height / 2 },
       { x: width - 25, y: height / 2 },
       { x: width / 2, y: height / 2 },
-      props.againstAi
+      props.againstAi,
+      scoreLeft,
+      scoreRight
     );
 
-    const keysPressed: any = {
+    const keysPressed: { [index: string]: boolean } = {
       ArrowUp: false,
       ArrowDown: false,
       w: false,
@@ -123,20 +132,22 @@ const Game: any = (props: any) => {
       " ": false,
     };
 
-    window.addEventListener("keydown", (e) => {
-      keysPressed[e.key] = true;
-    });
+    window.addEventListener("keydown", (e) => (keysPressed[e.key] = true));
 
-    window.addEventListener("keyup", (e) => {
-      keysPressed[e.key] = false;
-    });
+    window.addEventListener("keyup", (e) => (keysPressed[e.key] = false));
 
     const gameLoop = () => {
-      // ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // ctx.clearRect(0, 0, width, height);
       draw_field(ctx, width, height);
       ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
       ctx.fillRect(0, 0, width, height);
       draw(ctx, gameElements);
+      draw_score(
+        gameElements.paddleLeftScore,
+        gameElements.paddleRightScore,
+        ctx,
+        width
+      );
       gameUpdate(
         gameElements,
         width,
@@ -150,15 +161,10 @@ const Game: any = (props: any) => {
     gameLoop();
 
     return () => window.cancelAnimationFrame(animationId);
-  }, [draw]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [height, props.againstAi, width, draw]);
 
-  return (
-    <div>
-      <canvas ref={canvasRef} />
-      <h1 id="scoreLeft">{scoreLeft}</h1>
-      <h1 id="scoreRight">{scoreRight}</h1>
-    </div>
-  );
+  return <canvas ref={canvasRef} />;
 };
 
 export default Game;

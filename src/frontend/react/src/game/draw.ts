@@ -29,6 +29,18 @@ export const draw_field = (
   ctx.stroke();
 };
 
+export const draw_score = (
+  scoreLeft: number,
+  scoreRight: number,
+  ctx: CanvasRenderingContext2D,
+  windowWidth: number
+) => {
+  ctx.fillStyle = "white";
+  ctx.font = "30px Arial";
+  ctx.fillText(scoreLeft.toString(), windowWidth / 2 - 70, 50);
+  ctx.fillText(scoreRight.toString(), windowWidth / 2 + 50, 50);
+};
+
 export const draw = (
   ctx: CanvasRenderingContext2D,
   gameElements: gameElements

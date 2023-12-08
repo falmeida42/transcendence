@@ -2,8 +2,8 @@ import Ball from "./Ball";
 import Paddle from "./Paddle";
 
 export const ballPaddleCollision = (ball: Ball, paddle: Paddle) => {
-  let dx = Math.abs(ball.pos.x - paddle.getCenter().x);
-  let dy = Math.abs(ball.pos.y - paddle.getCenter().y);
+  const dx = Math.abs(ball.pos.x - paddle.getCenter().x);
+  const dy = Math.abs(ball.pos.y - paddle.getCenter().y);
 
   if (
     dx < ball.radius + paddle.getHalfWidth() &&
