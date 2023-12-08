@@ -1,10 +1,10 @@
 import "./App.css";
-import Game from "./game/Game";
+import Sidebar from "./Sidebar";
 
 function App() {
   return (
-    <div className="game">
-      <Game width={800} height={500} againstAi={false} />
+    <div>
+     <Sidebar/>
     </div>
   );
 }
