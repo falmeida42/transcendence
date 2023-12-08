@@ -2,13 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+import { ConfigService } from '@nestjs/config';
+
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private config: ConfigService,
+    private prisma: PrismaService,
+  ) {}
 
   async signup(dto: AuthDto) {
     try {
-      const user = this.prisma.user.findUnique({ where: { login: dto.login } });
+      const user = await this.prisma.user.findUnique({
+        where: { login: dto.login },
+      });
 
       if (user) {
         return user;
