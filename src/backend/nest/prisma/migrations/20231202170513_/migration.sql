@@ -1,8 +1,12 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "login" TEXT NOT NULL,
-    "name" TEXT,
+    "email" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
+    "first_name" TEXT,
+    "last_name" TEXT,
+    "username" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
