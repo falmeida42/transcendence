@@ -1,30 +1,42 @@
-import { Controller, Get, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Delete,
+  UseGuards,
+  Body,
+  Logger,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthenticationGuard} from '../auth/guard';
+import { JwtAuthGuard } from '../auth/guard';
 
-
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  private readonly logger = new Logger('UserController');
+
   @Get()
-  @UseGuards(AuthenticationGuard)
   async getUsers() {
     return this.userService.getUsers();
   }
 
   @Get('/:id')
-  @UseGuards(AuthenticationGuard)
   async findById(@Param('id') id: string) {
     return this.userService.getUserById(id);
   }
 
   @Delete('/login')
-  @UseGuards(AuthenticationGuard)
   async delete(@Param('login') login: string) {
     if (!login) {
       return 'No value inserted';
     }
     return this.userService.delete(login);
+  }
+
+  @Get('me')
+  async getMe(@Body() req: any) {
+    this.logger.log(req);
   }
 }
