@@ -1,7 +1,6 @@
 import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { FTGuard, JwtAuthGuard } from '../auth/guard';
-import { ConfigModule } from '@nestjs/config';
+import { FTGuard } from '../auth/guard';
 
 @Controller('auth')
 export class AuthController {
