@@ -980,6 +980,12 @@ a[data-toggle="collapse"] {
 }
 
 
+/** profile **/
+
+.middle-cont {
+	margin: 0 0 0 0;
+}
+
 /* Safari 4.0 - 8.0 */
 
 @-webkit-keyframes online {
