@@ -626,7 +626,7 @@ a:focus {
     width: 100%;
     padding-left: 280px;
     z-index: 3;
-    background: #00ff22;
+    background: #ffffff;
     top: 0;
     transition: ease all 0.3s;
     left: 0;
@@ -675,7 +675,7 @@ a:focus {
 }
 
 .icon_info ul li a {
-    color: #ee1515;
+    color: #bebebe;
     font-size: 18px;
     font-weight: normal;
 }
@@ -691,12 +691,12 @@ a:focus {
 .icon_info ul.user_profile_dd>li span {
     font-size: 13px;
     font-weight: 500;
-    color: #ffe600;
+    color: #61ff22;
     padding: 0 35px 0 10px;
 }
 
 .icon_info ul.user_profile_dd li>a::after {
-    color: #bbff00;
+    color: #bebebe;
     top: 13px;
     right: 28px;
     display: block;
@@ -720,7 +720,7 @@ a:focus {
 .icon_info ul.user_profile_dd>li {
     width: auto;
     border-radius: 0;
-    background: #22f8ff;
+    background: #bebebe;
     margin: 0;
     padding: 12px 0 12px 20px;
     height: auto;
@@ -728,9 +728,9 @@ a:focus {
 
 .sidebar_toggle {
     border: none;
-    padding: 14px 26px 14px;
+    padding: 16px 26px 14px;
     font-size: 21px;
-    background: #cb22ff;
+    background: #bebebe;
     margin-right: 0;
     cursor: pointer;
     float: left;
