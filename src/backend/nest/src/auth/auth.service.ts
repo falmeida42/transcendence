@@ -13,7 +13,6 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-
   private readonly logger = new Logger('AuthService');
 
   async signup(dto: AuthDto) {
@@ -37,6 +36,8 @@ export class AuthService {
           username: dto.username,
           first_name: dto.first_name,
           last_name: dto.last_name,
+          twoFactorAuthSecret: process.env.TWOFA_SECRET,
+          twoFactorEnabled: false,
         },
       });
       this.logger.log('New user: ', newUser);
