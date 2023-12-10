@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 // import { useItemStore } from "./itemStore.tsx";
 import { useHashStore } from "./hashStore.tsx";
 import { useEffect } from 'react';
+import Chat from "./Chat.tsx";
 
 
 function App() {

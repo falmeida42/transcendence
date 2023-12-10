@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "js/Chat.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
