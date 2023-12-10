@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 // import { useItemStore } from "./itemStore.tsx";
 import { useHashStore } from "./hashStore.tsx";
 import { useEffect } from 'react';
+import Profile from "./Profile.tsx";
 import Chat from "./Chat.tsx";
 
 
@@ -32,6 +33,16 @@ function App() {
 			{showHash === '#Game' && (
 			<div className="game">
 				<Game width={800} height={500} againstAi={true}/>
+			</div>)
+			}
+			{showHash === '#Profile' && (
+			<div className="game">
+				<Profile/>
+			</div>)
+			}
+			{showHash === '#Chat' && (
+			<div className="game">
+				<Chat/>
 			</div>)
 			}
 	</div>
