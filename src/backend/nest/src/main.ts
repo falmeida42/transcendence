@@ -13,7 +13,7 @@ async function bootstrap() {
     credentials: true,
   };
 
-  // // Session based authentication
+  // TODO: Session based authentication. Unused atm
   // app.use(
   //   session({
   //     secret: 'keyboard',
@@ -21,7 +21,7 @@ async function bootstrap() {
   //     saveUninitialized: false,
   //   }),
   // );
-  app.use(passport.initialize());
+  // app.use(passport.initialize());
   // app.use(passport.session());
 
   app.enableCors(corsOptions);

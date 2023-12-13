@@ -21,9 +21,8 @@ export class AuthService {
         where: { login: dto.login },
       });
 
-      const token = await this.signToken(Number(user.id), user.login);
-
       if (user) {
+        const token = await this.signToken(Number(user.id), user.login);
         return { token: token, user: user };
       }
 
@@ -36,13 +35,14 @@ export class AuthService {
           username: dto.username,
           first_name: dto.first_name,
           last_name: dto.last_name,
-          twoFactorAuthSecret: process.env.TWOFA_SECRET,
-          twoFactorEnabled: false,
         },
       });
       this.logger.log('New user: ', newUser);
 
-      return { token: token, user: user };
+      if (newUser) {
+        const token = await this.signToken(Number(newUser.id), newUser.login);
+        return { token: token, user: newUser };
+      }
     } catch (error) {
       this.logger.error(error);
     }
