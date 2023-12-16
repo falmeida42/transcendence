@@ -26,7 +26,8 @@ export class AuthController {
   @Get('intra-clbk')
   callbackIntra(@Req() req: any, @Res() res: any): any {
     this.logger.log('Request user:', req.user);
-    return res.redirect(process.env.FRONTEND_URL);
+    this.logger.log('Token:', req.user.access_token);
+    return res.redirect(`${process.env.FRONTEND_URL}/?token=${req.user.token}`);
   }
 
   // For testing purposes

@@ -6,10 +6,8 @@ import { UserModule } from '../user/user.module';
 import { FTStrategy } from './strategy/42.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
-import { JwtAuthGuard } from './guard';
-// Session based authentication
-import { SessionSerializer } from './strategy';
 import { PassportModule } from '@nestjs/passport';
+import { JwtAuthGuard } from './guard';
 
 @Module({
   imports: [
@@ -22,12 +20,7 @@ import { PassportModule } from '@nestjs/passport';
     PrismaModule,
     UserModule,
   ],
-  providers: [
-    AuthService,
-    FTStrategy,
-    JwtStrategy,
-    // SessionSerializer, // TODO: Session based authentication. Unused atm
-  ],
+  providers: [AuthService, FTStrategy, JwtStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })
