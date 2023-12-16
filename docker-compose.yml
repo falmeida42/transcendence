@@ -8,7 +8,8 @@ services:
     volumes:
       - ./src/backend/nest:/home/node/app
     ports:
-      - "3000:3000"
+      - 3000:3000
+      - 5555:5555
     container_name: backend
     user: root
     env_file:
