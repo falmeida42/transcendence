@@ -3,8 +3,8 @@ import {
   Get,
   Param,
   Delete,
+  Req,
   UseGuards,
-  Body,
   Logger,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -22,7 +22,16 @@ export class UserController {
     return this.userService.getUsers();
   }
 
-  @Get('/:id')
+  @Get('me')
+  async getMe(@Req() req: any) {
+    const logInfo = {
+      user: req.user, // Log only the user property
+    };
+    this.logger.debug(JSON.stringify(logInfo));
+    return this.findById(String(req.user.id));
+  }
+
+  @Get(':id')
   async findById(@Param('id') id: string) {
     return this.userService.getUserById(id);
   }
@@ -33,10 +42,5 @@ export class UserController {
       return 'No value inserted';
     }
     return this.userService.delete(login);
-  }
-
-  @Get('me')
-  async getMe(@Body() req: any) {
-    this.logger.log(req);
   }
 }
