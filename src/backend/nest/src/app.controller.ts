@@ -10,9 +10,8 @@ export class AppController {
     private readonly authServce: AuthService,
   ) {}
 
-  // @UseGuards(FTGuard)
-  // @Post('login')
-  // async login(@Req() req): any {
-  //   return 'Hi';
-  // }
+  @Get()
+  async getHome() {
+    return { Res: 'Success' };
+  }
 }

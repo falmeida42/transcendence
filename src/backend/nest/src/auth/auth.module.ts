@@ -7,7 +7,6 @@ import { FTStrategy } from './strategy/42.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { JwtAuthGuard } from './guard';
 
 @Module({
   imports: [
