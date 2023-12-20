@@ -1,5 +1,6 @@
 import "./App.css";
 import Pong from "./pong/components/Pong";
+import { GameProvider } from "./pong/components/contexts/gameContext";
 
 function App() {
   return (
@@ -7,7 +8,9 @@ function App() {
     //   <Game width={800} height={600} againstAi={false} />
     // </div>
     <div>
-      <Pong />
+      <GameProvider>
+        <Pong />
+      </GameProvider>
     </div>
   );
 }

@@ -1,12 +1,12 @@
-type PlayerListProps = {
+export interface PlayerListProps {
   players: { [index: string]: player };
-};
+}
 
 export interface player {
   name: string;
 }
 
-const PlayerList = (props: PlayerListProps) => {
+const PlayerList = (props: any) => {
   return (
     <div>
       {Object.keys(props.players).map((key) => (

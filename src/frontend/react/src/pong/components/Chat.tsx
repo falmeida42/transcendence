@@ -2,15 +2,26 @@ import { useState } from "react";
 
 interface chatProps {
   sendMessage: (message: string) => void;
-  messages: string;
+  messages: string[];
 }
 
 export const Chat = (props: chatProps) => {
   const [messageToSend, setMessageToSend] = useState("");
 
   return (
-    <div style={{ flex: 1 }}>
-      <div style={{ whiteSpace: "pre-wrap" }}>{props.messages}</div>
+    <div
+      style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <button>Criar Sala</button>
+      <div style={{ whiteSpace: "pre-wrap" }}>
+        {props.messages.join("\n\n")}
+      </div>
       <input
         type="text"
         value={messageToSend}

@@ -1,47 +1,26 @@
-import { useEffect, useState } from "react";
-import { Socket, io } from "socket.io-client";
+import { useContext } from "react";
 import { Chat } from "./Chat";
-import PlayerList, { player } from "./PlayerList";
+import PlayerList from "./PlayerList";
+import { GameContext, sendMessage } from "./contexts/gameContext";
 
-let socket: Socket;
 const Pong = () => {
-  const [players, setPlayers] = useState<{ [index: string]: player }>({});
-  const [messages, setMessages] = useState("");
-
-  useEffect(() => {
-    socket = io("http://localhost:3000/game");
-    socket.on("connect", () => {
-      console.log("Conectado!");
-    });
-  }, []);
-
-  useEffect(() => {
-    socket.on("PlayerUpdate", (players) => {
-      setPlayers(players);
-    });
-  }, [players]);
-  useEffect(() => {
-    socket.on("receiveMessage", (msg: string) => {
-      setMessages(messages + msg);
-    });
-  }, [messages]);
-
-  const sendMessage = (message: string) => {
-    socket.emit("sendMessage", { message });
-  };
+  const { isConnected, players, messages } = useContext(GameContext);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <PlayerList players={players} />
-      <Chat sendMessage={sendMessage} messages={messages} />
-    </div>
+    <>
+      {!isConnected && <div>Desconectado, conectando...</div>}
+      <div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          <PlayerList players={players} />
+          <Chat sendMessage={sendMessage} messages={messages} />
+        </div>
+      </div>
+    </>
   );
 };
 

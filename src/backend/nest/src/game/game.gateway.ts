@@ -27,6 +27,7 @@ export class GameGateway
   private logger: Logger = new Logger('GameGateway');
   private game = {
     players: {},
+    rooms: {},
   };
 
   constructor(private readonly gameService: GameService) {}
@@ -37,10 +38,32 @@ export class GameGateway
     @MessageBody('message') message: string,
   ) {
     const player = this.game.players[client.id];
-    this.server.emit('receiveMessage', `${player.name}: ${message}\n\n`);
+    this.server.emit('receiveMessage', `${player.name}: ${message}`);
   }
 
-  afterInit(server: Server) {
+  @SubscribeMessage('CreateRoom')
+  createRoom(@ConnectedSocket() client: Socket) {
+    client.join(client.id);
+
+    this.game.rooms[client.id] = {
+      player1: client.id,
+      player2: undefined,
+    };
+
+    this.game.players[client.id].room = client.id;
+    this.playersUpdate();
+    this.roomsUpdate();
+  }
+
+  roomsUpdate() {
+    this.server.emit('RoomsUpdate', this.game.rooms);
+  }
+
+  playersUpdate() {
+    this.server.emit('PlayerUpdate', this.game.players);
+  }
+
+  afterInit() {
     this.logger.log('init');
   }
 
@@ -48,18 +71,18 @@ export class GameGateway
     this.logger.log(`Client connected ${client.id}`);
     const name = `player_${client.id.substring(0, 5)}`;
     this.game.players[client.id] = { name };
-    this.server.emit('PlayerUpdate', this.game.players);
-    this.server.emit('receiveMessage', `${name}: connected!\n\n`);
+    this.playersUpdate;
+    this.server.emit('receiveMessage', `${name}: connected!`);
     this.logger.log(this.game.players);
   }
 
   handleDisconnect(client: Socket) {
     this.server.emit(
       'receiveMessage',
-      `${this.game.players[client.id].name}: disconnected!\n\n`,
+      `${this.game.players[client.id].name}: disconnected!`,
     );
     delete this.game.players[client.id];
-    this.server.emit('PlayerUpdate', this.game.players);
+    this.playersUpdate();
     this.logger.log(`Client disconnected ${client.id}`);
   }
 }
