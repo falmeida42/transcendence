@@ -3,17 +3,21 @@ import {
   Get,
   Param,
   Delete,
-  Req,
   UseGuards,
   Logger,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private prisma: PrismaService,
+  ) {}
 
   private readonly logger = new Logger('UserController');
 
@@ -36,11 +40,14 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
-  @Delete('/login')
+  @Delete(':login')
   async delete(@Param('login') login: string) {
-    if (!login) {
-      return 'No value inserted';
+    const user = await this.prisma.user.findUnique({ where: { login } });
+
+    if (!user) {
+      return 'User not found';
     }
-    return this.userService.delete(login);
+
+    return this.prisma.user.delete({ where: { login } });
   }
 }

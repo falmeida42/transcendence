@@ -11,11 +11,13 @@ datasource db {
 }
 
 model User {
-  id                  String  @id @default(uuid())
-  login               String  @unique
-  email               String?
-  image               String
-  first_name          String?
-  last_name           String?
-  username            String?
+  id                   String  @id @default(uuid())
+  login                String  @unique
+  email                String?
+  image                String
+  first_name           String?
+  last_name            String?
+  username             String?
+  twoFactorAuthSecret  String?
+  twoFactorAuthEnabled Boolean @default(false)
 }
