@@ -10,7 +10,6 @@ COPY script.sh /usr/local/bin/
 COPY nest/prisma ./prisma/
 
 RUN npx prisma migrate
-RUN npx prisma generate
 
 RUN chmod +x /usr/local/bin/script.sh
 
