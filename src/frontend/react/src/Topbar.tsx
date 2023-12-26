@@ -1,11 +1,15 @@
+import { usecollapseSidebar } from "./collapseSidebar.tsx";
 
-function Topbar() {
+const Topbar = () => {
+	
+	const { setOpen, isOpen } = usecollapseSidebar();
+
 	return (
 		<div id="content">
 		<div className="topbar">
 		<nav className="navbar navbar-expand-lg navbar-light">
 			<div className="full">
-			<button type="button" id="sidebarCollapse" className="sidebar_toggle" onKeyDown={(event) => {if(event.key===' '){event.preventDefault()}}}>
+			<button type="button" id="sidebarCollapse" className="sidebar_toggle" onClick={() => setOpen(!isOpen)} onKeyDown={(event) => {if(event.key===' '){event.preventDefault()}}}>
 				<i className="fa fa-bars"></i>
 			</button>
 			<div className="logo_section">

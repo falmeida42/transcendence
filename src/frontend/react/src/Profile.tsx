@@ -1,9 +1,6 @@
-import ProfilePage from "./boxes";
-
 function Profile() {
 	return (
 
-		// <ProfilePage/>
 		<div className="middle-cont">
 		<div className="container-fluid">
 		   <div className="row column1">

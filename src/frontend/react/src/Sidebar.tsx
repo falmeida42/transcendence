@@ -1,9 +1,12 @@
-// import { useHashStore } from "./hashStore";
-// import { useItemStore } from "./itemStore";
+import { usecollapseSidebar } from "./collapseSidebar.tsx";
 
-function Sidebar() {
+const Sidebar = () => {
+
+  const { isOpen } = usecollapseSidebar();
+
   return (
-    <nav id="sidebar">
+    <nav id="sidebar" className = {isOpen ? "" : "active"}>
+
       <div className="sidebar_blog_1">
         <div className="sidebar-header">
           <div className="logo_section">
@@ -63,6 +66,6 @@ function Sidebar() {
       </div>
     </nav>
   );
-}
+};
 
 export default Sidebar;
