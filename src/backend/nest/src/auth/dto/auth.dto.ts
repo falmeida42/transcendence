@@ -6,6 +6,7 @@ export class AuthDto {
 
   @IsString()
   @IsEmail()
+  @IsOptional()
   email: string;
 
   @IsString()
@@ -13,6 +14,7 @@ export class AuthDto {
 
   @IsString()
   @IsDataURI()
+  @IsOptional()
   image: string;
 
   @IsString()

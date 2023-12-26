@@ -15,6 +15,8 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       clientID: config.get('INTRA_CLIENT_ID'),
       clientSecret: config.get('INTRA_CLIENT_SECRET'),
       callbackURL: config.get('INTRA_CALLBACK_URL'),
+      passReqToCallback: false,
+      session: false,
     });
   }
 
@@ -33,8 +35,10 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       username: profile._json.login,
     };
 
-    await this.authService.signup(dto);
+    console.log(dto);
 
-    return dto;
+    const data = await this.authService.signup(dto);
+
+    return data;
   }
 }

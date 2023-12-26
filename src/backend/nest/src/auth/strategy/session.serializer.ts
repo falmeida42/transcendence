@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-// Session based authentication
+  // TODO: Session based authentication. Unused atm
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
   constructor(private prisma: PrismaService) {

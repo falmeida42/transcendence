@@ -5,7 +5,7 @@ export var socketIoRef: SocketIoReference.Socket;
 export var currentUsername: string | null;
 export var currentRoom: string | null;
 
-export const Mapping: React.FunctionComponent = () => {
+export const Connection: React.FunctionComponent = () => {
   
   socketIoRef = useRef<SocketIoReference.Socket>();
   useEffect(() => {

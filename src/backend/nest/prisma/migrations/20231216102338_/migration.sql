@@ -2,7 +2,7 @@
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "login" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
+    "email" TEXT,
     "image" TEXT NOT NULL,
     "first_name" TEXT,
     "last_name" TEXT,

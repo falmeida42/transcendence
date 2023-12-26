@@ -16,6 +16,7 @@ interface RoomData {
 }
 
 function fetchAvailableRooms(setRooms: React.Dispatch<React.SetStateAction<RoomData[]>>) {
+    console.log("fetch available rooms");
     socketIoRef.current.on("availableRooms", (rooms: Payload) => {
       console.log("Received message:", rooms);
       receivedRooms(rooms, setRooms);
