@@ -10,8 +10,6 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService } from './game.service';
-
 @WebSocketGateway({
   namespace: '/game',
   cors: {
@@ -34,7 +32,7 @@ export class GameGateway
     width: 580,
     height: 320,
   };
-  constructor(private readonly gameService: GameService) {}
+  constructor() {}
 
   @SubscribeMessage('SendMessage')
   handleMessage(

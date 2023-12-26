@@ -1,16 +1,18 @@
 import "./App.css";
-import Pong from "./pong/components/Pong";
-import { GameProvider } from "./pong/components/contexts/gameContext";
+import Home from "./realPong/Home";
+import { SocketProvider } from "./realPong/context/SocketContext";
 
 function App() {
   return (
-    // <div className="game">
-    //   <Game width={800} height={600} againstAi={false} />
+    // <div className="main-container">
+    //   <GameProvider>
+    //     <Pong />
+    //   </GameProvider>
     // </div>
-    <div className="main-container">
-      <GameProvider>
-        <Pong />
-      </GameProvider>
+    <div>
+      <SocketProvider>
+        <Home />
+      </SocketProvider>
     </div>
   );
 }

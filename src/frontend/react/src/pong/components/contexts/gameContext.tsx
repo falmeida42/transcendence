@@ -56,7 +56,8 @@ const initialState: state = {
   match: {},
 };
 
-const GameContext = React.createContext(initialState);
+const GameContext = React.createContext(initialState)
+
 const GameProvider = (props: any) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
