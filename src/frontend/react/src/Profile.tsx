@@ -1,5 +1,9 @@
+import ProfilePage from "./boxes";
+
 function Profile() {
 	return (
+
+		// <ProfilePage/>
 		<div className="middle-cont">
 		<div className="container-fluid">
 		   <div className="row column1">
@@ -26,28 +30,14 @@ function Profile() {
 									  </ul>
 								   </div>
 								   <div className="user_progress_bar">
-									  <div className="progress_bar">
-										 <span className="skill">Web Applications <span className="info_valume">85%</span></span>                   
-										 <div className="progress skill-bar ">
-											<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar">
-											</div>
-										 </div>
-										 <span className="skill">Website Design <span className="info_valume">78%</span></span>   
+									<h2>
+										 <span className="skill">Match results (wins | losses)<span className="info_valume"></span></span>                   
 										 <div className="progress skill-bar">
-											<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar">
+											<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style={{ width: '75%'}}> <h5 style={{textAlign: 'right', color: 'white', paddingRight: '4%', marginLeft: '-20px'}}>12</h5>
 											</div>
+											<h5 style={{lineHeight: "30px", paddingLeft: '3%', marginRight: '-39px'}}>3</h5 >
 										 </div>
-										 <span className="skill">Automation & Testing <span className="info_valume">47%</span></span>
-										 <div className="progress skill-bar">
-											<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar">
-											</div>
-										 </div>
-										 <span className="skill">UI / UX <span className="info_valume">65%</span></span>
-										 <div className="progress skill-bar">
-											<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar">
-											</div>
-										 </div>
-									  </div>
+									</h2>
 								   </div>
 								</div>
 							 </div>
@@ -56,9 +46,8 @@ function Profile() {
 								   <div className="tabbar">
 									  <nav>
 										 <div className="nav nav-tabs" id="nav-tab" role="tablist">
-											<a className="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#recent_activity" role="tab" aria-selected="true">Recent Activity</a>
-											<a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Projects Worked on</a>
-											<a className="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#profile_section" role="tab" aria-selected="false">Profile</a>
+											<a className="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#recent_activity" role="tab" aria-selected="true">Match History</a>
+											<a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a>
 										 </div>
 									  </nav>
 									  <div className="tab-content" id="nav-tabContent">
@@ -68,35 +57,45 @@ function Profile() {
 												  <li>
 													 <span><img src="images/layout_img/msg2.png" className="img-responsive" alt="#"></img></span>
 													 <span>
-													 <span className="name_user">Taison Jack</span>
-													 <span className="msg_user">Sed ut perspiciatis unde omnis.</span>
+													 <span className="name_user">Win against Taison Jack</span>
+													 <span className="msg_user">11-4</span>
 													 <span className="time_ago">12 min ago</span>
 													 </span>
 												  </li>
 												  <li>
 													 <span><img src="images/layout_img/msg3.png" className="img-responsive" alt="#"></img></span>
 													 <span>
-													 <span className="name_user">Mike John</span>
-													 <span className="msg_user">On the other hand, we denounce.</span>
+													 <span className="name_user">Loss against Mike John</span>
+													 <span className="msg_user">1-7</span>
 													 <span className="time_ago">12 min ago</span>
 													 </span>
 												  </li>
 											   </ul>
 											</div>
 										 </div>
-										 <div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-profile-tab">
-											<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et 
-											   quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos 
-											   qui ratione voluptatem sequi nesciunt.
-											</p>
-										 </div>
-										 <div className="tab-pane fade" id="profile_section" role="tabpanel" aria-labelledby="nav-contact-tab">
-											<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et 
-											   quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos 
-											   qui ratione voluptatem sequi nesciunt.
-											</p>
-										 </div>
-									  </div>
+										 <div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-home-tab">
+											<div className="msg_list_main">
+											   <ul className="msg_list">
+												  <li>
+													 <span><img src="images/layout_img/msg2.png" className="img-responsive" alt="#"></img></span>
+													 <span>
+													 <span className="name_user">Taison Jack</span>
+													 <span className="msg_user">Friend since: 1914</span>
+													 <span className="time_ago">online: 12 min ago</span>
+													 </span>
+												  </li>
+												  <li>
+													 <span><img src="images/layout_img/msg3.png" className="img-responsive" alt="#"></img></span>
+													 <span>
+													 <span className="name_user">Mike John</span>
+													 <span className="msg_user">Friend since: 2012</span>
+													 <span className="time_ago">online: 12 min ago</span>
+													 </span>
+												  </li>
+											   </ul>
+											</div>
+										 </div>								  
+										</div>
 								   </div>
 								</div>
 							 </div>
