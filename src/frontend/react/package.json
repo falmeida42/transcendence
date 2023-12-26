@@ -14,6 +14,7 @@
     "axios": "^1.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-svg-draw": "^0.0.12",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2"
   },

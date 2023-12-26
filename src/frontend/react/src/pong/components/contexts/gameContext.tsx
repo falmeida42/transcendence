@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-refresh/only-export-components */
 import React, { useEffect, useReducer } from "react";
 import { io } from "socket.io-client";
 
@@ -5,14 +7,17 @@ const socket = io("http://localhost:3000/game", { autoConnect: false });
 
 type action = {
   type: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload: any;
 };
 
 type state = {
   isConnected: boolean;
-  players: object;
+  players: any;
+  rooms: any;
+  room: object;
+  player: any;
   messages: string[];
+  match: any;
 };
 
 const reducer = (state: state, action: action) => {
@@ -23,6 +28,17 @@ const reducer = (state: state, action: action) => {
       return { ...state, isConnected: action.payload };
     case "PLAYERS":
       return { ...state, players: action.payload };
+    case "PLAYER":
+      return { ...state, player: action.payload };
+    case "ROOMS":
+      return { ...state, rooms: action.payload };
+    case "ROOM":
+      return {
+        ...state,
+        room: state.rooms[state.players[action.payload].room],
+      };
+    case "MATCH":
+      return { ...state, match: action.payload };
     case "ADD_MESSAGE":
       return { ...state, messages: [...state.messages, action.payload] };
     default:
@@ -32,13 +48,15 @@ const reducer = (state: state, action: action) => {
 
 const initialState: state = {
   isConnected: false,
+  rooms: {},
+  player: {},
   players: {},
+  room: {},
   messages: [],
+  match: {},
 };
 
 const GameContext = React.createContext(initialState);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GameProvider = (props: any) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -51,17 +69,24 @@ const GameProvider = (props: any) => {
     socket.on("disconnect", () => {
       console.log("Desconectado!");
       dispatch({ type: "DISCONNECTED", payload: false });
-      // setIsConnected(false);
     });
 
-    socket.on("PlayerUpdate", (players) => {
+    socket.on("PlayerUpdate", (players: any) => {
       dispatch({ type: "PLAYERS", payload: players });
-      // setPlayers(players);
+      dispatch({ type: "PLAYER", payload: players[socket.id] });
     });
 
-    socket.on("receiveMessage", (receivedMessage) => {
+    socket.on("ReceiveMessage", (receivedMessage) => {
       dispatch({ type: "ADD_MESSAGE", payload: receivedMessage });
-      // setMessages(messages + receivedMessage + "\n\n");
+    });
+
+    socket.on("RoomsUpdate", (rooms) => {
+      dispatch({ type: "ROOMS", payload: rooms });
+      dispatch({ type: "ROOM", payload: socket.id });
+    });
+
+    socket.on("MatchUpdate", (match) => {
+      dispatch({ type: "MATCH", payload: match });
     });
 
     socket.open();
@@ -77,11 +102,31 @@ const GameProvider = (props: any) => {
 };
 
 const sendMessage = (message: string) => {
-  socket.emit("sendMessage", { message });
+  socket.emit("SendMessage", { message });
 };
 
 const createRoom = () => {
-  socket.emit('CreateRoom')
-}
+  socket.emit("CreateRoom");
+};
 
-export { GameContext, GameProvider, sendMessage, createRoom };
+const leaveRoom = () => {
+  socket.emit("LeaveRoom");
+};
+
+const joinRoom = (roomId: string) => {
+  socket.emit("JoinRoom", { roomId });
+};
+
+const gameLoaded = () => {
+  socket.emit("GameLoaded");
+};
+
+export {
+  GameContext,
+  GameProvider,
+  createRoom,
+  gameLoaded,
+  joinRoom,
+  leaveRoom,
+  sendMessage,
+};

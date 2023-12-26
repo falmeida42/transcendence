@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+// import { sendMessage } from "./contexts/gameContext";
 
 interface chatProps {
   sendMessage: (message: string) => void;
@@ -8,33 +9,38 @@ interface chatProps {
 export const Chat = (props: chatProps) => {
   const [messageToSend, setMessageToSend] = useState("");
 
+  const sendMessage = () => {
+    if (!messageToSend.trim()) return;
+    props.sendMessage(messageToSend);
+    setMessageToSend("");
+  };
+
+  useEffect(() => {
+    const elem = document.getElementById("chat-content");
+    if (elem) {
+      elem.scrollTop = elem.scrollHeight;
+      console.log("entrou");
+    }
+  }, [props.messages]);
+
   return (
-    <div
-      style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <button>Criar Sala</button>
-      <div style={{ whiteSpace: "pre-wrap" }}>
+    <div className="chat-container">
+      <div id="chat-content" className="chat-content">
         {props.messages.join("\n\n")}
       </div>
-      <input
-        type="text"
-        value={messageToSend}
-        onChange={(e) => setMessageToSend(e.target.value)}
-      />
-      <button
-        onClick={() => {
-          props.sendMessage(messageToSend);
-          console.log(messageToSend);
-        }}
-      >
-        Send
-      </button>
+      <div className="chat-form">
+        <input
+          type="text"
+          value={messageToSend}
+          onChange={(e) => setMessageToSend(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") sendMessage();
+          }}
+        />
+        <button disabled={!messageToSend.trim()} onClick={sendMessage}>
+          Send
+        </button>
+      </div>
     </div>
   );
 };

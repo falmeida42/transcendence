@@ -7,7 +7,7 @@ function App() {
     // <div className="game">
     //   <Game width={800} height={600} againstAi={false} />
     // </div>
-    <div>
+    <div className="main-container">
       <GameProvider>
         <Pong />
       </GameProvider>
