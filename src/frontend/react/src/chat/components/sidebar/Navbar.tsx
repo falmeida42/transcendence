@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { ChatContext } from "../../context/ChatContext";
 
 export const toggleNavBarVisibility = () => {
     const sideBar = (document.getElementById("sidebar") as HTMLDivElement);
@@ -7,11 +9,13 @@ export const toggleNavBarVisibility = () => {
 }
 
 const Navbar = () => {
+    const {username = "", image = ""} = useContext(ChatContext) ?? {}
+
     return (
         <div className="navbar" onClick={toggleNavBarVisibility}>
             <div className="user">
-                <img src="https://www.42lisboa.com/wp-content/uploads/2020/07/42-Lisboa_RGB_Vertical.png" alt=""/>
-                <span>Username</span>
+                <img src={image} alt=""/>
+                <span>{username}</span>
             </div>
         </div>
     )
