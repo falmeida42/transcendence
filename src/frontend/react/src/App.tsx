@@ -5,36 +5,8 @@ import { useHashStore } from "./hashStore.tsx";
 import { useEffect } from 'react';
 import Profile from "./Profile.tsx";
 import Chat from "./Chat.tsx";
-
-import { useEffect } from "react";
-
-export var token: string | null;
-
-export const Mapping: React.FunctionComponent = () => {
-
-    useEffect(() => {
-
-      const urlParams = new URLSearchParams(window.location.search);
-      token = urlParams.get('token');
-
-      console.log("Frontend: token", token);
-
-      // handleFetchData();
-      fetch('http://localhost:3000/user/me', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type`': 'application/json',
-        }
-      })
-        .then(async (response) => await response.json())
-        .then((data) => console.log(data))
-        .catch((error) => console.log(error))
-
-    }, []);
-
-  return <div>Transcendence</div>;
-}
+// import { useApi } from "./apiStore.tsx";
+import ApiDataProvider from "./ApiDataProvider.tsx";
 
 function App() {
 	const { showHash } = useHashStore();
@@ -50,10 +22,10 @@ function App() {
 			window.removeEventListener('hashchange', handleHashChange);
 		}
 	}, []);
-
 	
   return (
 	<div>
+		<ApiDataProvider/>
 		<Bars />
 			{showHash === '#Game' && (
 			<div className="game">

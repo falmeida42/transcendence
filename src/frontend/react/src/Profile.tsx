@@ -1,6 +1,14 @@
-function Profile() {
-	return (
+// import { useEffect, useState } from 'react';
+// import { Mapping } from './App';
+import { useApi } from './apiStore';
 
+export var token: string | null;
+
+function Profile() {
+	
+	const { user, first_name, last_name, login, email, image } = useApi();
+
+	return (
 		<div className="middle-cont">
 		<div className="container-fluid">
 		   <div className="row column1">
@@ -16,13 +24,13 @@ function Profile() {
 					   <div className="row">
 						  <div className="col-lg-12">
 							 <div className="full dis_flex center_text">
-								<div className="profile_img"><img width="180" className="rounded-circle" src="images/layout_img/user_img.jpg" alt="#" /></div>
+								<div className="profile_img"><img width="180" className="rounded-circle" src={image} alt="#" /></div>
 								<div className="profile_contant">
 								   <div className="contact_inner">
-									  <h3>John Smith</h3>
+									  <h3>{first_name} {last_name}</h3>
 									  <p><strong>About: </strong>Frontend Developer</p>
 									  <ul className="list-unstyled">
-										 <li><i className="fa fa-envelope-o"></i> : test@gmail.com</li>
+										 <li><i className="fa fa-envelope-o"></i> : {email}</li>
 										 <li><i className="fa fa-phone"></i> : 987 654 3210</li>
 									  </ul>
 								   </div>

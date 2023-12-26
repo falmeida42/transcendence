@@ -1,8 +1,10 @@
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
+import { useApi } from "./apiStore.tsx";
 
 const Topbar = () => {
 	
 	const { setOpen, isOpen } = usecollapseSidebar();
+	const { user, first_name, last_name, login, email, image } = useApi();
 
 	return (
 		<div id="content">
@@ -13,14 +15,14 @@ const Topbar = () => {
 				<i className="fa fa-bars"></i>
 			</button>
 			<div className="logo_section">
-				<a href="index.html">
-					{/* <img className="img-responsive" src="images/logo/logo.png" alt="#" /> */}
+				<a href="#Profile">
+					<img className="img-responsive" src={image} alt="#" />
 				</a>
 			</div>
 			<div className="right_topbar">
 				<div className="icon_info">
 				<ul>
-					<li>
+					{/* <li>
 					<a href="#">
 						<i className="fa fa-bell-o"></i>
 						<span className="badge">2</span>
@@ -36,22 +38,23 @@ const Topbar = () => {
 						<i className="fa fa-envelope-o"></i>
 						<span className="badge">3</span>
 					</a>
-					</li>
+					</li> */}
 				</ul>
+				</div>
 				<ul className="user_profile_dd">
 					<li>
 					<a className="dropdown-toggle" data-toggle="dropdown">
-						<img className="img-responsive rounded-circle" src="" alt="USER IMG" />
-						<span className="name_user">John David</span>
+						<img className="img-responsive rounded-circle" style={{width: 30}} src={image} alt="#" />
+						<span className="name_user">{first_name}</span>
 					</a>
 					<div className="dropdown-menu">
-						<a className="dropdown-item" href="profile.html">
+						<a className="dropdown-item" href="#Profile">
 						My Profile
 						</a>
-						<a className="dropdown-item" href="settings.html">
+						<a className="dropdown-item" href="#Settings">
 						Settings
 						</a>
-						<a className="dropdown-item" href="help.html">
+						<a className="dropdown-item" href="#Help">
 						Help
 						</a>
 						<a className="dropdown-item" href="#">
@@ -60,7 +63,6 @@ const Topbar = () => {
 					</div>
 					</li>
 				</ul>
-				</div>
 			</div>
 			</div>
 		</nav>

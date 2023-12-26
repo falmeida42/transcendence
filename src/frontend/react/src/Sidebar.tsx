@@ -1,7 +1,9 @@
+import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
 
 const Sidebar = () => {
-
+	
+  const { user, first_name, last_name, login, email, image } = useApi();
   const { isOpen } = usecollapseSidebar();
 
   return (
@@ -13,7 +15,7 @@ const Sidebar = () => {
             <a href="">
               <img
                 className="logo_icon img-responsive"
-                src="images/logo/logo_icon.png"
+                src={image}
                 alt="#"
               />
             </a>
@@ -26,7 +28,7 @@ const Sidebar = () => {
               <img className="img-responsive" src="" alt="USER IMG" />
             </div>
             <div className="user_info">
-              <h6>Fucking Githuber</h6>
+              <h6>{first_name}</h6>
               <p>
                 <span className="online_animation"></span> Online
               </p>
