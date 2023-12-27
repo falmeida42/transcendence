@@ -28,7 +28,7 @@ function Profile() {
 								<div className="profile_contant">
 								   <div className="contact_inner">
 									  <h3>{first_name} {last_name}</h3>
-									  <p><strong>About: </strong>Frontend Developer</p>
+									  <p><strong>Username: </strong>{login}</p>
 									  <ul className="list-unstyled">
 										 <li><i className="fa fa-envelope-o"></i> : {email}</li>
 										 <li><i className="fa fa-phone"></i> : 987 654 3210</li>

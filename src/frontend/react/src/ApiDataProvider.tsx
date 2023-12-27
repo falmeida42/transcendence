@@ -27,6 +27,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         }
 
         const data = await response.json();
+        console.log(data);
         setInfo(data.user, data.first_name, data.last_name, data.login, data.email, data.image);
       } catch (error) {
         console.error(error);

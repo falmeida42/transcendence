@@ -643,6 +643,8 @@ a:focus {
 .right_topbar {
     float: right;
     padding: 0;
+    display: flex;
+    align-items: stretch;
 }
 
 .icon_info {
@@ -657,7 +659,7 @@ a:focus {
     margin: 0;
 }
 
-.icon_info ul li {
+/* .icon_info ul li {
     float: left;
     width: 35px;
     height: 35px;
@@ -666,7 +668,7 @@ a:focus {
     line-height: 35px;
     position: relative;
     margin: 15px 0 0 5px;
-}
+} */
 
 .icon_info ul li .fa-question-circle {
     font-size: 21px;
@@ -1023,9 +1025,9 @@ nav#sidebar .logo_big {
     padding: 0;
     margin: 12px 0 0 15px;
 }
-.icon_info ul li {
+/* .icon_info ul li {
     width: 30px;
-}
+} */
 .icon_info ul li a {
     font-size: 16px;
 }
@@ -1257,6 +1259,28 @@ a[data-toggle="collapse"] {
     font-size: 18px;
     color: #fff;
     border-bottom: solid #ff5722 1px;
+}
+
+.user_list {
+    float: left;
+    height: 35px;
+    border-radius: 100%;
+    text-align: center;
+    line-height: 35px;
+    position: relative;
+    margin: 7px 0px 0px 5px;
+    padding-left: 10px;
+}
+
+.icons_list {
+    float: left;
+    width: 30px;
+    height: 35px;
+    border-radius: 100%;
+    text-align: center;
+    line-height: 35px;
+    position: relative;
+    margin: 15px 0 0 5px;
 }
 
 

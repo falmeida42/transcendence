@@ -12,13 +12,13 @@ const Sidebar = () => {
       <div className="sidebar_blog_1">
         <div className="sidebar-header">
           <div className="logo_section">
-            <a href="">
+            {/* <a href="">
               <img
                 className="logo_icon img-responsive"
                 src={image}
                 alt="#"
               />
-            </a>
+            </a> */}
           </div>
         </div>
         <div className="sidebar_user_info">
