@@ -24,22 +24,21 @@ const Input = () => {
 
   
   return (
-    <div className="input">
-      <input
-        id="input"
-        type="text"
-        placeholder="Type something..."
-        onKeyDown={handleKey}
+
+    <div className="chat-message clearfix">
+    <textarea 
+        name="message-to-send" 
+        id="message-to-send" 
+        placeholder ="Type your message" 
         value={text}
         onChange={(e) => setText(e.target.value)}
-      />
-      <div className="send">
-        <img src={Play} alt="" />
-        <button onClick={() => sendMessage()}>
-          Send
-        </button>
-      </div>
-    </div>
+        ></textarea>
+           
+    <i className="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
+    <i className="fa fa-file-image-o"></i>
+
+    <button onClick={() => sendMessage()}>Send</button>
+    </div>  
   );
 };
 

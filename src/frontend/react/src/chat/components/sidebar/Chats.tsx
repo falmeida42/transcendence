@@ -37,15 +37,22 @@ function receivedRooms(room: Payload, setRooms: React.Dispatch<React.SetStateAct
 
 
 const Chats = () => {
-    const [rooms, setRooms] = useState<RoomData[]>([]);
 
-    useEffect(() => {
 
-        fetchAvailableRooms(setRooms)
-        return () => {
-
+    const rooms: RoomData[] = [
+        {
+            id: crypto.randomUUID(),
+            name: "Vincent Porter",
+            image: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg"
+        },
+        {
+            id: crypto.randomUUID(),
+            name: "Peyton Mckinney",
+            image: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_10.jpg"
         }
-    }, []);
+    ]
+ 
+  
 
     console.log("Current Rooms:", rooms)
 

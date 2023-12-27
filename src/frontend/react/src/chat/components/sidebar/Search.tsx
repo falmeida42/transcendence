@@ -1,10 +1,9 @@
 
 const Search = () => {
     return (
-        <div className="search" id="search">
-            <div className="searchForm">
-                <input type="text" placeholder="Search for a user"/>
-            </div>
+        <div className="search">
+          <input type="text" placeholder="search" />
+          <i className="fa fa-search"></i>
         </div>
     )
 }

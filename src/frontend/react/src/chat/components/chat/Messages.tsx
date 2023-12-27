@@ -52,7 +52,7 @@ const Messages = () => {
   return (
     <div className="messages">
       {messages.map((message) => (
-        <Message key={message.id} username={message.username} text={message.message} imageContent={message.userImage}/>
+        <Message key={message.id} username={message.username} text={message.message}/>
       ))}
     </div>
   );

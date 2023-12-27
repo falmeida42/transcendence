@@ -4,7 +4,7 @@ import Bars from './Bars.tsx';
 import { useHashStore } from "./hashStore.tsx";
 import { useEffect } from 'react';
 import Profile from "./Profile.tsx";
-import Chat from "./Chat.tsx";
+import Chat from "./chat/Chat.tsx";
 // import { useApi } from "./apiStore.tsx";
 import ApiDataProvider from "./ApiDataProvider.tsx";
 
@@ -38,7 +38,7 @@ function App() {
 			</div>)
 			}
 			{showHash === '#Chat' && (
-			<div className="game">
+			<div className="game">		
 				<Chat/>
 			</div>)
 			}

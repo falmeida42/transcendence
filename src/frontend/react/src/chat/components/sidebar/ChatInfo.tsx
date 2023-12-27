@@ -7,12 +7,15 @@ interface ChatInfoProps {
 const ChatInfo = (chatInfoProps: ChatInfoProps) => {
     console.log(`Chat information received: ${chatInfoProps.name}`)
     return(
-        <div className="userChat">
-            <img src={chatInfoProps.image} alt=""></img>
-            <div className="userChatInfo">
-                <span>{chatInfoProps.name}</span>
+        <div className="clearfix">
+            <img src={chatInfoProps.image} alt="avatar" />
+            <div className="about">
+              <span>{chatInfoProps.name}</span>
+              <div className="status">
+                <i className="fa fa-circle online"></i> online
+              </div>
             </div>
-        </div>
+          </div>
     );
 };
 

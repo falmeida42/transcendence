@@ -17,7 +17,6 @@ export const Connection: React.FunctionComponent = () => {
       console.log('Client connected')
 
       const urlParams = new URLSearchParams(window.location.search);
-      currentUsername = urlParams.get('name');
       currentRoom = urlParams.get('room');
       const payload = {id: crypto.randomUUID(), username: currentUsername }
       console.log(`sending payload ${payload.username}`)
