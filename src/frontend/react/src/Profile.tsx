@@ -1,4 +1,5 @@
-// import { useEffect, useState } from 'react';
+import { useState } from 'react';
+
 // import { Mapping } from './App';
 import { useApi } from './apiStore';
 
@@ -7,6 +8,25 @@ export var token: string | null;
 function Profile() {
 	
 	const { user, first_name, last_name, login, email, image } = useApi();
+	
+	const [isEditing, setIsEditing] = useState(false);
+	const [textValue, setTextValue] = useState(login);
+	
+	const handleEditClick = () => {
+		setIsEditing(true);
+	};
+	
+	const handleSubmitClick = () => {
+		setIsEditing(false);
+		// You can add logic here to handle the submission of changes
+		console.log('Submitted changes:', textValue);
+	};
+	
+	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setTextValue(event.target.value);
+	};
+
+
 
 	return (
 		<div className="middle-cont">
@@ -28,7 +48,48 @@ function Profile() {
 								<div className="profile_contant">
 								   <div className="contact_inner">
 									  <h3>{first_name} {last_name}</h3>
-									  <p><strong>Username: </strong>{login}</p>
+
+
+									  <div className="">
+										<div className="form-group" style={{marginBottom: "4px"}}>
+											{/* <label htmlFor="textField">Username:</label> */}
+											<div className="input-group">
+											<span className="mr-2" style={{maxHeight: "20px"}}><p><strong>Username: </strong></p></span>
+											<input
+												type="text"
+												id="textField"
+												className="form-control"
+												value={textValue}
+												readOnly={!isEditing}
+												onChange={handleTextChange}
+												style={{maxHeight: "25px",  maxWidth: "200px"}}
+											/>
+											<div className="input-group-append" style={{maxHeight: "25px"}}>
+												<button
+												className="btn btn-outline-secondary"
+												type="button"
+												style={{maxHeight: "25px"}}
+												onClick={handleEditClick}
+												>
+												<i className="fa fa-pencil green_color " style={{verticalAlign: "super"}}> </i>
+												</button>
+											</div>
+											</div>
+										</div>
+
+										{isEditing && (
+											<button className="btn btn-secondary btn-sm mb-2" onClick={handleSubmitClick}>
+											Submit Changes
+											</button>
+										)}
+										</div>
+
+
+										
+										{/* <div className="">
+											<span className="mr-2"><p><strong>Username: </strong>{login}</p></span>
+									  		<i className="fa fa-pencil green_color "> </i>
+										</div> */}
 									  <ul className="list-unstyled">
 										 <li><i className="fa fa-envelope-o"></i> : {email}</li>
 										 <li><i className="fa fa-phone"></i> : 987 654 3210</li>

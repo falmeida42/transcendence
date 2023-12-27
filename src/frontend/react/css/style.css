@@ -1865,6 +1865,7 @@ button.main_bt {
 
 .contact_inner {
     float: left;
+    user-select: all;
     width: 100%;
 }
 
@@ -1961,6 +1962,11 @@ button.main_bt {
     border-left: none;
     padding-left: 15px;
     padding-right: 0;
+}
+
+.user_progress_bar {
+    float: left;
+    width: inherit;
 }
 
 .user_progress_bar .progress_bar {
