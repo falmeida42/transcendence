@@ -63,34 +63,35 @@ export class AuthService {
   }
 
   async generate2FASecret() {
-    return await authenticator.generateSecret();
+    return authenticator.generateSecret();
   }
 
-  async generateTwoFactorKeyURI(user: User, secret: string) {
-    return await authenticator.keyuri(user.login, 'transcendence', secret);
-  }
-
-  async set2FASecret(login: string, secret: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { login: login },
-    });
-    if (user) {
-      user.twoFactorAuthSecret = secret;
-      user.twoFactorAuthEnabled = true;
-    }
+  async generate2FAKeyURI(user: User, secret: string) {
+    return authenticator.keyuri(user.login, 'transcendence', secret);
   }
 
   async generateQrCodeURL(otpAuthURL: string) {
     return toDataURL(otpAuthURL);
   }
 
-  async twoFactorAuthCodeValid(
-    twoFactorAuthenticationCode: string,
-    user: User,
-  ) {
+  is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,
     });
   }
+
+  // TODO: WIP
+  // async authenticate2FA(user: User) {
+  //   const payload = {
+  //     login: user.login,
+  //     isTwoFactorAuthenticationEnabled: user.twoFactorAuthEnabled,
+  //     isTwoFactorAuthenticated: true,
+  //   };
+
+  //   return {
+  //     login: payload.login,
+  //     access_token: this.jwtService.sign(payload),
+  //   };
+  // }
 }

@@ -26,58 +26,29 @@ export class UserService {
     });
   }
 
-  async setTwoFactorAuthSecret(secret: string, id: string) {
+  async set2FASecret(id: string, secret: string) {
+    return this.prisma.user.update({
+      where: { id: id },
+      data: { twoFactorAuthSecret: secret },
+    });
+  }
+
+  async set2FAOn(id: string) {
+    return this.prisma.user.update({
+      where: { id: id },
+      data: { twoFactorAuthEnabled: true },
+    });
+  }
+
+  async set2FAOff(id: string) {
+    return this.prisma.user.update({
+      where: { id: id },
+      data: { twoFactorAuthEnabled: false },
+    });
+  }
+
+  async is2FAEnabled(id: string) {
     const user = await this.getUserById(id);
-    if (user) {
-      const updated = await this.prisma.user.update({
-        where: { id: id },
-        data: {
-          twoFactorAuthSecret: secret,
-          twoFactorAuthEnabled: true,
-        },
-      });
-      this.logger.log(
-        'Setting two factor authentication for user ',
-        user.username,
-      );
-      return updated;
-    }
-
-    this.logger.error('User does not exist');
-
-    return null;
-  }
-
-  async setTwoFactorAuthOn(login: string) {
-    const user = await this.getUserByLogin(login);
-    if (user.twoFactorAuthEnabled == false) {
-      return this.prisma.user.update({
-        where: { login: login },
-        data: { twoFactorAuthEnabled: true },
-      });
-    }
-
-    this.logger.error('User does not exist');
-
-    return null;
-  }
-
-  async setTwoFactorAuthOff(login: string) {
-    const user = await this.getUserByLogin(login);
-    if (user.twoFactorAuthEnabled == true) {
-      return this.prisma.user.update({
-        where: { login: login },
-        data: { twoFactorAuthEnabled: false },
-      });
-    }
-
-    this.logger.error('User does not exist');
-
-    return null;
-  }
-
-  async isTwoFactorAuthEnabled(login: string): Promise<boolean | null> {
-    const user = await this.getUserByLogin(login);
     if (user) {
       return user.twoFactorAuthEnabled;
     }
