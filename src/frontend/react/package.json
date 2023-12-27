@@ -11,14 +11,17 @@
   },
   "dependencies": {
     "@types/uuid": "^9.0.7",
-    "axios": "^1.6.2",
+    "@types/socket.io-client": "^3.0.0",
+    "axios": "^1.6.3",
+    "jquery": "^3.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.69.5",
     "socket.io": "^4.7.2",
-    "socket.io-client": "^4.7.2"
+    "socket.io-client": "^4.7.2",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/jquery": "^3.5.29",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
