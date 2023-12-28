@@ -5,11 +5,12 @@ import {
   Delete,
   UseGuards,
   Logger,
-  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { GetMe } from 'src/decorators';
+import { User } from '@prisma/client';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
@@ -27,12 +28,12 @@ export class UserController {
   }
 
   @Get('me')
-  async getMe(@Req() req: any) {
+  async getMe(@GetMe() user: User) {
     const logInfo = {
-      user: req.user, // Log only the user property
+      user: user, // Log only the user property
     };
     this.logger.debug(JSON.stringify(logInfo));
-    return this.findById(String(req.user.id));
+    return this.findById(String(user.id));
   }
 
   @Get(':id')
