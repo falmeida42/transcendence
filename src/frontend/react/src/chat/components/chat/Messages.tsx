@@ -38,19 +38,46 @@ function receivedMessage(message: Payload, setMessages: React.Dispatch<React.Set
 const Messages = () => {
   const [messages, setMessages] = useState<MessageData[]>([]);
 
-  useEffect(() => {
-    
+  messages.push(
+    {
+      id: crypto.randomUUID(),
+      username: "falmeida",
+      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg",
+      message: "Hello"
+    }
+  )
 
-    fetchMessageData(setMessages)
-    return () => {
-      // Cleanup or disconnect logic (if needed)
-    };
-  }, []); // Removed messages and text from the dependency arrx\ay to avoid unnecessary re-renders
+  messages.push(
+    {
+      id: crypto.randomUUID(),
+      username: "falmeidaa",
+      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_10.jpg",
+      message: "World"
+    }
+  )
 
+  messages.push(
+    {
+      id: crypto.randomUUID(),
+      username: "falmeida",
+      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg",
+      message: "Hello"
+    }
+  )
+
+  messages.push(
+    {
+      id: crypto.randomUUID(),
+      username: "falmeidaa",
+      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_10.jpg",
+      message: "World"
+    }
+  )
+  
   console.log("Current messages:", messages);
 
   return (
-    <div className="messages">
+    <div className="chat-history">
       {messages.map((message) => (
         <Message key={message.id} username={message.username} text={message.message}/>
       ))}

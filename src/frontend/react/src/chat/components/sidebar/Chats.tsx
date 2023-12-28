@@ -1,5 +1,5 @@
 import { socketIoRef } from "../../../network/SocketConnection"
-import { toggleChatVisibility } from "../chat/Chat"
+import { toggleChatVisibility } from "../chat/ChatContent"
 import { useState, useEffect } from "react";
 import ChatInfo from "./ChatInfo";
 

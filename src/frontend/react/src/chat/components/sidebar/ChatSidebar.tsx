@@ -1,7 +1,7 @@
 import Chats from "./Chats"
 import Search from "./Search"
 
-const Sidebar = () => {
+const ChatSidebar = () => {
     return (
         <div className="sidebar">
             <Search/>
@@ -10,4 +10,4 @@ const Sidebar = () => {
     )
 }
 
-export default Sidebar
+export default ChatSidebar

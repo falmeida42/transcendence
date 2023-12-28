@@ -9,22 +9,22 @@ export const toggleChatVisibility = () => {
     element.style.visibility = visibility === "hidden" ? "visible" :  "hidden";
 }
 
-const Chat = () => {
+const ChatContent = () => {
 
 
     return (
-        <div className="chat"  id="chat">
-            <div className="chatInfo"  onClick={toggleChatVisibility}>
-                <span>Friend</span>
-                <div className="chatIcons">
-                    <img src={Mute} alt=""/>
-                    <img src={Block} alt=""/>
+        <div className="chat">
+            <div className="chat-header clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg" alt="avatar" />
+            
+                <div className="chat-about">
+                <div className="chat-with">Chat with Vincent Porter</div>
                 </div>
             </div>
             <Messages/>
             <Input/>
-        </div>
+        </div> 
     )
 }
 
-export default Chat
+export default ChatContent

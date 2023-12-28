@@ -117,6 +117,7 @@ $gray: #92959E;
     overflow-y: scroll;
     height: 100%; 
     width: 100%;
+    display: grid;
     
     .message-data {
       margin-bottom: 15px;
