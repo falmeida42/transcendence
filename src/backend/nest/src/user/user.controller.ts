@@ -5,6 +5,7 @@ import {
   Delete,
   UseGuards,
   Logger,
+  Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard';
@@ -50,5 +51,24 @@ export class UserController {
     }
 
     return this.prisma.user.delete({ where: { login } });
+  }
+
+  @Post(':username')
+  async changeUsername(
+    @GetMe() userInfo: User,
+    @Param('username') username: string,
+  ) {
+    try {
+      const user = this.prisma.user.update({
+        where: { id: userInfo.id },
+        data: { username: username },
+      });
+
+      if (!user) {
+        throw new Error('Failed to update username');
+      }
+    } catch (error) {
+      return { error: error.message };
+    }
   }
 }
