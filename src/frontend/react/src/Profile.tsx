@@ -2,19 +2,20 @@ import { useState } from 'react';
 
 // import { Mapping } from './App';
 import { useApi } from './apiStore';
+import useUpdateUserData from './UpdateUserData';
+import ApiDataProvider from './ApiDataProvider';
 
 export var token: string | null;
 
 function Profile() {
 	
-	const { user, first_name, last_name, login, email, image } = useApi();
+	const { user, first_name, last_name, login, email, image, setUsername, setImage } = useApi();
 	
-
 	/////////////// Username update /////////////////
-
-	const [isEditing, setIsEditing] = useState(false);
-	const [textValue, setTextValue] = useState(login);
 	
+	const [isEditing, setIsEditing] = useState(false);
+	const [textValue, setTextValue] = useState<string | undefined>(user);
+
 	const handleEditClick = () => {
 		setIsEditing(true);
 	};
@@ -22,42 +23,52 @@ function Profile() {
 	const handleSubmitClick = () => {
 		setIsEditing(false);
 		// You can add logic here to handle the submission of changes
+		setUsername(textValue);
+		updateFunction();
 		console.log('Submitted changes:', textValue);
 	};
 	
 	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setTextValue(event.target.value);
 	};
-
+	
 
 	/////////////// Image update /////////////////
-
-
+	
+	
 	const [isEditingImage, setIsEditingImage] = useState(false);
-  	const [selectedImage, setSelectedImage] = useState<string | null>(image);
-
-	const handleEditClickImage = () => {
+  	const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
+	  
+	  const handleEditClickImage = () => {
 		setIsEditingImage(true);
 	};
-
+	
 	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files && event.target.files[0];
-
+		
 		if (file) {
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			setSelectedImage(e.target?.result as string);
-		};
-		reader.readAsDataURL(file);
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				setSelectedImage(e.target?.result as string);
+			};
+			reader.readAsDataURL(file);
 		}
 	};
 
+	const { updateFunction } = useUpdateUserData({
+		updateFunction: () => ({
+		  username: textValue, // Assuming you want to update the username with the current textValue
+		  image: selectedImage,
+		}),
+	  });
+	
 	const handleSubmitClickImage = () => {
 		setIsEditingImage(false);
 		// You can add logic here to handle the submission of the new image
+		setImage(selectedImage);
+		updateFunction();
 		console.log('Submitted new image:', selectedImage);
 	};
-
 
 	return (
 		// <div className="middle-cont">
@@ -108,7 +119,7 @@ function Profile() {
 											<img
 												//width="180"
 												//height="300"
-												style={{maxHeight: 300}}
+												style={{maxHeight: 300, maxWidth: 300}}
 												src={selectedImage || 'placeholder.jpg'}
 												alt="Selected"
 												className=" rounded-circle"
@@ -182,7 +193,7 @@ function Profile() {
 										</div> */}
 									  <ul className="list-unstyled">
 										 <li><i className="fa fa-envelope-o"></i> : {email}</li>
-										 <li><i className="fa fa-phone"></i> : 987 654 3210</li>
+										 <li><i className="fa fa-phone"></i> {user}</li>
 									  </ul>
 								   </div>
 								   <div className="user_progress_bar">

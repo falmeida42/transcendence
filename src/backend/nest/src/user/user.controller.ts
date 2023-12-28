@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Param,
+  Body,
+  Post,
   Delete,
   Req,
   UseGuards,
@@ -29,6 +31,20 @@ export class UserController {
     };
     this.logger.debug(JSON.stringify(logInfo));
     return this.findById(String(req.user.id));
+  }
+    
+  @Post('me')
+  async updateMe(@Req() req: any, @Body() userData: any) {
+    const logInfo = {
+      user: req.user,
+    };
+    this.logger.debug(JSON.stringify(logInfo));
+    console.log(req, ' ', userData);
+  
+    // Assuming you have a method in the userService to update user data
+    const updatedUser = await this.userService.updateUserById(String(req.user.id), userData);
+  
+    return updatedUser;
   }
 
   @Get(':id')

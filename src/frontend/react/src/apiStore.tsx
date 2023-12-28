@@ -11,6 +11,8 @@ interface ap {
   email: string;
   image: string;
   setInfo: (user: string, first_name: string, last_name: string, login: string, email: string, image: string) => void;
+  setUsername: (user: string | undefined) => void;
+  setImage: (newImage: string | undefined) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
@@ -30,6 +32,10 @@ export const useApi = create<ap>((set) => ({
       email: Email,
       image: Image,
     })),
+  setUsername: (newUser) =>
+    set(() => ({user: newUser,})),
+  setImage: (newImage) =>
+    set(() => ({image: newImage,})),
   [Symbol.iterator]: function* () {
     yield this.user;
     yield this.first_name;

@@ -23,6 +23,13 @@ export class UserService {
     });
   }
 
+  async updateUserById(userId: string, userData: Partial<UserDto>): Promise<UserDto | null> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: userData,
+    });
+  }
+  
   async delete(login: string) {
     const user = await this.prisma.user.findUnique({ where: { login } });
 
