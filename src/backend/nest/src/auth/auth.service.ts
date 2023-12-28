@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -67,6 +67,9 @@ export class AuthService {
   }
 
   async generate2FAKeyURI(user: User, secret: string) {
+    if (!user) {
+      throw new ForbiddenException('User is undefined');
+    }
     return authenticator.keyuri(user.login, 'transcendence', secret);
   }
 
@@ -74,24 +77,16 @@ export class AuthService {
     return toDataURL(otpAuthURL);
   }
 
-  is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
+  is2FACodeValid(twoFactorAuthenticationCode: string, user: any) {
+    if (!user.twoFactorAuthSecret) {
+      throw new ForbiddenException('2FA secret is not set');
+    }
+
+    this.logger.debug(twoFactorAuthenticationCode, user);
+
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,
     });
   }
-
-  // TODO: WIP
-  // async authenticate2FA(user: User) {
-  //   const payload = {
-  //     login: user.login,
-  //     isTwoFactorAuthenticationEnabled: user.twoFactorAuthEnabled,
-  //     isTwoFactorAuthenticated: true,
-  //   };
-
-  //   return {
-  //     login: payload.login,
-  //     access_token: this.jwtService.sign(payload),
-  //   };
-  // }
 }

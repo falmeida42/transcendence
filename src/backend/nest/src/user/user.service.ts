@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto';
 
@@ -27,7 +27,7 @@ export class UserService {
   }
 
   async set2FASecret(id: string, secret: string) {
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id: id },
       data: { twoFactorAuthSecret: secret },
     });
@@ -48,10 +48,10 @@ export class UserService {
   }
 
   async is2FAEnabled(id: string) {
-    const user = await this.getUserById(id);
-    if (user) {
-      return user.twoFactorAuthEnabled;
+    const user = await this.prisma.user.findUnique({ where: { id: id } });
+    if (!user) {
+      throw new ForbiddenException('User does not exist');
     }
-    return null;
+    return user.twoFactorAuthEnabled;
   }
 }
