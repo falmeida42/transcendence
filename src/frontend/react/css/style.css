@@ -1129,9 +1129,11 @@ a[data-toggle="collapse"] {
 
 /** profile **/
 
-.middle-cont {
-	margin: 0 0 0 0;
+.profile_container {
+	max-width: 55%;
 }
+
+
 
 /* Safari 4.0 - 8.0 */
 
@@ -1230,6 +1232,11 @@ a[data-toggle="collapse"] {
     line-height: 35px;
     position: relative;
     margin: 15px 0 0 5px;
+}
+
+
+.flex-item {
+    max-width: fit-content;
 }
 
 
@@ -1489,6 +1496,10 @@ a[data-toggle="collapse"] {
 /*------------------------------------------------------------------
     6. Progressbar
 -------------------------------------------------------------------*/
+
+.progress {
+    max-width: 400px;
+}
 
 .progress_bar {
     padding: 15px 40px 50px 40px;

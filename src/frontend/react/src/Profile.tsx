@@ -9,6 +9,9 @@ function Profile() {
 	
 	const { user, first_name, last_name, login, email, image } = useApi();
 	
+
+	/////////////// Username update /////////////////
+
 	const [isEditing, setIsEditing] = useState(false);
 	const [textValue, setTextValue] = useState(login);
 	
@@ -27,13 +30,41 @@ function Profile() {
 	};
 
 
+	/////////////// Image update /////////////////
+
+
+	const [isEditingImage, setIsEditingImage] = useState(false);
+  	const [selectedImage, setSelectedImage] = useState<string | null>(image);
+
+	const handleEditClickImage = () => {
+		setIsEditingImage(true);
+	};
+
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files && event.target.files[0];
+
+		if (file) {
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			setSelectedImage(e.target?.result as string);
+		};
+		reader.readAsDataURL(file);
+		}
+	};
+
+	const handleSubmitClickImage = () => {
+		setIsEditingImage(false);
+		// You can add logic here to handle the submission of the new image
+		console.log('Submitted new image:', selectedImage);
+	};
+
 
 	return (
-		<div className="middle-cont">
-		<div className="container-fluid">
+		// <div className="middle-cont">
+		<div className="container-fluid profile_container">
 		   <div className="row column1">
-			  <div className="col-md-2"></div>
-			  <div className="col-md-8">
+			  {/* <div className="col-md-2"></div>
+			  <div className="col-md-8"> */}
 				 <div className="white_shd full margin_bottom_30">
 					<div className="full graph_head">
 					   <div className="heading1 margin_0">
@@ -44,8 +75,67 @@ function Profile() {
 					   <div className="row">
 						  <div className="col-lg-12">
 							 <div className="full dis_flex center_text">
-								<div className="profile_img"><img width="180" className="rounded-circle" src={image} alt="#" /></div>
-								<div className="profile_contant">
+
+								{/* <div className="profile_img"><img width="180" className="rounded-circle" src={image} alt="#" /></div> */}
+								<div className="container flex-item">
+									<div className="form-group">
+										{/* <label htmlFor="imageField">Image:</label> */}
+										<div className="input-group d-flex flex-column">
+										{isEditingImage ? (
+											<>
+											<input
+												type="file"
+												id="imageField"
+												className="form-control-file"
+												accept="image/*"
+												onChange={handleImageChange}
+											/>
+											{/* <div className="input-group-append">
+												<button
+												className="btn btn-outline-secondary"
+												type="button"
+												style={{width: "fit-content"}}
+												onClick={handleEditClickImage}
+												>
+												<i className="fa fa-pencil green_color " style={{}}> </i>
+												</button>
+											</div> */}
+											</>
+										) : (
+											<>
+											<div className="profile_img">
+
+											<img
+												//width="180"
+												//height="300"
+												style={{maxHeight: 300}}
+												src={selectedImage || 'placeholder.jpg'}
+												alt="Selected"
+												className=" rounded-circle"
+											/>
+											</div>
+											<button
+												className="btn btn-outline-secondary ml-2"
+												style={{width: "fit-content"}}
+												type="button"
+												onClick={handleEditClickImage}
+											>
+												<i className="fa fa-pencil green_color " > </i>
+											</button>
+											</>
+										)}
+										</div>
+									</div>
+
+									{isEditingImage && (
+										<button className="btn btn-primary" onClick={handleSubmitClickImage}>
+										Submit New Image
+										</button>
+									)}
+									</div> 
+
+
+								<div className="profile_contant flex-item">
 								   <div className="contact_inner">
 									  <h3>{first_name} {last_name}</h3>
 
@@ -172,8 +262,8 @@ function Profile() {
 				 <div className="col-md-2"></div>
 			  </div>
 		   </div>
-		</div>
-	 </div>		
+		// </div>
+	//  </div>		
 	)
 }
 

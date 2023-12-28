@@ -44,7 +44,7 @@ const Topbar = () => {
 					</li>	
 					<li className="user_list">
 					<a href="#Profile">
-						<span className="name_user">{first_name}</span>
+						<span className="name_user">{login}</span>
 					</a>
 					</li>				
 				</ul>
