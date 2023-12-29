@@ -46,10 +46,11 @@ export class UserService {
   }
 
 
-  async insertFriend(user: any, friend: any) {
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { friends: { connect: { id: friend.id } } }
+  async insertFriend(userId: string, friend: any) {
+
+    await this.prisma.user.update({
+        where: { id: userId },
+        data: { friends: { connect: { id: friend } } }
       })
   }
 }

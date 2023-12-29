@@ -50,26 +50,26 @@ export class UserController {
     
     console.log("backend getting friends")
     
-    const frineds = this.userService.getFriends(String(req.user.id));
+    const friends = this.userService.getFriends(String(req.user.id));
     
-    console.log("friends receeeeived ", frineds)
-    return frineds
+    console.log("friends receeeeived ", friends)
+    return friends
   }
 
-  @Post(':userId/add-friend/:friendName')
+  @Post('add-friend/:friendName')
   async addFriend(
-    @Param('userId') userId: string,
+    @Req() req: any,
     @Param('friendName') friendName: string,
   ): Promise<string> {
     try {
-      const user = await this.userService.getUserById(userId)
-
+      const user = await this.userService.getUserById(String(req.user.id))
+            
       if (!user) {
         return 'User not found';
       }
-      const friend = await this.userService.getUserById(friendName)
+      const friend = await this.userService.getUserByLogin(friendName)
 
-      await this.userService.insertFriend(userId, friend.id)
+      await this.userService.insertFriend(String(req.user.id), friend.id)
 
       return 'Friend added'
     } catch (error) {
