@@ -8,7 +8,7 @@ import ChatSidebar from './components/sidebar/ChatSidebar';
 function Chat() {
 
     return (
-      <div className="container_chat clearfix">
+      <div className="container container_chat clearfix">
         <ChatSidebar/>
         <ChatContent/>
       </div>

@@ -43,7 +43,7 @@ const Messages = () => {
       id: crypto.randomUUID(),
       username: "falmeida",
       userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg",
-      message: "Hello"
+      message: "Hello hello hello hello aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     }
   )
 
