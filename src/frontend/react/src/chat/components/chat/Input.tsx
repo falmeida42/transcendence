@@ -8,6 +8,7 @@ function validInput(str: string) {
 
 const Input = () => {
   const [text, setText] = useState("");
+  const [placeholder, setPlaceHolder] = useState("Type your message");
 
   const sendMessage = () => {
     if (validInput(text)) {
@@ -29,9 +30,11 @@ const Input = () => {
     <textarea 
         name="message-to-send" 
         id="message-to-send" 
-        placeholder ="Type your message" 
+        placeholder ={placeholder}
         value={text}
         onChange={(e) => setText(e.target.value)}
+        onClick={() => setPlaceHolder("")}
+        onBlur={() => setPlaceHolder("Type your message")}
         ></textarea>
            
     <i className="fa fa-ban clickable" style={{marginRight: "10px"}}></i>

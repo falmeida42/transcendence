@@ -46,6 +46,8 @@ $gray: #92959E;
   
   .chats {
     padding: 20px;
+    overflow-y: scroll;
+    max-height: 600px;
     
     
     li {
@@ -55,15 +57,17 @@ $gray: #92959E;
   
   img {
     float: left;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    padding: 7px;
   }
   
   .about {
     float: left;
     margin-top: 8px;
-  }
-  
-  .about {
-    padding-left: 8px;
+    padding-left: 2px;
   }
   
   .status {
@@ -250,4 +254,3 @@ $gray: #92959E;
 .clickable {
   cursor: pointer;
 }
-
