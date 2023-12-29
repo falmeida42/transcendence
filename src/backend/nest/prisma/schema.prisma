@@ -18,4 +18,6 @@ model User {
   first_name          String?
   last_name           String?
   username            String?
+  friends             User[]  @relation("UserFriends")
+  friendOf            User[]  @relation("UserFriends")
 }

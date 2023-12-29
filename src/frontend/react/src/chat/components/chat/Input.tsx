@@ -34,8 +34,8 @@ const Input = () => {
         onChange={(e) => setText(e.target.value)}
         ></textarea>
            
-    <i className="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
-    <i className="fa fa-file-image-o"></i>
+    <i className="fa fa-ban clickable" style={{marginRight: "10px"}}></i>
+    <i className="fa fa-gamepad clickable"></i>
 
     <button onClick={() => sendMessage()}>Send</button>
     </div>  

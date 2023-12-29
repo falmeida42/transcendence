@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto';
+import { error } from 'console';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -31,5 +32,24 @@ export class UserService {
     }
 
     return this.prisma.user.delete({ where: { login } });
+  }
+
+  async getFriends(userId: string) {
+    const friends = await this.prisma.user.findUnique({ 
+      where: { id: userId },
+      include: {
+        friends: true
+      }
+    })
+
+    return friends
+  }
+
+
+  async insertFriend(user: any, friend: any) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { friends: { connect: { id: friend.id } } }
+      })
   }
 }
