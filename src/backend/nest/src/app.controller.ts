@@ -1,15 +1,16 @@
-import { Controller, Get, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { AuthService } from './auth/auth.service';
 
-@Controller('')
+@Controller('home')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly authServce: AuthService,
+  ) {}
 
-  @Get('/home')
-  get42(@Res() res: Response): string {
-    const responseWellcome = this.appService.get42();
-    res.send(responseWellcome);
-    return responseWellcome;
+  @Get()
+  async getHome() {
+    return { Res: 'Success' };
   }
 }
