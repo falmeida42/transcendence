@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
-import { AuthDto } from './dto/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { authenticator } from 'otplib';
 import { User } from '@prisma/client';
 import { toDataURL } from 'qrcode';
+import { AuthDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
   async signup(dto: AuthDto) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { login: dto.login },
+        where: { id: dto.id },
       });
 
       if (user) {
@@ -70,23 +70,44 @@ export class AuthService {
     if (!user) {
       throw new ForbiddenException('User is undefined');
     }
-    return authenticator.keyuri(user.login, 'transcendence', secret);
+    return authenticator.keyuri(user.id, 'transcendence', secret);
   }
 
   async generateQrCodeURL(otpAuthURL: string) {
     return toDataURL(otpAuthURL);
   }
 
-  is2FACodeValid(twoFactorAuthenticationCode: string, user: any) {
+  is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
+    this.logger.debug(twoFactorAuthenticationCode, user);
+
     if (!user.twoFactorAuthSecret) {
       throw new ForbiddenException('2FA secret is not set');
     }
 
-    this.logger.debug(twoFactorAuthenticationCode, user);
-
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,
+    });
+  }
+
+  async is2FAActive(id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({ where: { id: id } });
+      if (!user) {
+        throw new ForbiddenException('User is not in database. id: ', id);
+      }
+      return user.twoFactorAuthEnabled;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async sign2FAToken(id: string): Promise<string> {
+    const payload = { sub: id };
+
+    return this.jwtService.signAsync(payload, {
+      expiresIn: '5m',
+      secret: this.config.get('JWT_2FA_SECRET'),
     });
   }
 }
