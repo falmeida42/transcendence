@@ -168,7 +168,12 @@ export class GamerGateway
     const match = this.match[roomId];
 
     const direction = type === 'keyup' ? 'STOP' : key;
-
+    // if (key === 'Enter' && type === 'keydown') {
+    //   match.score1 = 0;
+    //   match.score2 = 0;
+    //   this.restartBall(match, roomId);
+    //   this.refreshGame(roomId);
+    // }
     match[playerNumber].direction = direction;
   }
 
@@ -296,7 +301,6 @@ export class GamerGateway
         ball.y_speed += 0.05;
         ball.x_speed -= 0.05;
       }
-
       ball.x_speed *= 1.1;
       ball.x_speed = Math.min(ball.x_speed, 25);
     } else if (ball.x < ball.radius) {
@@ -310,7 +314,7 @@ export class GamerGateway
     }
   }
 
-  restartBall(match: Match, roomId?: string) {
+  async restartBall(match: Match, roomId?: string) {
     const { ball, gameConfig } = match;
     ball.x = gameConfig.width / 2;
     ball.y = gameConfig.height / 2;
@@ -321,16 +325,28 @@ export class GamerGateway
       match.score1 === match.gameConfig.maxScore ||
       match.score2 === match.gameConfig.maxScore
     ) {
+      this.logger.log('Game Over');
       match.status = 'END';
-      this.server.to(roomId).emit('GameOver', match);
-      // this.prisma.match.create({
-      //   data: {
-      //     player1Score: match.score1,
-      //     player2Score: match.score2,
-      //     player1Id: match.player1,
-      //     player2Id: match.player2,
-      //   }
-      // });
+      const lucasId = await this.prisma.user.findUnique({
+        where: {
+          login: 'lucas-ma',
+        },
+      });
+      const winnerScore =
+        match.score1 === match.gameConfig.maxScore
+          ? match.score1
+          : match.score2;
+      const loserScore =
+        match.score1 < match.score2 ? match.score1 : match.score2;
+      const matchCreated = await this.prisma.match.create({
+        data: {
+          playerwinScore: winnerScore,
+          playerlosScore: loserScore,
+          userwinId: lucasId.id,
+        },
+      });
+      this.logger.log(matchCreated);
     }
+    this.server.to(roomId).emit('GameOver', match);
   }
 }
