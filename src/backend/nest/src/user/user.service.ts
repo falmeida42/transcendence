@@ -13,7 +13,11 @@ export class UserService {
   }
 
   async getUserById(userId: string): Promise<UserDto | null> {
-    return this.prisma.user.findUnique({ where: { id: userId } });
+    try {
+      return this.prisma.user.findUnique({ where: { id: userId } });
+    } catch (error) {
+      return error;
+    }
   }
 
   async getUserByLogin(userLogin: string): Promise<UserDto | null> {
@@ -27,10 +31,18 @@ export class UserService {
   }
 
   async set2FASecret(id: string, secret: string) {
-    return await this.prisma.user.update({
-      where: { id: id },
-      data: { twoFactorAuthSecret: secret },
-    });
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: id },
+        data: { twoFactorAuthSecret: secret },
+      });
+      if (!user) {
+        throw new ForbiddenException('Failed to set 2FA secret');
+      }
+      return true;
+    } catch (error) {
+      return { message: error };
+    }
   }
 
   async set2FAOn(id: string) {

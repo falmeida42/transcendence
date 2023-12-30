@@ -84,16 +84,14 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-on')
-  async turn2FAOn(
-    @GetMe() user: User,
-    @Body('code') code: string,
-    @Res() res: any,
-  ) {
+  async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
     this.logger.debug(user);
 
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
-      // TODO: Check if 2FA has been generated before, generate if not
-      // TODO: Send code to frontend
+      if (!user.twoFactorAuthSecret) {
+        // TODO: Check if 2FA has been generated before, generate if not
+        
+      }
 
       const isCodeValid = this.authService.is2FACodeValid(code, user);
 
@@ -102,28 +100,20 @@ export class AuthController {
       }
 
       await this.userService.set2FAOn(user.id);
-      return await this.authenticate2FA(code, user.id, res); // Do I really need to authenticate here??
     }
     return { message: '2FA is already on' };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-off')
-  async turn2FAOff(@GetMe() user: User, @Body() body: any, @Res() res: any) {
-    if ((await this.userService.is2FAEnabled(body.user.id)) === true) {
-      const isCodeValid = this.authService.is2FACodeValid(
-        body.twoFactorAuthenticationCode,
-        user,
-      );
+  async turn2FAOff(@GetMe() user: User, @Body('code') code: string) {
+    if ((await this.userService.is2FAEnabled(user.id)) === true) {
+      const isCodeValid = this.authService.is2FACodeValid(code, user);
 
       if (!isCodeValid) {
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
-      const authenticated = await this.authenticate2FA(body, user.id, res);
-      if (!authenticated) {
-        throw new ForbiddenException('User not authenticated');
-      }
       await this.userService.set2FAOff(user.id);
     }
     return { message: '2FA is already off' };
