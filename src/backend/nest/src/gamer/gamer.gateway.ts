@@ -10,6 +10,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Match } from './utils/Match';
 import { Player } from './utils/Player';
 import { Room } from './utils/Room';
@@ -28,6 +29,8 @@ export class GamerGateway
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('GamerGateway');
+
+  constructor(private prisma: PrismaService) {}
 
   // data
   private players: Record<string, Player> = {};
@@ -311,8 +314,8 @@ export class GamerGateway
     const { ball, gameConfig } = match;
     ball.x = gameConfig.width / 2;
     ball.y = gameConfig.height / 2;
-    ball.x_speed = 5;
-    ball.y_speed = 5;
+    ball.x_speed = 10;
+    ball.y_speed = 10;
 
     if (
       match.score1 === match.gameConfig.maxScore ||
@@ -320,6 +323,14 @@ export class GamerGateway
     ) {
       match.status = 'END';
       this.server.to(roomId).emit('GameOver', match);
+      // this.prisma.match.create({
+      //   data: {
+      //     player1Score: match.score1,
+      //     player2Score: match.score2,
+      //     player1Id: match.player1,
+      //     player2Id: match.player2,
+      //   }
+      // });
     }
   }
 }

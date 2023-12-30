@@ -2,13 +2,11 @@ import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
 
 const Sidebar = () => {
-	
-  const { user, first_name, last_name, login, email, image } = useApi();
+  const { first_name } = useApi();
   const { isOpen } = usecollapseSidebar();
 
   return (
-    <nav id="sidebar" className = {isOpen ? "" : "active"}>
-
+    <nav id="sidebar" className={isOpen ? "" : "active"}>
       <div className="sidebar_blog_1">
         <div className="sidebar-header">
           <div className="logo_section">

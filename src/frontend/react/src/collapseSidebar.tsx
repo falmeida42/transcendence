@@ -1,5 +1,5 @@
 // hashStore.ts
-import create from 'zustand';
+import { create } from "zustand";
 
 interface collapseSidebar {
   isOpen: boolean;

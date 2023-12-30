@@ -3,7 +3,7 @@ import SVG, { Circle, Line, Rect } from "react-svg-draw";
 import { SocketContext, gameLoaded, sendKey } from "../context/SocketContext";
 
 const RealPong = () => {
-  const { match } = useContext(SocketContext);
+  const { match, winner } = useContext(SocketContext);
   const { gameConfig, ball, player1, player2 } = match!;
 
   useEffect(() => {
@@ -33,12 +33,42 @@ const RealPong = () => {
         width={gameConfig.width.toString()}
         height={gameConfig.height.toString()}
       >
+        <defs>
+          <pattern
+            id="image"
+            x="0%"
+            y="0%"
+            height="100%"
+            width="100%"
+            viewBox={
+              "0 0 " +
+              gameConfig.width.toString() +
+              " " +
+              gameConfig.height.toString()
+            }
+          >
+            <image
+              x="0"
+              y="0"
+              width={gameConfig.width.toString()}
+              height={gameConfig.height.toString()}
+              xlinkHref="https://cdn.intra.42.fr/users/baf96bbadcaa62e4d9c24524ad0738e9/lucas-ma.JPG"
+            ></image>
+          </pattern>
+        </defs>
         <Rect
           x={"0"}
           y={"0"}
           width={gameConfig.width.toString()}
           height={gameConfig.height.toString()}
           style={{ fill: "#000" }}
+        />
+        <Rect
+          x={"0"}
+          y={"0"}
+          width={gameConfig.width.toString()}
+          height={gameConfig.height.toString()}
+          style={{ fill: "url(#image)" }}
         />
 
         <Line
@@ -85,6 +115,8 @@ const RealPong = () => {
           {match?.score2}
         </text>
 
+        <text>{`${winner} ganhou o jogo!`}</text>
+
         {ball && (
           <Circle
             cx={ball.x.toString()}
@@ -112,19 +144,6 @@ const RealPong = () => {
             height={player2.height.toString()}
             style={{ fill: "#fff" }}
           />
-        )}
-        {!match && (
-          <text
-            x={(gameConfig.width / 2 - 20).toString()}
-            y={(gameConfig.height / 2).toString()}
-            style={{
-              direction: "rtl",
-              fill: "#FFF)",
-              fontSize: "50px",
-            }}
-          >
-            Waiting for another player...
-          </text>
         )}
       </SVG>
     </div>

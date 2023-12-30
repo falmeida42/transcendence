@@ -5,7 +5,7 @@ import { useApi } from "./apiStore";
 export var token: string | null;
 
 function Profile() {
-  const { user, first_name, last_name, login, email, image } = useApi();
+  const { first_name, last_name, login, email, image } = useApi();
 
   return (
     <div className="middle-cont">
