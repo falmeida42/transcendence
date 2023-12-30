@@ -27,7 +27,7 @@ export const Mapping: React.FunctionComponent = () => {
 
     }, []);
 
-  return <div>Transcendence</div>;
+  return <div></div>;
 }
 
 function App() {
