@@ -1,15 +1,37 @@
+import { useContext, useState } from "react";
+import { SocketContext, setUsername } from "./context/SocketContext";
+
 const Home = () => {
-  // const { isConnected } = useContext(SocketContext);
+  const { isConnected, username } = useContext(SocketContext);
+  const [name, setName] = useState<string>("");
 
   return (
     <>
-      {/* {!isConnected && <div>Desconectado, conectando...</div>} */}
-      {
+      {!isConnected && (
         <div className="main-container">
-          <button>Play a random</button>
-          <button>Play a friend</button>
+          <input
+            name="username"
+            type="text"
+            placeholder="Type your login"
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && name.trim()) setUsername(name);
+            }}
+            autoComplete="true"
+          />
+          <button
+            onClick={() => {
+              if (!name.trim()) return;
+              setUsername(name);
+            }}
+          >
+            Connect
+          </button>
         </div>
-      }
+      )}
+      {isConnected && <span>{username}</span>}
     </>
   );
 };

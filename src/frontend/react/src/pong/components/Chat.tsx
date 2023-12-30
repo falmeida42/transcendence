@@ -19,7 +19,6 @@ export const Chat = (props: chatProps) => {
     const elem = document.getElementById("chat-content");
     if (elem) {
       elem.scrollTop = elem.scrollHeight;
-      console.log("entrou");
     }
   }, [props.messages]);
 

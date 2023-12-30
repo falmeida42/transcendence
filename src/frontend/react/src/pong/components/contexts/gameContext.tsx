@@ -56,7 +56,7 @@ const initialState: state = {
   match: {},
 };
 
-const GameContext = React.createContext(initialState)
+const GameContext = React.createContext(initialState);
 
 const GameProvider = (props: any) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -93,10 +93,6 @@ const GameProvider = (props: any) => {
     socket.open();
   }, []);
 
-  useEffect(() => {
-    dispatch({ type: "", payload: "" });
-  }, []);
-
   return (
     <GameContext.Provider value={state}>{props.children}</GameContext.Provider>
   );
@@ -122,6 +118,14 @@ const gameLoaded = () => {
   socket.emit("GameLoaded");
 };
 
+let lastType: string | undefined = undefined;
+const sendKey = (type: string, key: string) => {
+  if (lastType !== type) {
+    lastType = type;
+    socket.emit("SendKey", { type, key });
+  }
+};
+
 export {
   GameContext,
   GameProvider,
@@ -129,5 +133,6 @@ export {
   gameLoaded,
   joinRoom,
   leaveRoom,
+  sendKey,
   sendMessage,
 };
