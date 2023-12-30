@@ -1,6 +1,6 @@
 // hashStore.ts
 // import { useEffect, useState } from 'react';
-import { create } from 'zustand';
+import { create } from "zustand";
 export var token: string | null;
 
 interface ap {
@@ -10,17 +10,24 @@ interface ap {
   login: string;
   email: string;
   image: string;
-  setInfo: (user: string, first_name: string, last_name: string, login: string, email: string, image: string) => void;
+  setInfo: (
+    user: string,
+    first_name: string,
+    last_name: string,
+    login: string,
+    email: string,
+    image: string
+  ) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
 export const useApi = create<ap>((set) => ({
-  user: '',
-  first_name: '',
-  last_name: '',
-  login: '',
-  email: '',
-  image: '',
+  user: "",
+  first_name: "",
+  last_name: "",
+  login: "",
+  email: "",
+  image: "",
   setInfo: (User, First_name, Last_name, Login, Email, Image) =>
     set(() => ({
       user: User,

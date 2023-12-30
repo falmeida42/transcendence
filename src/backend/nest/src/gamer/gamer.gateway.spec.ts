@@ -1,18 +1,18 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { GamerGateway } from './gamer.gateway';
+import { Test, TestingModule } from '@nestjs/testing';
+import { GamerGateway } from './gamer.gateway';
 
-// describe('GamerGateway', () => {
-//   let gateway: GamerGateway;
+describe('GamerGateway', () => {
+  let gateway: GamerGateway;
 
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [GamerGateway],
-//     }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [GamerGateway],
+    }).compile();
 
-//     gateway = module.get<GamerGateway>(GamerGateway);
-//   });
+    gateway = module.get<GamerGateway>(GamerGateway);
+  });
 
-//   it('should be defined', () => {
-//     expect(gateway).toBeDefined();
-//   });
-// });
+  it('should be defined', () => {
+    expect(gateway).toBeDefined();
+  });
+});
