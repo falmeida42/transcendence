@@ -1,10 +1,15 @@
 import { useContext, useState } from "react";
-import { SocketContext, createRoom, set_name } from "../context/SocketContext";
+import {
+  SocketContext,
+  createRoom,
+  joinQueue,
+  leaveQueue,
+  set_name,
+} from "../context/SocketContext";
 import RealPong from "./RealPong";
 
 const Home = () => {
-  const { isConnected, room, username, match, winner } =
-    useContext(SocketContext);
+  const { isConnected, room, username, onQueue } = useContext(SocketContext);
   const [name, setName] = useState<string>("");
 
   if (!isConnected) {
@@ -31,24 +36,39 @@ const Home = () => {
     );
   }
 
+  if (onQueue)
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <button onClick={() => leaveQueue()}>Leave Queue</button>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <div className="loader"></div>
+        <br></br>
+        <br></br>
+
+        <h1>Waiting...</h1>
+      </div>
+    );
+
   if (!room) {
     return (
       <div>
         <button onClick={() => createRoom(true)}>Play against AI</button>
-        <button>Play a random</button>
+        <button onClick={() => joinQueue()}>Play a random</button>
         <button disabled>Play with a friend</button>
       </div>
     );
   }
-
-  if (!match)
-    return (
-      <div>
-        <h1>Waiting for a match...</h1>
-      </div>
-    );
-
-  if (winner) return <h1>{winner} ganhou o jogo!</h1>;
 
   return <RealPong />;
 };

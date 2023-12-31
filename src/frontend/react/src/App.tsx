@@ -28,7 +28,7 @@ function App() {
       <ApiDataProvider />
       <Bars />
       {showHash === "#Game" && (
-        <div className="game" style={{ padding: "none" }}>
+        <div className="game" style={{ padding: "none", height: "80vh" }}>
           <SocketProvider>
             <Home />
           </SocketProvider>

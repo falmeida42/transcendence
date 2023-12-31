@@ -13,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Match } from './utils/Match';
 import { Player } from './utils/Player';
+import Queue from './utils/Queue';
 import { Room } from './utils/Room';
 import { gameConfig } from './utils/gameConfig';
 
@@ -36,6 +37,7 @@ export class GamerGateway
   private players: Record<string, Player> = {};
   private rooms: Record<string, Room> = {};
   private match: Record<string, Match> = {};
+  private queue: Queue<Player> = new Queue();
 
   afterInit() {
     this.logger.log('init');
@@ -43,7 +45,7 @@ export class GamerGateway
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected ${client.id}`);
-    this.players[client.id] = { socketId: client.id };
+    this.players[client.id] = { socketId: client.id, onQueue: false };
   }
 
   handleDisconnect(client: Socket) {
@@ -175,6 +177,28 @@ export class GamerGateway
     //   this.refreshGame(roomId);
     // }
     match[playerNumber].direction = direction;
+  }
+
+  @SubscribeMessage('JoinQueue')
+  joinQueue(@ConnectedSocket() client: Socket) {
+    const player = this.players[client.id];
+
+    if (player.onQueue) return;
+    this.queue.enqueue(player);
+    player.onQueue = true;
+    client.emit('QueueJoined');
+    this.logger.log(`Client ${client.id} joined the queue`);
+  }
+
+  @SubscribeMessage('LeaveQueue')
+  leaveQueue(@ConnectedSocket() client: Socket) {
+    const player = this.players[client.id];
+
+    if (!player.onQueue) return;
+    this.queue.dequeue();
+    player.onQueue = false;
+    client.emit('QueueLeft');
+    this.logger.log(`Client ${client.id} left the queue`);
   }
 
   runGame(roomId: string, againstAi: boolean) {

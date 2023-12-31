@@ -16,6 +16,7 @@ type state = {
   room?: Room;
   match?: Match;
   winner?: string;
+  onQueue: boolean;
 };
 
 const initialState: state = {
@@ -23,6 +24,7 @@ const initialState: state = {
   room: undefined,
   match: undefined,
   username: "",
+  onQueue: false,
   winner: undefined,
 };
 
@@ -54,6 +56,8 @@ const SocketProvider = (props: any) => {
         return { ...state, room: action.payload };
       case "MATCH_REFRESH":
         return { ...state, match: action.payload };
+      case "QUEUE_JOINED":
+        return { ...state, onQueue: action.payload };
       case "SET_WINNER":
         return {
           ...state,
@@ -86,10 +90,19 @@ const SocketProvider = (props: any) => {
       dispatch({ type: "MATCH_REFRESH", payload: match });
     });
 
-    socket.on("GameOver", (winner) => {
-      dispatch({ type: "SET_WINNER", payload: winner });
-      dispatch({ type: "MATCH_REFRESH", payload: undefined });
+    socket.on("QueueJoined", () => {
+      dispatch({ type: "QUEUE_JOINED", payload: true });
     });
+
+    socket.on("QueueLeft", () => {
+      dispatch({ type: "QUEUE_JOINED", payload: false });
+    });
+
+    // TODO: Make the winner be displayed
+    // socket.on("GameOver", (winner) => {
+    //   dispatch({ type: "SET_WINNER", payload: winner });
+    //   dispatch({ type: "MATCH_REFRESH", payload: undefined });
+    // });
 
     set_name = (name: string) => {
       if (!name.trim()) return;
@@ -121,6 +134,14 @@ const sendKey = (key: string, type: string) => {
   socket.emit("SendKey", { key, type });
 };
 
+const joinQueue = () => {
+  socket.emit("JoinQueue");
+};
+
+const leaveQueue = () => {
+  socket.emit("LeaveQueue");
+};
+
 // const checkQueue = () => {
 //   socket.emit("CheckQueue");
 // };
@@ -130,6 +151,8 @@ export {
   SocketProvider,
   createRoom,
   gameLoaded,
+  joinQueue,
+  leaveQueue,
   sendKey,
   set_name,
 };
