@@ -10,9 +10,11 @@ interface ap {
   login: string;
   email: string;
   image: string;
+  qrcode: any;
   setInfo: (user: string, first_name: string, last_name: string, login: string, email: string, image: string) => void;
   setUsername: (user: string | undefined) => void;
   setImage: (newImage: string | undefined) => void;
+  setqrcode: (newImage: any | undefined) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 

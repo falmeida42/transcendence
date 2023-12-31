@@ -39,7 +39,6 @@ export class UserController {
       user: req.user,
     };
     this.logger.debug(JSON.stringify(logInfo));
-    console.log(req, ' ', userData);
   
     // Assuming you have a method in the userService to update user data
     const updatedUser = await this.userService.updateUserById(String(req.user.id), userData);
