@@ -1,6 +1,6 @@
 import { KeyboardEventHandler, useState } from "react";
-import Play from "../../../assets/Play.png";
 import { currentRoom, currentUsername, socketIoRef } from "../../../network/SocketConnection";
+import { useApi } from '../../../apiStore';
 
 function validInput(str: string) {
    return str.length > 0;
@@ -9,10 +9,11 @@ function validInput(str: string) {
 const Input = () => {
   const [text, setText] = useState("");
   const [placeholder, setPlaceHolder] = useState("Type your message");
+  const {user} = useApi();
 
   const sendMessage = () => {
     if (validInput(text)) {
-      socketIoRef.current.emit("messageToServer", { username: currentUsername, room: currentRoom, message: text });
+      socketIoRef.current.emit("messageToServer", { username: user, message: text });
       setText("");
     }
   };
@@ -36,11 +37,8 @@ const Input = () => {
         onClick={() => setPlaceHolder("")}
         onBlur={() => setPlaceHolder("Type your message")}
         ></textarea>
-           
-    <i className="fa fa-ban clickable" style={{marginRight: "10px"}}></i>
-    <i className="fa fa-gamepad clickable"></i>
 
-    <button onClick={() => sendMessage()}>Send</button>
+    <button onClick={() => sendMessage()}> <i className="fa fa-paper-plane clickable" style={{color: "grey"}}></i></button>
     </div>  
   );
 };

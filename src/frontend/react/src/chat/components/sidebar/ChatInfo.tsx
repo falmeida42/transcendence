@@ -2,12 +2,17 @@
 interface ChatInfoProps {
     name: string;
     image: string;
+    passSelectedChatData: (data: string) => void;
 }
 
 const ChatInfo = (chatInfoProps: ChatInfoProps) => {
-    console.log(`Chat information received: ${chatInfoProps.name}`)
+
+  const handleClick = () => {
+    chatInfoProps.passSelectedChatData(chatInfoProps.name);
+  }
+
     return(
-        <div className="clearfix">
+        <div className="clearfix" onClick={handleClick}>
             <img src={chatInfoProps.image} alt="avatar" />
             <div className="about">
               <span>{chatInfoProps.name}</span>

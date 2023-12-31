@@ -1,6 +1,6 @@
 import { toggleChatVisibility } from "../chat/ChatContent"
 import ChatInfo from "./ChatInfo";
-import { useContext } from "react";
+import { useContext} from "react";
 import { ChatContext } from "../../context/ChatContext";
 
 interface RoomData {
@@ -9,8 +9,13 @@ interface RoomData {
     image: string
 }
 
+interface ChatsProps {
+    passSelectedChatData: (data: string) => void;
+}
 
-const Chats = () => {
+
+const Chats = (chatsProps: ChatsProps) => {
+
 
     const {friends = []} = useContext(ChatContext) ?? {}
     const rooms: RoomData[] = []
@@ -32,7 +37,7 @@ const Chats = () => {
         <div className="chats" onClick={toggleChatVisibility}>
             {
                 rooms.map((room) => (
-                    <ChatInfo key={room.id} name={room.name} image={room.image}/>
+                    <ChatInfo passSelectedChatData={chatsProps.passSelectedChatData} key={room.id} name={room.name} image={room.image}/>
                 ))
             }
         </div>

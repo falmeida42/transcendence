@@ -6,13 +6,21 @@ import ChatSidebar from './components/sidebar/ChatSidebar';
 import { ChatContext, ChatProvider } from './context/ChatContext';
 
 
+
 function Chat() {
 
+  const [selectedChatData, setSelectedChatData] = useState("");
+
+  const passSelectedChatData = (data: string) => {
+    setSelectedChatData(data);
+  };
+
+  console.log("Chat:", selectedChatData);
     return (
       <div className="container container_chat clearfix">
         <ChatProvider>
-          <ChatSidebar/>
-          <ChatContent/>
+          <ChatSidebar passSelectedChatData={passSelectedChatData}/>
+          <ChatContent selectedChatData={selectedChatData}/>
         </ChatProvider>
       </div>
     );

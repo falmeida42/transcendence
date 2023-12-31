@@ -49,6 +49,9 @@ $gray: #92959E;
     overflow-y: scroll;
     max-height: 600px;
     
+    .clearfix {
+      cursor: pointer;
+    }
     
     li {
       padding-bottom: 20px;
@@ -113,6 +116,13 @@ $gray: #92959E;
       color: #D8DADF;
       font-size: 20px;
       margin-top: 12px;
+    }
+
+    i {
+      margin: 16px 10px;
+      left: 50%;
+      // float: right;
+      color: grey;
     }
   }
   
@@ -179,7 +189,7 @@ $gray: #92959E;
     padding: 30px;
     
     textarea {
-      width: 100%;
+      width: 90%;
       border: none;
       padding: 10px 20px;
       font: 14px/22px "Lato", Arial, sans-serif;
@@ -205,6 +215,7 @@ $gray: #92959E;
       cursor: pointer;
       font-weight: bold;
       background: #F2F5F8;
+      margin-top: 16px;
       
       &:hover {
         color: darken($blue, 7%);
@@ -253,4 +264,14 @@ $gray: #92959E;
 
 .clickable {
   cursor: pointer;
+}
+
+.modal {
+  display: block;
+  top: 40%;
+  left: 4%;
+
+  .modal-dialog {
+    max-width: 300px;
+  }
 }

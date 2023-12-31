@@ -1,11 +1,16 @@
 import Chats from "./Chats"
 import Search from "./Search"
 
-const ChatSidebar = () => {
+
+interface ChatSidebarProps {
+    passSelectedChatData: (data: string) => void;
+}
+
+const ChatSidebar = (chatSidebarProps: ChatSidebarProps) => {
     return (
         <div className="sidebar">
             <Search/>
-            <Chats/>
+            <Chats passSelectedChatData={chatSidebarProps.passSelectedChatData}/>
         </div>
     )
 }
