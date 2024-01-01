@@ -10,10 +10,15 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+
+const ip = process.env.IP_MACHINE || 'localhost';
+
+console.log(ip);
+
 @WebSocketGateway({
   namespace: '/game',
   cors: {
-    origin: 'http://localhost:5173',
+    origin: [`http://${ip}:5173`, 'http://localhost:5173'],
     credentials: true,
   },
 })

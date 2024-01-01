@@ -1,6 +1,7 @@
 import { gameConfig } from './gameConfig';
 
 export interface playerConfig {
+  id: string;
   ready: boolean;
   x: number;
   y: number;

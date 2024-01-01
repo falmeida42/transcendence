@@ -86,6 +86,7 @@ export class GamerGateway
       this.match[this.players[client.id].room] = {
         gameConfig,
         player1: {
+          id: client.id,
           ready: false,
           x: 5,
           y: gameConfig.height / 2 - 50,
@@ -95,6 +96,7 @@ export class GamerGateway
           direction: 'STOP',
         },
         player2: {
+          id: 'AI',
           ready: false,
           x: gameConfig.width - 20,
           y: gameConfig.height / 2 - 50,
@@ -170,12 +172,6 @@ export class GamerGateway
     const match = this.match[roomId];
 
     const direction = type === 'keyup' ? 'STOP' : key;
-    // if (key === 'Enter' && type === 'keydown') {
-    //   match.score1 = 0;
-    //   match.score2 = 0;
-    //   this.restartBall(match, roomId);
-    //   this.refreshGame(roomId);
-    // }
     match[playerNumber].direction = direction;
   }
 
@@ -351,9 +347,16 @@ export class GamerGateway
     ) {
       this.logger.log('Game Over');
       match.status = 'END';
-      const lucasId = await this.prisma.user.findUnique({
+      await this.saveMatchOnDatabase(match);
+      this.server.to(roomId).emit('GameOver', match);
+    }
+  }
+
+  async saveMatchOnDatabase(match: Match) {
+    try {
+      const userId = await this.prisma.user.findUniqueOrThrow({
         where: {
-          login: 'lucas-ma',
+          login: this.players[match.player1.id].name,
         },
       });
       const winnerScore =
@@ -366,11 +369,22 @@ export class GamerGateway
         data: {
           playerwinScore: winnerScore,
           playerlosScore: loserScore,
-          userwinId: lucasId.id,
+          userwinId: userId.id,
         },
       });
       this.logger.log(matchCreated);
+    } catch (e) {
+      this.logger.log(e);
     }
-    this.server.to(roomId).emit('GameOver', match);
   }
+
+  queueMatch() {
+    if (this.queue.size() < 2) return;
+    const player1 = this.queue.dequeue();
+    const player2 = this.queue.dequeue();
+
+    this.createRoomFromQueue(player1, player2);
+  }
+
+  createRoomFromQueue(player1: Player, player2: Player) {}
 }

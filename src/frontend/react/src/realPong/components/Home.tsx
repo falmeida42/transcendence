@@ -46,17 +46,12 @@ const Home = () => {
         }}
       >
         <button onClick={() => leaveQueue()}>Leave Queue</button>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <div className="loader"></div>
-        <br></br>
-        <br></br>
 
-        <h1>Waiting...</h1>
+        <div className="loading">
+          <div className="loader"></div>
+
+          <h1>Waiting...</h1>
+        </div>
       </div>
     );
 

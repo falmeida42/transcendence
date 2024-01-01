@@ -1,15 +1,15 @@
 import {
+  Body,
   Controller,
   Get,
-  UseGuards,
+  Logger,
+  Post,
   Req,
   Res,
-  Body,
-  Post,
-  Logger,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { FTGuard } from '../auth/guard';
+import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 
 @Controller('auth')
