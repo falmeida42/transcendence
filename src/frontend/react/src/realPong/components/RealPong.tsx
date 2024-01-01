@@ -7,6 +7,7 @@ const RealPong = () => {
   const { gameConfig, ball, player1, player2 } = match!;
 
   useEffect(() => {
+    console.log("RealPong.tsx: useEffect");
     gameLoaded();
 
     const sendKeyEvent = (e: KeyboardEvent) => {

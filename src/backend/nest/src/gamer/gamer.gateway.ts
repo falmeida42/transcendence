@@ -37,7 +37,7 @@ export class GamerGateway
   private players: Record<string, Player> = {};
   private rooms: Record<string, Room> = {};
   private match: Record<string, Match> = {};
-  private queue: Queue<Player> = new Queue();
+  private queue: Queue<Socket> = new Queue();
 
   afterInit() {
     this.logger.log('init');
@@ -45,7 +45,7 @@ export class GamerGateway
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected ${client.id}`);
-    this.players[client.id] = { socketId: client.id, onQueue: false };
+    this.players[client.id] = { socket: client.id, onQueue: false };
   }
 
   handleDisconnect(client: Socket) {
@@ -76,7 +76,7 @@ export class GamerGateway
 
     this.rooms[client.id] = {
       id: client.id,
-      player1: this.players[client.id].socketId,
+      player1: this.players[client.id].socket,
       player2: 'AI',
       againstAi,
     };
@@ -150,7 +150,7 @@ export class GamerGateway
         match.status = 'PLAY';
         return;
       }
-      if (room.player1 === player.socketId) {
+      if (room.player1 === player.socket) {
         match.player1.ready = true;
         return;
       }
@@ -180,10 +180,11 @@ export class GamerGateway
     const player = this.players[client.id];
 
     if (player.onQueue) return;
-    this.queue.enqueue(player);
+    this.queue.enqueue(client);
     player.onQueue = true;
     client.emit('QueueJoined');
     this.logger.log(`Client ${client.id} joined the queue`);
+    this.queueMatch();
   }
 
   @SubscribeMessage('LeaveQueue')
@@ -218,6 +219,11 @@ export class GamerGateway
 
   refreshGame(roomId: string) {
     const match = this.match[roomId];
+    this.logger.log(
+      `1 : ${this.players[match.player1.id]} 2: ${
+        this.players[match.player2.id]
+      } `,
+    );
     this.server.to(roomId).emit('MatchRefresh', match);
   }
 
@@ -386,5 +392,64 @@ export class GamerGateway
     this.createRoomFromQueue(player1, player2);
   }
 
-  createRoomFromQueue(player1: Player, player2: Player) {}
+  createRoomFromQueue(socket1: Socket, socket2: Socket) {
+    const roomId = socket1.id + socket1.id;
+    const player1 = this.players[socket1.id];
+    const player2 = this.players[socket2.id];
+
+    this.logger.log(`${player1.name} vs ${player2.name} in room }`);
+    socket1.join(roomId);
+    socket2.join(roomId);
+
+    this.rooms[roomId] = {
+      id: roomId,
+      player1: socket1.id,
+      player2: socket2.id,
+      againstAi: false,
+    };
+
+    player1.room = roomId;
+    player2.room = roomId;
+
+    this.match[roomId] = {
+      gameConfig,
+      player1: {
+        id: player1.socket,
+        ready: false,
+        x: 5,
+        y: gameConfig.height / 2 - 50,
+        height: 100,
+        width: 15,
+        speed: 10,
+        direction: 'STOP',
+      },
+      player2: {
+        id: player2.socket,
+        ready: false,
+        x: gameConfig.width - 20,
+        y: gameConfig.height / 2 - 50,
+        height: 100,
+        width: 15,
+        speed: 10,
+        direction: 'STOP',
+      },
+      ball: {
+        x: gameConfig.width / 2,
+        y: gameConfig.height / 2,
+        radius: 10,
+        x_speed: 10,
+        y_speed: 10,
+        x_direction: 1,
+        y_direction: 1,
+      },
+      score1: 0,
+      score2: 0,
+      status: 'START',
+    };
+
+    socket1.emit('RoomCreated', this.rooms[roomId]);
+    socket2.emit('RoomCreated', this.rooms[roomId]);
+    // this.runGame(roomId, false);
+    this.logger.log(`Room ${roomId} created`);
+  }
 }

@@ -3,13 +3,12 @@ import {
   SocketContext,
   createRoom,
   joinQueue,
-  leaveQueue,
   set_name,
 } from "../context/SocketContext";
 import RealPong from "./RealPong";
 
 const Home = () => {
-  const { isConnected, room, username, onQueue } = useContext(SocketContext);
+  const { isConnected, room, username } = useContext(SocketContext);
   const [name, setName] = useState<string>("");
 
   if (!isConnected) {
@@ -36,24 +35,24 @@ const Home = () => {
     );
   }
 
-  if (onQueue)
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        <button onClick={() => leaveQueue()}>Leave Queue</button>
+  // if (onQueue)
+  //   return (
+  //     <div
+  //       style={{
+  //         display: "flex",
+  //         flexDirection: "column",
+  //         justifyContent: "space-between",
+  //       }}
+  //     >
+  //       <button onClick={() => leaveQueue()}>Leave Queue</button>
 
-        <div className="loading">
-          <div className="loader"></div>
+  //       <div className="loading">
+  //         <div className="loader"></div>
 
-          <h1>Waiting...</h1>
-        </div>
-      </div>
-    );
+  //         <h1>Waiting...</h1>
+  //       </div>
+  //     </div>
+  //   );
 
   if (!room) {
     return (

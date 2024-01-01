@@ -25,26 +25,25 @@ function App() {
 
   return (
     <div>
-      <ApiDataProvider>
-        <Bars />
-        {showHash === "#Game" && (
-          <div className="game" style={{ padding: "none", height: "80vh" }}>
-            <SocketProvider>
-              <Home />
-            </SocketProvider>
-          </div>
-        )}
-        {showHash === "#Profile" && (
-          <div className="game">
-            <Profile />
-          </div>
-        )}
-        {showHash === "#Chat" && (
-          <div className="game">
-            <Chat />
-          </div>
-        )}
-      </ApiDataProvider>
+      <ApiDataProvider />
+      <Bars />
+      {showHash === "#Game" && (
+        <div className="game" style={{ padding: "none", height: "80vh" }}>
+          <SocketProvider>
+            <Home />
+          </SocketProvider>
+        </div>
+      )}
+      {showHash === "#Profile" && (
+        <div className="game">
+          <Profile />
+        </div>
+      )}
+      {showHash === "#Chat" && (
+        <div className="game">
+          <Chat />
+        </div>
+      )}
     </div>
   );
 }

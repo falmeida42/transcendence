@@ -1,6 +1,6 @@
 export interface Player {
   name?: string;
-  socketId: string;
+  socket: string;
   room?: string;
   onQueue: boolean;
 }
