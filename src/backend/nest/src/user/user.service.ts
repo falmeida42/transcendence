@@ -36,15 +36,15 @@ export class UserService {
   }
 
   async getFriends(userId: string) {
-    const friends = await this.prisma.user.findUnique({ 
+    const user = await this.prisma.user.findUnique({ 
       where: { id: userId },
       include: {
         friends: true
       }
     })
 
-    JSON.stringify(friends)
-    return friends
+    JSON.stringify(user)
+    return user.friends
   }
 
   async getChatRooms(userId: string) {
@@ -82,7 +82,25 @@ export class UserService {
     return null; // or handle the case when userWithChatRooms is null
   }
   
-
+  async getChatHistory(userId: string, chatId: string) {
+    const user = await this.prisma.user.findUnique({ 
+      where: { id: userId },
+      include: {
+        chatRooms: {
+          where: { id: chatId },
+          include: {
+            messages: true,
+          },
+        },
+      },
+    });
+  
+    // Extract messages from the chat room
+    const messages = user?.chatRooms[0]?.messages || [];
+  
+    return messages;
+  }
+  
 
 
   async insertFriend(userId: string, friend: any) {

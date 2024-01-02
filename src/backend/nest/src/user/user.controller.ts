@@ -74,6 +74,14 @@ export class UserController {
     return ChatRooms
   }
 
+  @Get('chatHistory/:id')
+  async getChatHistory(@Req() req: any, @Param('id') id: string) {
+    
+    const chatHistory = this.userService.getChatHistory(req.user.id, id);
+    
+    return chatHistory
+  }
+
   @Post('add-friend/:friendName')
   async addFriend(
     @Req() req: any,
