@@ -51,7 +51,7 @@ const SocketProvider = (props: any) => {
       case "DISCONNECTED":
         return { ...state, isConnected: action.payload };
       case "NAME_SET":
-        return { ...state, username: action.payload };
+        return { ...state, username: action.payload, match: undefined };
       case "ROOM_CREATED":
         return { ...state, room: action.payload };
       case "MATCH_REFRESH":
@@ -62,6 +62,7 @@ const SocketProvider = (props: any) => {
         return {
           ...state,
           winner: action.payload,
+          match: undefined,
         };
       default:
         return state;
@@ -99,10 +100,9 @@ const SocketProvider = (props: any) => {
     });
 
     // TODO: Make the winner be displayed
-    // socket.on("GameOver", (winner) => {
-    //   dispatch({ type: "SET_WINNER", payload: winner });
-    //   dispatch({ type: "MATCH_REFRESH", payload: undefined });
-    // });
+    socket.on("GameOver", (winner) => {
+      dispatch({ type: "SET_WINNER", payload: winner });
+    });
 
     set_name = (name: string) => {
       if (!name.trim()) return;
@@ -141,10 +141,6 @@ const joinQueue = () => {
 const leaveQueue = () => {
   socket.emit("LeaveQueue");
 };
-
-// const checkQueue = () => {
-//   socket.emit("CheckQueue");
-// };
 
 export {
   SocketContext,

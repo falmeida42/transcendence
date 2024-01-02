@@ -53,7 +53,7 @@ const RealPong = () => {
               y="0"
               width={gameConfig.width.toString()}
               height={gameConfig.height.toString()}
-              xlinkHref="https://cdn.intra.42.fr/users/baf96bbadcaa62e4d9c24524ad0738e9/lucas-ma.JPG"
+              xlinkHref="https://images.unsplash.com/photo-1697484452652-6ac6e917ecc8?q=80&w=1943&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             ></image>
           </pattern>
         </defs>

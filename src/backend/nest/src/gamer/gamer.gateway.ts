@@ -81,6 +81,7 @@ export class GamerGateway
       againstAi,
     };
     this.players[client.id].room = client.id;
+    // createMatch(client.id, againstAi);
 
     if (againstAi) {
       this.match[this.players[client.id].room] = {
@@ -198,6 +199,46 @@ export class GamerGateway
     this.logger.log(`Client ${client.id} left the queue`);
   }
 
+  createMatch(player1Id: string, againstAi: boolean, player2Id?: string) {
+    const match: Match = {
+      gameConfig,
+      player1: {
+        id: player1Id,
+        ready: false,
+        x: 5,
+        y: gameConfig.height / 2 - 50,
+        height: 100,
+        width: 15,
+        speed: 10,
+        direction: 'STOP',
+      },
+      player2: {
+        id: againstAi ? 'AI' : player2Id,
+        ready: false,
+        x: gameConfig.width - 20,
+        y: gameConfig.height / 2 - 50,
+        height: 100,
+        width: 15,
+        speed: 10,
+        direction: 'STOP',
+      },
+      ball: {
+        x: gameConfig.width / 2,
+        y: gameConfig.height / 2,
+        radius: 10,
+        x_speed: 10,
+        y_speed: 10,
+        x_direction: 1,
+        y_direction: 1,
+      },
+      score1: 0,
+      score2: 0,
+      status: 'START',
+    };
+    this.match[this.players[player1Id].room] = match;
+    return match;
+  }
+
   runGame(roomId: string, againstAi: boolean) {
     const match = this.match[roomId];
     if (!match || match.status === 'END') return;
@@ -219,11 +260,6 @@ export class GamerGateway
 
   refreshGame(roomId: string) {
     const match = this.match[roomId];
-    this.logger.log(
-      `1 : ${this.players[match.player1.id]} 2: ${
-        this.players[match.player2.id]
-      } `,
-    );
     this.server.to(roomId).emit('MatchRefresh', match);
   }
 
@@ -411,45 +447,11 @@ export class GamerGateway
     player1.room = roomId;
     player2.room = roomId;
 
-    this.match[roomId] = {
-      gameConfig,
-      player1: {
-        id: player1.socket,
-        ready: false,
-        x: 5,
-        y: gameConfig.height / 2 - 50,
-        height: 100,
-        width: 15,
-        speed: 10,
-        direction: 'STOP',
-      },
-      player2: {
-        id: player2.socket,
-        ready: false,
-        x: gameConfig.width - 20,
-        y: gameConfig.height / 2 - 50,
-        height: 100,
-        width: 15,
-        speed: 10,
-        direction: 'STOP',
-      },
-      ball: {
-        x: gameConfig.width / 2,
-        y: gameConfig.height / 2,
-        radius: 10,
-        x_speed: 10,
-        y_speed: 10,
-        x_direction: 1,
-        y_direction: 1,
-      },
-      score1: 0,
-      score2: 0,
-      status: 'START',
-    };
+    this.match[roomId] = this.createMatch(socket1.id, false, socket2.id);
 
     socket1.emit('RoomCreated', this.rooms[roomId]);
     socket2.emit('RoomCreated', this.rooms[roomId]);
-    // this.runGame(roomId, false);
+    this.runGame(roomId, false);
     this.logger.log(`Room ${roomId} created`);
   }
 }
