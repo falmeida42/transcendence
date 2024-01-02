@@ -20,11 +20,16 @@ $gray: #92959E;
 }
 
 .sidebar {
-  max-width: 300px;
+  max-width: 33vw;
   flex: 1;
   float: left;
   background: #444753;
   
+  @media (max-width: 767px) {
+    max-width: 50vw;
+   // min-width: 33vw;
+  }
+
   .search {
     padding: 20px;
   }
@@ -84,10 +89,15 @@ $gray: #92959E;
   background: #F2F5F8;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  max-width: 300px;
+  max-width: 33vw;
   flex: 1;
   color: #434651;
+  height: 700px;
   
+  @media (max-width: 767px) {
+    max-width: 50vw;
+  }
+
   .chat-header {
     padding: 20px;
     border-bottom: 2px solid white;
@@ -274,4 +284,8 @@ $gray: #92959E;
   .modal-dialog {
     max-width: 300px;
   }
+}
+
+.container {
+  width: 100%;
 }
