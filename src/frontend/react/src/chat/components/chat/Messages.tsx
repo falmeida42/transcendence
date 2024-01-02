@@ -1,6 +1,7 @@
 import { socketIoRef } from "../../../network/SocketConnection";
+import { ChatContext,  } from "../../context/ChatContext";
 import Message from "./Message";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 export interface MessageData {
   id: string;
@@ -16,10 +17,7 @@ export interface Payload {
 }
 
 function fetchMessageData(setMessages: React.Dispatch<React.SetStateAction<MessageData[]>>) {
-  socketIoRef.current.on("messageToClient", (message: Payload) => {
-    console.log("Received message:", message);
-    receivedMessage(message, setMessages);
-  })
+  
   
 };
 
@@ -37,43 +35,22 @@ function receivedMessage(message: Payload, setMessages: React.Dispatch<React.Set
 
 const Messages = () => {
   const [messages, setMessages] = useState<MessageData[]>([]);
+  const {socket} = useContext(ChatContext) ?? {}
 
-  messages.push(
-    {
-      id: crypto.randomUUID(),
-      username: "falmeida",
-      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg",
-      message: "Hello hello hello hello aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    }
-  )
 
-  messages.push(
-    {
-      id: crypto.randomUUID(),
-      username: "falmeidaa",
-      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_10.jpg",
-      message: "World"
-    }
-  )
+  useEffect(() => {
+    
 
-  messages.push(
-    {
-      id: crypto.randomUUID(),
-      username: "falmeida",
-      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg",
-      message: "Hello"
-    }
-  )
+    fetchMessageData(setMessages)
+    return () => {
+      console.log("before fetch data")
+      socketIoRef.current.on("messageToClient", (message: Payload) => {
+        console.log("Received message:", message);
+        receivedMessage(message, setMessages);
+      })
+    };
+  }, []); // Removed messages and text from the dependency arrx\ay to avoid unnecessary re-renders
 
-  messages.push(
-    {
-      id: crypto.randomUUID(),
-      username: "falmeidaa",
-      userImage: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_10.jpg",
-      message: "World"
-    }
-  )
-  
   console.log("Current messages:", messages);
 
   return (

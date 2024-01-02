@@ -1,24 +1,31 @@
-import { KeyboardEventHandler, useState } from "react";
-import { currentRoom, currentUsername, socketIoRef } from "../../../network/SocketConnection";
+import { KeyboardEventHandler, useContext, useState } from "react";
 import { useApi } from '../../../apiStore';
+import { ChatContext } from "../../context/ChatContext";
 
 function validInput(str: string) {
    return str.length > 0;
 }
 
-const Input = () => {
+const Input = (content: any) => {
+
+
   const [text, setText] = useState("");
   const [placeholder, setPlaceHolder] = useState("Type your message");
-  const {user} = useApi();
+  const {login} = useApi();
+  const {socket} = useContext(ChatContext) ?? {}
+
+
 
   const sendMessage = () => {
     if (validInput(text)) {
-      socketIoRef.current.emit("messageToServer", { username: user, message: text });
+      console.log("This is the input content: ", content.content.selectedChatData )
+      console.log("This is the user content: ", login )
+      socket.emit("messageToServer", { to: login , message: text, sender: content.content.selectedChatData });
       setText("");
     }
   };
 
-  const handleKey: KeyboardEventHandler<HTMLInputElement> = (event) => {
+  const handleKey: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === 'Enter') {
       sendMessage();
     }
