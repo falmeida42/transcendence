@@ -38,6 +38,7 @@ export class GamerGateway
   private rooms: Record<string, Room> = {};
   private match: Record<string, Match> = {};
   private queue: Queue<Socket> = new Queue();
+  private queueTimeOutID: NodeJS.Timeout | undefined;
 
   afterInit() {
     this.logger.log('init');
@@ -241,7 +242,6 @@ export class GamerGateway
     if (match.status === 'PLAY') {
       this.moveBall(match);
       if (againstAi && match.ball.x_direction == 1) this.moveAi(match);
-      else match.player2.direction = 'STOP';
       this.movePaddle(match);
       this.checkCollision(match);
     }
@@ -296,7 +296,7 @@ export class GamerGateway
       match.player2.direction = 'ArrowUp';
     } else if (match.ball.y > match.player2.y + match.player2.height) {
       match.player2.direction = 'ArrowDown';
-    }
+    } else match.player2.direction = 'STOP';
   }
 
   checkCollision(match: Match) {
@@ -391,9 +391,14 @@ export class GamerGateway
 
   async saveMatchOnDatabase(match: Match) {
     try {
-      const userId = await this.prisma.user.findUniqueOrThrow({
+      const user1Id = await this.prisma.user.findUniqueOrThrow({
         where: {
           login: this.players[match.player1.id].name,
+        },
+      });
+      const user2Id = await this.prisma.user.findFirstOrThrow({
+        where: {
+          login: this.players[match.player2.id].name,
         },
       });
       const winnerScore =
@@ -406,7 +411,8 @@ export class GamerGateway
         data: {
           playerwinScore: winnerScore,
           playerlosScore: loserScore,
-          userwinId: userId.id,
+          userwinId: winnerScore === match.score1 ? user1Id.id : user2Id.id,
+          userlosId: winnerScore === match.score1 ? user1Id.id : user2Id.id,
         },
       });
       this.logger.log(matchCreated);
@@ -416,7 +422,11 @@ export class GamerGateway
   }
 
   queueMatch() {
-    if (this.queue.size() < 2) return;
+    if (this.queue.size() < 2) {
+      clearTimeout(this.queueTimeOutID);
+      return;
+    }
+    this.queueTimeOutID = setTimeout(() => this.queueMatch(), 1000);
     const player1 = this.queue.dequeue();
     const player2 = this.queue.dequeue();
 
