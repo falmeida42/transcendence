@@ -10,14 +10,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ChatType {
+  DIRECT_MESSAGE
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}
+
 model User {
-  id                  String  @id @default(uuid())
-  login               String  @unique
-  email               String?
-  image               String
-  first_name          String?
-  last_name           String?
-  username            String?
-  friends             User[]  @relation("UserFriends")
-  friendOf            User[]  @relation("UserFriends")
+  id         String     @id @default(uuid())
+  login      String     @unique
+  email      String?
+  image      String
+  first_name String?
+  last_name  String?
+  username   String?
+  chatRooms  ChatRoom[] @relation("Participants")
+
+  ownerOf ChatRoom[] @relation("Owners")
+
+  friends  User[] @relation("UserFriends")
+  friendOf User[] @relation("UserFriends")
+
+  chatRoomId String?
+  Message    Message[]
+}
+
+model ChatRoom {
+  id           String    @id @default(uuid())
+  name         String
+  image        String
+  type         ChatType
+  owners       User[]    @relation("Owners")
+  messages     Message[]
+  participants User[]    @relation("Participants")
+
+  userId String?
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  content        String
+  chat_id        String
+  chat_reference ChatRoom @relation(fields: [chat_id], references: [id])
+  sender_id      String
+  sender         User     @relation(fields: [userId], references: [id])
+  userId         String
 }

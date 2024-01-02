@@ -32,6 +32,13 @@ export class UserController {
     return this.userService.getUserById(String(req.user.id));
   }
 
+  @Get('findlogin/:login')
+  async findByLogin(@Param('login') login: string) {
+
+    return this.userService.getUserByLogin(login);
+  }
+
+
   @Get('find/:id')
   async findById(@Param('id') id: string) {
     return this.userService.getUserById(id);
@@ -54,6 +61,17 @@ export class UserController {
     
     console.log("friends receeeeived ", friends)
     return friends
+  }
+
+  @Get('chatRooms')
+  async getChatRooms(@Req() req: any) {
+    
+    console.log("backend getting ChatRooms")
+    
+    const ChatRooms = this.userService.getChatRooms(String(req.user.id));
+    
+    console.log("friends receeeeived ", ChatRooms)
+    return ChatRooms
   }
 
   @Post('add-friend/:friendName')

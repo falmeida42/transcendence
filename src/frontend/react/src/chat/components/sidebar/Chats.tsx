@@ -17,17 +17,17 @@ interface ChatsProps {
 const Chats = (chatsProps: ChatsProps) => {
 
 
-    const {friends = []} = useContext(ChatContext) ?? {}
+    const {chatRooms = []} = useContext(ChatContext) ?? {}
     const rooms: RoomData[] = []
 
-    console.log("friends in chat", friends)
+    console.log("friends in chat", chatRooms)
 
-    friends.map((friend : any) => (
+    chatRooms.map((room : any) => (
         rooms.push(
             {
-                id: friend.id,
-                name: friend.login,
-                image: friend.image
+                id: room.id,
+                name: room.name,
+                image: room.image
             }
         )
     ))

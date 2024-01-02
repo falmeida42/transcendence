@@ -2,7 +2,8 @@ import Messages from "./Messages"
 import Input from "./Input"
 import BlockPopup from "./BlockPopup"
 import MatchPopup from "./MatchPopup"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { tk } from "../../context/ChatContext"
 
 export const toggleChatVisibility = () => {
     const element = (document.getElementById("chat") as HTMLDivElement);
@@ -26,6 +27,23 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
         setIsVisibleMatch(!isVisibleMatch);
     };
 
+
+        fetch(`http://localhost:3000/user/findlogin/${chatContentProps}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${tk}`,
+            'Content-Type`': 'application/json',
+        }
+        })
+        .then(async (response) => await response.json())
+        .then((data) => {
+
+            console.log("This is the data from my friend: ", data)
+            
+        })
+        .catch((error) => console.log(error))
+    
+
     return (
         <div className="chat">
             {isVisibleBlock && <BlockPopup isVisible={isVisibleBlock} handleClose={handleClickBlock}/>}
@@ -39,7 +57,7 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
                 </div>
             </div>
             <Messages/>
-            <Input/>
+            <Input content={chatContentProps}/>
         </div> 
     )
 }

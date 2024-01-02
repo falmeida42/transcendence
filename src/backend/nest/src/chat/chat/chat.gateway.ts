@@ -38,7 +38,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('messageToServer')
   handleMessage(client: Socket, payload: any): void {
     this.logger.log(`Message received from ${client.id}: ${JSON.stringify(payload)}`);
-    this.io.to(payload.room).emit('messageToClient', payload);
+    this.io.to(payload.to).emit('messageToClient', { message: payload.message, from: payload.sender });
   }
 
   @SubscribeMessage('joinChannel')
