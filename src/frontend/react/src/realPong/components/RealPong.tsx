@@ -12,8 +12,10 @@ const RealPong = () => {
 
     const sendKeyEvent = (e: KeyboardEvent) => {
       const { key, type } = e;
-
+      if (e.repeat) return;
       if (key === "ArrowUp" || key === "ArrowDown") {
+        console.log("boas");
+
         sendKey(key, type);
         e.preventDefault();
       }
@@ -67,6 +69,7 @@ const RealPong = () => {
         <Rect
           x={"0"}
           y={"0"}
+          STOP
           width={gameConfig.width.toString()}
           height={gameConfig.height.toString()}
           style={{ fill: "url(#image)" }}

@@ -137,11 +137,10 @@ export class GamerGateway
 
     const match = this.match[roomId];
     if (!match) return;
-
+    if (room.player1 === player.socket) match.player1.ready = true;
+    else match.player2.ready = true;
     if (room.againstAi) {
-      match.player1.ready = true;
       match.status = 'PLAY';
-      return;
     } else {
       if (
         match.player1.ready &&
@@ -149,13 +148,7 @@ export class GamerGateway
         match.status !== 'PLAY'
       ) {
         match.status = 'PLAY';
-        return;
       }
-      if (room.player1 === player.socket) {
-        match.player1.ready = true;
-        return;
-      }
-      match.player2.ready = true;
     }
   }
 
@@ -173,6 +166,8 @@ export class GamerGateway
     const match = this.match[roomId];
 
     const direction = type === 'keyup' ? 'STOP' : key;
+    if (playerNumber === 'player2')
+      this.logger.debug(`player ${JSON.stringify(player)}`);
     match[playerNumber].direction = direction;
   }
 

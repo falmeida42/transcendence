@@ -55,7 +55,7 @@ const SocketProvider = (props: any) => {
       case "ROOM_CREATED":
         return { ...state, room: action.payload };
       case "MATCH_REFRESH":
-        return { ...state, match: action.payload };
+        return { ...state, match: action.payload, onQueue: false };
       case "QUEUE_JOINED":
         return { ...state, onQueue: action.payload };
       case "SET_WINNER":

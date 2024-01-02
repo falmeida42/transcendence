@@ -15,6 +15,13 @@ const Home = () => {
   const [page, setPage] = useState<number>(0);
 
   useEffect(() => {
+    console.log("page changer");
+    console.log({
+      isConnected,
+      username,
+      onQueue,
+      room,
+    });
     const changePage = () => {
       if (!isConnected) {
         setPage(0);
@@ -32,14 +39,15 @@ const Home = () => {
         setPage(3);
         return;
       }
-      // if (!match && winner) {
-      //   setPage(4);
-      //   return;
-      // }
+      if (!match && winner) {
+        setPage(4);
+        return;
+      }
       setPage(4);
     };
     changePage();
-  }, [isConnected, room, username, onQueue, match, winner]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, room, username, onQueue, !!match, !!winner]);
 
   if (page === 0) {
     return (
