@@ -10,7 +10,9 @@ interface ap {
   login: string;
   email: string;
   image: string;
-  setInfo: (user: string, first_name: string, last_name: string, login: string, email: string, image: string) => void;
+  friends: any;
+
+  setInfo: (user: string, first_name: string, last_name: string, login: string, email: string, image: string, friends: any) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
@@ -21,7 +23,8 @@ export const useApi = create<ap>((set) => ({
   login: '',
   email: '',
   image: '',
-  setInfo: (User, First_name, Last_name, Login, Email, Image) =>
+  friends: [],
+  setInfo: (User, First_name, Last_name, Login, Email, Image, Friends) =>
     set(() => ({
       user: User,
       first_name: First_name,
@@ -29,6 +32,7 @@ export const useApi = create<ap>((set) => ({
       login: Login,
       email: Email,
       image: Image,
+      friends: Friends
     })),
   [Symbol.iterator]: function* () {
     yield this.user;
@@ -37,5 +41,6 @@ export const useApi = create<ap>((set) => ({
     yield this.login;
     yield this.email;
     yield this.image;
+    yield this.friends;
   },
 }));

@@ -1,31 +1,19 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "ChatType" AS ENUM ('DIRECT_MESSAGE', 'PUBLIC', 'PRIVATE', 'PROTECTED');
 
-  - You are about to drop the `Chat` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `ChatUser` table. If the table is not empty, all the data it contains will be lost.
-  - Added the required column `userId` to the `Message` table without a default value. This is not possible if the table is not empty.
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "login" TEXT NOT NULL,
+    "email" TEXT,
+    "image" TEXT NOT NULL,
+    "first_name" TEXT,
+    "last_name" TEXT,
+    "username" TEXT,
+    "chatRoomId" TEXT,
 
-*/
--- DropForeignKey
-ALTER TABLE "ChatUser" DROP CONSTRAINT "ChatUser_chat_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "Message" DROP CONSTRAINT "Message_chat_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "Message" DROP CONSTRAINT "Message_sender_id_fkey";
-
--- AlterTable
-ALTER TABLE "Message" ADD COLUMN     "userId" TEXT NOT NULL;
-
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "chatRoomId" TEXT;
-
--- DropTable
-DROP TABLE "Chat";
-
--- DropTable
-DROP TABLE "ChatUser";
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "ChatRoom" (
@@ -39,6 +27,23 @@ CREATE TABLE "ChatRoom" (
 );
 
 -- CreateTable
+CREATE TABLE "Message" (
+    "id" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "chat_id" TEXT NOT NULL,
+    "sender_id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "_UserFriends" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "_Owners" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
@@ -49,6 +54,15 @@ CREATE TABLE "_Participants" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_login_key" ON "User"("login");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_UserFriends_AB_unique" ON "_UserFriends"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_UserFriends_B_index" ON "_UserFriends"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_Owners_AB_unique" ON "_Owners"("A", "B");
@@ -67,6 +81,12 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_chat_id_fkey" FOREIGN KEY ("chat_i
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserFriends" ADD CONSTRAINT "_UserFriends_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserFriends" ADD CONSTRAINT "_UserFriends_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_Owners" ADD CONSTRAINT "_Owners_A_fkey" FOREIGN KEY ("A") REFERENCES "ChatRoom"("id") ON DELETE CASCADE ON UPDATE CASCADE;
