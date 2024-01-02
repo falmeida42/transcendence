@@ -89,7 +89,12 @@ export class UserService {
         chatRooms: {
           where: { id: chatId },
           include: {
-            messages: true,
+            messages: {
+              include: {
+                sender: true
+              }
+            }
+            
           },
         },
       },
