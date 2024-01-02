@@ -44,8 +44,8 @@ const Messages = (props: MessagesProps) => {
           
           setMessages(data.map( (message): MessageData => ({
             id: message.id,
-            username: props.chatName,
-            userImage: props.chatImage,
+            username: message.sender.login,
+            userImage: message.sender.image,
             message: message.content
             })
           ))
@@ -61,7 +61,7 @@ const Messages = (props: MessagesProps) => {
   return (
     <div className="chat-history">
       {messages.map((message) => (
-        <Message key={message.id} username={message.username} text={message.message}/>
+        <Message key={message.id} username={message.username} text={message.message} image={message.userImage}/>
       ))}
     </div>
   );
