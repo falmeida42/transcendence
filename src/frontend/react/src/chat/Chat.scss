@@ -93,7 +93,12 @@ $gray: #92959E;
     border-bottom: 2px solid white;
     
     img {
-      float: left;
+      float: right;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      padding: 7px;
     }
     
     .chat-about {

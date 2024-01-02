@@ -1,5 +1,5 @@
 import { socketIoRef } from "../../../network/SocketConnection";
-import { ChatContext,  } from "../../context/ChatContext";
+import { ChatContext, tk,  } from "../../context/ChatContext";
 import Message from "./Message";
 import { useState, useEffect, useContext } from "react";
 
@@ -10,46 +10,51 @@ export interface MessageData {
   message: string;
 }
 
-export interface Payload {
-  username: string;
-  userImage: string
-  message: string;
+
+interface MessagesProps {
+  chatId: string;
+  chatName: string;
+  chatImage: string
 }
 
-function fetchMessageData(setMessages: React.Dispatch<React.SetStateAction<MessageData[]>>) {
-  
-  
-};
 
-function receivedMessage(message: Payload, setMessages: React.Dispatch<React.SetStateAction<MessageData[]>>) {
-  const newMessage: MessageData = {
-    id: crypto.randomUUID(),
-    username: message.username,
-    userImage: message.userImage,
-    message: message.message,
-  };
-
-  console.log("Message until set", newMessage);
-  setMessages((prevMessages) => [...prevMessages, newMessage]); 
-}
-
-const Messages = () => {
+const Messages = (props: MessagesProps) => {
   const [messages, setMessages] = useState<MessageData[]>([]);
-  const {socket} = useContext(ChatContext) ?? {}
 
+  console.log("ID  ",props.chatId)
 
   useEffect(() => {
-    
-
-    fetchMessageData(setMessages)
-    return () => {
-      console.log("before fetch data")
-      socketIoRef.current.on("messageToClient", (message: Payload) => {
-        console.log("Received message:", message);
-        receivedMessage(message, setMessages);
+    fetch(`http://localhost:3000/user/chatHistory/${props.chatId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
       })
-    };
-  }, []); // Removed messages and text from the dependency arrx\ay to avoid unnecessary re-renders
+      .then((data) => {
+        if (data) {
+          console.log("Daaaata received ", data);
+          
+          setMessages(data.map( (message): MessageData => ({
+            id: message.id,
+            username: props.chatName,
+            userImage: props.chatImage,
+            message: message.content
+            })
+          ))
+        } else {
+          console.log("No data received");
+        }
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  }, [props.chatId]);
 
   console.log("Current messages:", messages);
 

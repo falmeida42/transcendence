@@ -1,9 +1,10 @@
+import { ChatData } from "./ChatInfo";
 import Chats from "./Chats"
 import Search from "./Search"
 
 
 interface ChatSidebarProps {
-    passSelectedChatData: (data: string) => void;
+    passSelectedChatData: (data: ChatData) => void;
 }
 
 const ChatSidebar = (chatSidebarProps: ChatSidebarProps) => {
