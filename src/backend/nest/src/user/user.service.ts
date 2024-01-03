@@ -105,8 +105,6 @@ export class UserService {
   
     return messages;
   }
-  
-
 
   async insertFriend(userId: string, friend: any) {
 
@@ -136,6 +134,21 @@ export class UserService {
     } catch (error) { 
 
       return error
+    }
+  }
+
+  async leaveRoom(login: string, roomId: string) {
+
+    try {
+      await this.prisma.user.update({
+        where: { login: login },
+        data: { chatRooms: { disconnect: { id: roomId } } },
+      });
+
+      return { success: true, message: "User successfully left the chat room" };
+    } catch (error) {
+      return { success: false, message: "Internal server error" };
+
     }
   }
 }

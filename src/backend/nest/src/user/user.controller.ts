@@ -117,4 +117,19 @@ export class UserController {
         await this.userService.createRoom(String(req.user.id), body.roomdata)
       }
   }
+
+  // In your resolver or service file
+
+//...
+
+@Post('leave-room')
+async leaveRoom(
+  @Req() req: any,
+  @Body() body: any
+){
+    return this.userService.leaveRoom(body.username, body.roomId)
+};
+
+//...
+
 }
