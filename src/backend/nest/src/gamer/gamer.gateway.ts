@@ -19,10 +19,7 @@ import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: {
-    origin: 'http://localhost:5173',
-    credentials: true,
-  },
+  cors: true,
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -68,7 +65,7 @@ export class GamerGateway
   }
 
   @SubscribeMessage('CreateRoom')
-  createRoom(
+  createRoomAgainstAi(
     @ConnectedSocket() client: Socket,
     @MessageBody('againstAi') againstAi: boolean,
   ) {
@@ -82,47 +79,12 @@ export class GamerGateway
       againstAi,
     };
     this.players[client.id].room = client.id;
-    // createMatch(client.id, againstAi);
+    this.match[this.players[client.id].room] = this.createMatch(
+      client.id,
+      againstAi,
+    );
+    if (againstAi) this.runGame(this.players[client.id].room, againstAi);
 
-    if (againstAi) {
-      this.match[this.players[client.id].room] = {
-        gameConfig,
-        player1: {
-          id: client.id,
-          ready: false,
-          x: 5,
-          y: gameConfig.height / 2 - 50,
-          height: 100,
-          width: 15,
-          speed: 10,
-          direction: 'STOP',
-        },
-        player2: {
-          id: 'AI',
-          ready: false,
-          x: gameConfig.width - 20,
-          y: gameConfig.height / 2 - 50,
-          height: 100,
-          width: 15,
-          speed: 10,
-          direction: 'STOP',
-        },
-        ball: {
-          x: gameConfig.width / 2,
-          y: gameConfig.height / 2,
-          radius: 10,
-          x_speed: 10,
-          y_speed: 10,
-          x_direction: 1,
-          y_direction: 1,
-        },
-        score1: 0,
-        score2: 0,
-        status: 'START',
-      };
-
-      this.runGame(this.players[client.id].room, againstAi);
-    }
     client.emit('RoomCreated', this.rooms[client.id]);
   }
 
@@ -200,6 +162,7 @@ export class GamerGateway
       gameConfig,
       player1: {
         id: player1Id,
+        name: this.players[player1Id].name,
         ready: false,
         x: 5,
         y: gameConfig.height / 2 - 50,
@@ -210,6 +173,7 @@ export class GamerGateway
       },
       player2: {
         id: againstAi ? 'AI' : player2Id,
+        name: againstAi ? 'AI' : this.players[player2Id].name,
         ready: false,
         x: gameConfig.width - 20,
         y: gameConfig.height / 2 - 50,
@@ -393,12 +357,12 @@ export class GamerGateway
     try {
       const user1Id = await this.prisma.user.findUniqueOrThrow({
         where: {
-          login: this.players[match.player1.id].name,
+          login: match.player1.name,
         },
       });
       const user2Id = await this.prisma.user.findFirstOrThrow({
         where: {
-          login: this.players[match.player2.id].name,
+          login: match.player2.name,
         },
       });
       const winnerScore =
@@ -412,7 +376,7 @@ export class GamerGateway
           playerwinScore: winnerScore,
           playerlosScore: loserScore,
           userwinId: winnerScore === match.score1 ? user1Id.id : user2Id.id,
-          userlosId: winnerScore === match.score1 ? user1Id.id : user2Id.id,
+          userlosId: loserScore === match.score1 ? user1Id.id : user2Id.id,
         },
       });
       this.logger.log(matchCreated);

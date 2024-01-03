@@ -55,7 +55,8 @@ const RealPong = () => {
               y="0"
               width={gameConfig.width.toString()}
               height={gameConfig.height.toString()}
-              xlinkHref="https://images.unsplash.com/photo-1697484452652-6ac6e917ecc8?q=80&w=1943&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              // xlinkHref="https://images.unsplash.com/photo-1697484452652-6ac6e917ecc8?q=80&w=1943&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              xlinkHref="https://cdnb.artstation.com/p/assets/images/images/060/251/939/large/kazu_arts-image4.jpg?1678154083"
             ></image>
           </pattern>
         </defs>
@@ -102,10 +103,10 @@ const RealPong = () => {
           style={{
             direction: "rtl",
             fill: "rgba(255, 255, 255, 0.7)",
-            fontSize: "50px",
+            fontSize: "30px",
           }}
         >
-          {match?.score1}
+          {match?.score1 + " " + match?.player1.name}
         </text>
 
         <text
@@ -113,10 +114,10 @@ const RealPong = () => {
           y="45"
           style={{
             fill: "rgba(255, 255, 255, 0.7)",
-            fontSize: "50px",
+            fontSize: "30px",
           }}
         >
-          {match?.score2}
+          {match?.score2 + " " + match?.player2.name}
         </text>
 
         <text>{`${winner} ganhou o jogo!`}</text>
