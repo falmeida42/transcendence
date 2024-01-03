@@ -1,9 +1,7 @@
 import Messages from "./Messages"
 import Input from "./Input"
-import BlockPopup from "./BlockPopup"
 import MatchPopup from "./MatchPopup"
 import { useEffect, useState } from "react"
-import { tk } from "../../context/ChatContext"
 import { ChatData } from "../sidebar/ChatInfo"
 import LeaveChannelPopUp from "./LeaveChannelPopUp"
 
@@ -20,6 +18,7 @@ interface ChatContentProps {
 const ChatContent = (chatContentProps: ChatContentProps) => {
     const [isVisibleLeave, setIsVisibleLeave] = useState(false);
     const [isVisibleMatch, setIsVisibleMatch] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
     const handleClickBlock = () => {
         setIsVisibleLeave(!isVisibleLeave);
@@ -29,13 +28,22 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
         setIsVisibleMatch(!isVisibleMatch);
     };
     
-
     return (
         <div className="chat">
             {isVisibleLeave && <LeaveChannelPopUp isVisible={isVisibleLeave} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickBlock}/>}
             {isVisibleMatch && <MatchPopup isVisible={isVisibleMatch} handleClose={handleClickMatch}/>}
             <div className="chat-header clearfix">
-                <img src={chatContentProps.selectedChatData.image} alt="avatar" />
+                <img src={chatContentProps.selectedChatData.image} 
+                     alt="avatar"
+                     onClick={() => {
+                        if (chatContentProps.selectedChatData.type === "DIRECT_MESSAGE") {
+                            // go to profile
+                        }
+                     }}
+                     style={{
+                        cursor: chatContentProps.selectedChatData.type === "DIRECT_MESSAGE" ? 'pointer' : 'default'
+                     }}
+                />
                 <div className="chat-about">
                 <div className="chat-with">Chat with {chatContentProps.selectedChatData.name}</div>
                 <button onClick={handleClickBlock} className="fa fa-lg clickable" >

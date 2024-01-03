@@ -138,17 +138,36 @@ export class UserService {
   }
 
   async leaveRoom(login: string, roomId: string) {
-
     try {
-      await this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: { login: login },
         data: { chatRooms: { disconnect: { id: roomId } } },
       });
-
+  
+      if (!updatedUser) {
+        // User not found or update failed
+        return { success: false, message: "Failed to leave the chat room" };
+      }
+  
+      // Check if the chat room becomes empty after the user leaves
+      const chatRoom = await this.prisma.chatRoom.findUnique({
+        where: { id: roomId },
+        include: { participants: true },
+      });
+  
+      if (chatRoom?.participants.length === 0) {
+        // If the chat room is empty, delete it
+        await this.prisma.chatRoom.delete({
+          where: { id: roomId },
+        });
+      }
+  
       return { success: true, message: "User successfully left the chat room" };
     } catch (error) {
+      console.error("Error leaving room:", error.message || error);
       return { success: false, message: "Internal server error" };
-
     }
   }
+  
+
 }

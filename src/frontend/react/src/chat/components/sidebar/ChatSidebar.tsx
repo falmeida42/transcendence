@@ -23,7 +23,7 @@ const ChatSidebar = (chatSidebarProps: ChatSidebarProps) => {
         <div className="search">
             <button className="btn btn-primary" onClick={handleClick}>
                 <i className="fa fa-plus mr-2"></i>
-                Create Room
+                Create Channel
             </button> 
         </div>
             {/* <Search/> */}

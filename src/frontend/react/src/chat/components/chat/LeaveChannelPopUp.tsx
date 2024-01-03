@@ -1,5 +1,5 @@
 import { useApi } from "../../../apiStore";
-import { tk } from "../../context/ChatContext";
+import { tk, updateChatRooms } from "../../context/ChatContext";
 
 interface LeaveChannelProps {
     channelId: string,
@@ -44,7 +44,10 @@ const LeaveChannelPopUp: React.FC<LeaveChannelProps> = (props: LeaveChannelProps
                     console.log("No data received");
                     }
                 })
-
+                .then(
+                    updateChatRooms
+                )
+                
         props.handleClose();
     }; 
 

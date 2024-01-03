@@ -124,12 +124,16 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                 .then((data) => {
                     if (data) {
                     console.log("Rooms received ", JSON.stringify(data));
+
                     } else {
                     console.log("No data received");
                     }
                 })
+                .then(
+                    updateChatRooms
+                )
                 .catch((error) => console.error("Fetch error:", error));
-            updateChatRooms()
+
             handleClose();
         }
         setModal(modal + 1);
