@@ -11,20 +11,48 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
 
     const [placeholder, setPlaceHolder] = useState("Name");
     const [inputName, setInputName] = useState("");
-    const [inputImage, setInputImage] = useState("");
+    const [inputImage, setInputImage] = useState<string | undefined>("");
+    const [inputPassword, setInputPassword] = useState("");
+    const [inputPrivacy, setInputPrivacy] = useState<string>("");
     const [checkboxValues, setCheckboxValues] = useState<string[]>([]);
     const [modal, setModal] = useState(1);
-    const {friends, login} = useApi()
+    const {friends, login} = useApi();
+    const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
 
-    console.log("my friends ", friends)
+    const toggleVisibility = (visibility: boolean) => {
+        setIsVisibleWarning(visibility);
+    };
 
     const handleInputChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputName(event.target.value);
     };
 
-    const handleInputChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setInputImage(event.target.value);
+    const handleInputChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInputPassword(event.target.value);
     };
+
+    const handleInputChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            console.log("Reader", reader)
+            reader.onloadend = () => {
+                if (reader.readyState == FileReader.DONE) {                    
+                    setInputImage(reader.result as string);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        toggleVisibility(false);
+    };
+
+    const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInputPrivacy(event.target.value);
+        setPlaceHolder("Password");
+        toggleVisibility(false);
+        if (inputPrivacy !== "protected")
+            setInputPassword("");
+      };
 
     const handleCheckboxChange = (value: string) => {
         setCheckboxValues([login])
@@ -45,18 +73,30 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
     const handleClickYes = () => {
         if (modal === 1)
         {
-            // handle name
-            console.log("Chat name: ", inputName);
-
+            if (inputName === "")
+            {
+                toggleVisibility(true);
+                return;
+            }
         } else if (modal === 2) {
-            // handle image
-            console.log("Chat image: ", inputImage);
-
+            if (inputImage === "")
+            {
+                toggleVisibility(true);
+                return;
+            }
+            console.log("image:", inputImage);
         } else if (modal === 3) {
-            // handle users
-            console.log('Selected values: ', checkboxValues);
-
-            // send to backend
+            if (inputPrivacy === "" || (inputPrivacy === "protected" && inputPassword === ""))
+            {
+                toggleVisibility(true);
+                return;
+            }
+        } else if (modal === 4) {
+            if (checkboxValues.length === 0)
+            {
+                toggleVisibility(true);
+                return;
+            }
 
             fetch(`http://localhost:3000/user/add-room`, {
                 method: "POST",
@@ -113,11 +153,15 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                             <input
                             className="popup-input"
                             type="text"
-                            onClick={() => setPlaceHolder("")}
+                            onClick={() => {
+                                setPlaceHolder(""),
+                                toggleVisibility(false)
+                            }}
                             onBlur={() => setPlaceHolder("Name")}
                             value={inputName}
                             onChange={handleInputChangeName}
                             placeholder={placeholder} />
+                            {isVisibleWarning && <p style={{color: "red"}}>This field is mandatory</p>}
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-clear" onClick={handleClickYes}>Continue</button>
@@ -132,9 +176,9 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                             className="popup-input"
                             type="file"
                             accept="image/*"
-                            value={inputImage}
                             onChange={handleInputChangeImage}
                              />
+                            {isVisibleWarning && <p style={{color: "red"}}>This field is mandatory</p>}
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-clear" onClick={handleClickYes}>Continue</button>
@@ -143,6 +187,71 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                     </div>
                     }
                     {modal === 3 && <div>
+                        <div className="modal-body">
+                            <p>Select the chat's privacy level:</p>
+                            <ul
+                            className="popup-input"
+                            style={{padding: "4px 0"}}
+                            >
+                            
+                                    <li>
+                                        <label>
+                                            <input 
+                                            type="radio" 
+                                            value="public"
+                                            name="group"
+                                            onChange={handleRadioChange}
+                                            />
+                                                public
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input 
+                                            type="radio" 
+                                            value="private"
+                                            name="group"
+                                            onChange={handleRadioChange}
+                                            />
+                                                private
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input 
+                                            type="radio" 
+                                            value="protected"
+                                            name="group"
+                                            onChange={handleRadioChange}
+                                            />
+                                                password-protected
+                                        </label>
+                                    </li>
+                                    { inputPrivacy === "protected" &&
+                                        <label>
+                                            <input
+                                            className="popup-input"
+                                            type="password"
+                                            onClick={() => {
+                                                setPlaceHolder(""),
+                                                toggleVisibility(false)
+                                            }}
+                                            onBlur={() => setPlaceHolder("Password")}
+                                            value={inputPassword}
+                                            onChange={handleInputChangePassword}
+                                            placeholder={placeholder} />
+                                        </label>
+                                    }
+                            </ul>
+                            {isVisibleWarning && <p style={{color: "red"}}>This field is mandatory</p>}
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-clear" onClick={handleClickYes}>Continue</button>
+                            <button type="button" className="btn btn-secondary" onClick={handleClickClose}>Cancel</button>
+                        </div>
+                    </div>
+                    }                   
+                    {modal === 4 && <div>
                         <div className="modal-body">
                             <p>Please select at least another participant:</p>
                             <ul
@@ -164,6 +273,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                                     ))
                                 }
                             </ul>
+                            {isVisibleWarning && <p style={{color: "red"}}>This field is mandatory</p>}
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-clear" onClick={handleClickYes}>Submit</button>
