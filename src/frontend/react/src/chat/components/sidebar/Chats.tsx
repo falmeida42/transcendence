@@ -6,13 +6,13 @@ import { ChatContext } from "../../context/ChatContext";
 interface RoomData {
     id: string,
     name: string,
-    image: string
+    image: string,
+    type: string
 }
 
 interface ChatsProps {
     passSelectedChatData: (data: ChatData) => void;
 }
-
 
 const Chats = (chatsProps: ChatsProps) => {
 
@@ -27,7 +27,8 @@ const Chats = (chatsProps: ChatsProps) => {
             {
                 id: room.id,
                 name: room.name,
-                image: room.image
+                image: room.image,
+                type: room.type
             }
         )
     ))
@@ -37,7 +38,14 @@ const Chats = (chatsProps: ChatsProps) => {
         <div className="chats" onClick={toggleChatVisibility}>
             {
                 rooms.map((room) => (
-                    <ChatInfo passSelectedChatData={chatsProps.passSelectedChatData} key={room.id} data={{id: room.id, name: room.name, image: room.image}}/>
+                    <ChatInfo passSelectedChatData={chatsProps.passSelectedChatData}
+                     key={room.id} 
+                     data={{
+                        id: room.id, 
+                        name: room.name, 
+                        image: room.image,
+                        type: room.type
+                    }}/>
                 ))
             }
         </div>
