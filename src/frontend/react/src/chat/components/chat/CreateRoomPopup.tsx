@@ -109,7 +109,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                         id: crypto.randomUUID().toString(),
                         name: inputName,
                         image: inputImage,
-                        type: 'PUBLIC',
+                        type: inputPrivacy,
                         participants: checkboxValues
                     }
                 })

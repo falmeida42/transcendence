@@ -110,8 +110,11 @@ export class UserController {
     @Req() req: any,
     @Body() body: any,
   ) {
-      console.log("Add room")
-      console.log(JSON.stringify(body))
-      await this.userService.createRoom(String(req.user.id), body.roomdata)
+      if (body.roomdata) {
+        body.roomdata.type = body.roomdata.type.toUpperCase()
+        console.log("Add room")
+        console.log(JSON.stringify(body))
+        await this.userService.createRoom(String(req.user.id), body.roomdata)
+      }
   }
 }

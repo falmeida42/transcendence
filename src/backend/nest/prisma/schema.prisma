@@ -40,6 +40,7 @@ model ChatRoom {
   id           String    @id @default(uuid())
   name         String
   image        String
+  password     String   @default("")
   type         ChatType
   owners       User[]    @relation("Owners")
   messages     Message[]
