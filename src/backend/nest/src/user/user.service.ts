@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto';
 import { error } from 'console';
-import { ChatType } from '@prisma/client';
+import { ChatRoom, ChatType } from '@prisma/client';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -114,5 +114,28 @@ export class UserService {
         where: { id: userId },
         data: { friends: { connect: { id: friend } } }
       })
+  }
+
+  async createRoom(userId: string, roomData: any) {
+
+    try {  
+      const result = await this.prisma.chatRoom.create({
+        data: {
+          id: roomData.id,
+          name: roomData.name,
+          image: roomData.image,
+          type: roomData.type,
+          participants: {
+            connect: roomData.participants.map((login : string) => ({
+              login: login
+            }))
+          }
+        }
+      }
+      )
+    } catch (error) { 
+
+      return error
+    }
   }
 }

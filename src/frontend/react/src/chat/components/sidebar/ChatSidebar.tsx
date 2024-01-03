@@ -1,7 +1,6 @@
 import { ChatData } from "./ChatInfo";
 import { useState } from "react";
 import Chats from "./Chats"
-import Search from "./Search"
 import CreateRoomPopup from "../chat/CreateRoomPopup";
 
 

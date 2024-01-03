@@ -14,10 +14,40 @@ const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 export var tk: string | null;
 
+let updateChatRooms: () => void;
+
 function ChatProvider({ children }: ChatProviderProps) {
- 
+
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
   const [chatRooms, setChatRooms] = useState([])
+
+  updateChatRooms = () => {
+
+    fetch(`http://localhost:3000/user/chatRooms`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+      })
+      .then((data) => {
+        if (data) {
+          console.log("Rooms received ", JSON.stringify(data));
+          setChatRooms(data);
+        } else {
+          console.log("No data received");
+        }
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  }
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -82,4 +112,4 @@ function ChatProvider({ children }: ChatProviderProps) {
   );
 }
 
-export { ChatContext, ChatProvider };
+export { ChatContext, ChatProvider, updateChatRooms };
