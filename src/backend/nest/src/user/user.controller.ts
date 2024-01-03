@@ -6,7 +6,8 @@ import {
   Req,
   UseGuards,
   Logger,
-  Post
+  Post,
+  Body
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard';
@@ -102,5 +103,15 @@ export class UserController {
       console.error(error);
       return 'Error to add a friend'   
     }
+  }
+
+  @Post('add-room')
+  async addRoom(
+    @Req() req: any,
+    @Body() body: any,
+  ) {
+      console.log("Add room")
+      console.log(JSON.stringify(body))
+      await this.userService.createRoom(String(req.user.id), body.roomdata)
   }
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
+import { tk, updateChatRooms } from "../../context/ChatContext";
 
 interface CreateRoomPopupProps {
     isVisible: boolean;
@@ -13,7 +14,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
     const [inputImage, setInputImage] = useState("");
     const [checkboxValues, setCheckboxValues] = useState<string[]>([]);
     const [modal, setModal] = useState(1);
-    const {friends} = useApi()
+    const {friends, login} = useApi()
 
     console.log("my friends ", friends)
 
@@ -26,8 +27,10 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
     };
 
     const handleCheckboxChange = (value: string) => {
+        setCheckboxValues([login])
+        
         const isChecked = checkboxValues.includes(value);
-    
+
         if (isChecked) {
           setCheckboxValues(prevValues => prevValues.filter(item => item !== value));
         } else {
@@ -54,6 +57,39 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
             console.log('Selected values: ', checkboxValues);
 
             // send to backend
+
+            fetch(`http://localhost:3000/user/add-room`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${tk}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    roomdata: {
+                        id: crypto.randomUUID().toString(),
+                        name: inputName,
+                        image: inputImage,
+                        type: 'PUBLIC',
+                        participants: checkboxValues
+                    }
+                })
+                })
+                .then(async (response) => {
+                    if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const data = await response.text();
+                    return data ? JSON.parse(data) : null;
+                })
+                .then((data) => {
+                    if (data) {
+                    console.log("Rooms received ", JSON.stringify(data));
+                    } else {
+                    console.log("No data received");
+                    }
+                })
+                .catch((error) => console.error("Fetch error:", error));
+            updateChatRooms()
             handleClose();
         }
         setModal(modal + 1);
