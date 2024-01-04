@@ -168,6 +168,46 @@ export class UserService {
       return { success: false, message: "Internal server error" };
     }
   }
+
+  async joinRoom(login: string, roomId: string, password: string, roomType: string) {
+    try {
+
+      const room = await this.prisma.chatRoom.findUnique({
+        where: { id: roomId },
+      });
+
+      if (roomType === "PROTECTED" && room.password !== password) {
+        return { success: false, message: "Incorrect password for the chat room" };
+      }
+
+      const updatedUser = await this.prisma.user.update({
+        where: { login: login },
+        data: { chatRooms: { connect: { id: roomId } } },
+      });
   
+      if (!updatedUser) {
+        return { success: false, message: "Failed to join the chat room" };
+      }
+  
+      return { success: true, message: "User successfully joined the chat room" };
+    } catch (error) {
+      console.error("Error joining room:", error.message || error);
+      return { success: false, message: "Internal server error" };
+    }
+  }
+  
+  async getJoinableRooms(userId: string){
+    const allChatRooms = await this.prisma.chatRoom.findMany({
+      where: {
+        type: { not: 'DIRECT_MESSAGE' as ChatType},
+        participants: {
+          none: {
+            id: userId
+          }
+        }
+      }
+    })
+    return allChatRooms
+  }
 
 }

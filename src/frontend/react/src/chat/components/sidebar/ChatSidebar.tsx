@@ -2,6 +2,7 @@ import { ChatData } from "./ChatInfo";
 import { useState } from "react";
 import Chats from "./Chats"
 import CreateRoomPopup from "../chat/CreateRoomPopup";
+import JoinRoomPopup from "../chat/JoinRoomPopup";
 
 
 
@@ -11,22 +12,33 @@ interface ChatSidebarProps {
 
 const ChatSidebar = (chatSidebarProps: ChatSidebarProps) => {
 
-    const [isVisible, setIsVisible] = useState(false);
+    const [isVisibleJoin, setIsVisibleJoin] = useState(false);
+    const [isVisibleCreate, setIsVisibleCreate] = useState(false);
 
-    const handleClick = () => {
-        setIsVisible(!isVisible);
+    const handleClickJoin = () => {
+        setIsVisibleJoin(!isVisibleJoin);
+    };
+
+    const handleClickCreate = () => {
+        setIsVisibleCreate(!isVisibleCreate);
     };
 
     return (
         <div className="sidebar">
-        {isVisible && <CreateRoomPopup isVisible={isVisible} handleClose={handleClick}/>}
-        <div className="search">
-            <button className="btn btn-primary" onClick={handleClick}>
-                <i className="fa fa-plus mr-2"></i>
-                Create Channel
-            </button> 
+        {isVisibleCreate && <CreateRoomPopup isVisible={isVisibleCreate} handleClose={handleClickCreate}/>}
+        {isVisibleJoin && <JoinRoomPopup isVisible={isVisibleJoin} handleClose={handleClickJoin}/>}
+        <div>
+            <div className="search">
+                <button className="btn btn-primary mr-2 mb-2" onClick={handleClickCreate}>
+                    <i className="fa fa-plus mr-2"></i>
+                    Create Channel
+                </button> 
+                <button className="btn btn-primary mb-2" onClick={handleClickJoin}>
+                    <i className="fa fa-hand-o-up mr-2"></i>
+                    Join Channel
+                </button> 
+            </div>
         </div>
-            {/* <Search/> */}
             <Chats passSelectedChatData={chatSidebarProps.passSelectedChatData}/>
         </div>
     )
