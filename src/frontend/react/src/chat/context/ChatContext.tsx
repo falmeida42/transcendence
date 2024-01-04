@@ -1,9 +1,11 @@
 import React, { createContext, ReactNode, useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
+import { useApi } from "../../apiStore";
 
 interface ChatContextProps {
   socket: SocketIoReference.Socket | null;
-  chatRooms: any
+  chatRooms: any,
+  usersOnline: any
 }
 
 interface ChatProviderProps {
@@ -20,6 +22,11 @@ function ChatProvider({ children }: ChatProviderProps) {
 
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
   const [chatRooms, setChatRooms] = useState([])
+  const [usersOnline, setUsersOnline] = useState([])
+
+  const {login} = useApi()
+
+  console.log()
 
   updateChatRooms = () => {
 
@@ -59,12 +66,22 @@ function ChatProvider({ children }: ChatProviderProps) {
       withCredentials: true,
     }).connect();
 
+    console.log("socketInstance", socketInstance)
+
     socketInstance.on("connect", () => {
       console.log("Client connected");
 
 
-      socketInstance.emit("joinChannel", "ok");
+      socketInstance.emit("userConnected", { username: login, socketId: socketInstance.id });
     });
+
+    socketInstance.on('getUsersConnected', (data) => {
+
+      console.log("Users connected ", data)
+
+      setUsersOnline(data)
+  });
+
 
     setSocket(socketInstance);
 
@@ -102,7 +119,8 @@ function ChatProvider({ children }: ChatProviderProps) {
 
   const contextValue: ChatContextProps = {
     socket: socket,
-    chatRooms: chatRooms
+    chatRooms: chatRooms,
+    usersOnline: usersOnline
   };
 
   return (
