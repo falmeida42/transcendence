@@ -14,13 +14,12 @@ const Input = (content: any) => {
   const {login} = useApi();
   const {socket} = useContext(ChatContext) ?? {}
 
-  
+  console.log("CONTENT: ", JSON.stringify(content.content))
 
   const sendMessage = () => {
     if (validInput(text)) {
-      console.log("This is the input content: ", content.content.selectedChatData )
       console.log("This is the user content: ", login )
-      socket.emit("messageToServer", { to: content.content.selectedChatData , message: text, sender: login });
+      socket.emit("messageToServer", { to: content.content.id , message: text, sender: login });
       setText("");
     }
   };

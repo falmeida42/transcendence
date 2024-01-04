@@ -23,7 +23,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('ChatGateway');
   private users = [];
-
+  private channelRooms = [];
 
   afterInit(server: Server) {
     this.io = server;
@@ -31,11 +31,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   handleConnection(client: Socket): void {
-    client.join('global');
-    this.io.emit("roomsAvaiable", client.rooms);
-    // Make sure that this.io.sockets.adapter exists before accessing its properties
+
 
     this.logger.log(`Client connected ${client.id}`);
+
   }
 
   handleDisconnect(client: Socket): void {
@@ -51,11 +50,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
 
   @SubscribeMessage('userConnected')
-  handleUserConnected(client: Socket, payload: any): void {
+  async handleUserConnected(client: Socket, payload: any): Promise<void> {
     this.logger.log(`new user connected ${payload.socketId}: ${payload.username}`);
-
+  
     const existingUserIndex = this.users.findIndex(user => user.username === payload.username);
+  
+    const channelRooms = await this.userService.getChatRoomsByLogin(payload.username);
+  
+    console.log("CHANNEL ROOMS: ", channelRooms);
 
+    channelRooms.forEach((room) => {
+      
+      client.join(room.id)
+    })
+  
     if (existingUserIndex !== -1) {
       // User with the same username already exists, update the data
       this.users[existingUserIndex] = {
@@ -71,9 +79,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         userStatus: UserStatus.ONLINE
       });
     }
-
+  
     this.io.emit('getUsersConnected', this.users);
   }
+  
 
 
   @SubscribeMessage('messageToServer')
