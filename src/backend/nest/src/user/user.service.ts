@@ -32,16 +32,13 @@ export class UserService {
 
   async set2FASecret(id: string, secret: string) {
     try {
-      const user = await this.prisma.user.update({
+      return await this.prisma.user.update({
         where: { id: id },
         data: { twoFactorAuthSecret: secret },
       });
-      if (!user) {
-        throw new ForbiddenException('Failed to set 2FA secret');
-      }
-      return true;
     } catch (error) {
-      return { message: error };
+      console.error(error);
+      throw error;
     }
   }
 
@@ -53,9 +50,12 @@ export class UserService {
   }
 
   async set2FAOff(id: string) {
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id: id },
-      data: { twoFactorAuthEnabled: false },
+      data: {
+        twoFactorAuthEnabled: false,
+        twoFactorAuthSecret: null,
+      },
     });
   }
 

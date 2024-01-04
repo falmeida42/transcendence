@@ -54,32 +54,39 @@ export class AuthController {
     return res.redirect(`${process.env.FRONTEND_URL}/?token=${data.token}`);
   }
 
-  // For testing purposes
-  // @Post('signin-test')
-  // signin(@Body() dto: AuthDto) {
-  //   this.logger.debug(dto);
-
-  //   return this.authService.signup(dto);
-  // }
-
   @UseGuards(JwtAuthGuard)
   @Get('2fa/generate')
-  async register(@Res() res: any, @GetMe() user: User) {
-    this.logger.debug(res.user);
+  async register(@Res() res: any, @GetMe('id') id: string) {
+    const user = await this.userService.getUserById(id);
 
-    // generate 2FA secret
-    const secret = await this.authService.generate2FASecret();
+    if (!user) {
+      throw new ForbiddenException('User does not exist');
+    }
+
+    let secret: string;
+    this.logger.debug(user.twoFactorAuthSecret);
+    // if no secret
+    if (!user.twoFactorAuthSecret) {
+      try {
+        console.debug('PASSOU!!!!!!!!');
+        // generate 2FA secret
+        secret = await this.authService.generate2FASecret();
+        // update user data
+        await this.userService.set2FASecret(String(user.id), secret);
+      } catch (error) {
+        console.error(error);
+        return { message: error };
+      }
+    }
+
     // generate key uri
     const otpAuthURL = await this.authService.generate2FAKeyURI(user, secret);
 
     this.logger.debug('secret: ', secret);
     this.logger.debug('otp url: ', otpAuthURL);
 
-    // update user data
-    if (await this.userService.set2FASecret(String(user.id), secret)) {
-      // generate QR code
-      return res.json(await this.authService.generateQrCodeURL(otpAuthURL));
-    }
+    // generate QR code
+    return res.json(await this.authService.generateQrCodeURL(otpAuthURL));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -90,7 +97,6 @@ export class AuthController {
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
         // TODO: Check if 2FA has been generated before, generate if not
-        
       }
 
       const isCodeValid = this.authService.is2FACodeValid(code, user);
@@ -106,15 +112,21 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-off')
-  async turn2FAOff(@GetMe() user: User, @Body('code') code: string) {
-    if ((await this.userService.is2FAEnabled(user.id)) === true) {
+  async turn2FAOff(@GetMe('id') id: string, @Body('code') code: string) {
+    const user = await this.userService.getUserById(id);
+    if (!user) {
+      throw new ForbiddenException('No such user');
+    }
+
+    if ((await this.userService.is2FAEnabled(id)) === true) {
       const isCodeValid = this.authService.is2FACodeValid(code, user);
 
       if (!isCodeValid) {
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
-      await this.userService.set2FAOff(user.id);
+      const updated = await this.userService.set2FAOff(id);
+      this.logger.debug(updated);
     }
     return { message: '2FA is already off' };
   }
@@ -122,8 +134,8 @@ export class AuthController {
   @UseGuards(twoFAGuard)
   @Post('2fa/authentication')
   async authenticate2FA(
-    @Body('code') code: string,
-    @Body('id') id: string,
+    @GetMe('code') code: string,
+    @GetMe('id') id: string,
     @Res() res: any,
   ) {
     this.logger.debug('code: ', code);
