@@ -4,11 +4,11 @@ import Topbar from "./Topbar";
 import { useApi } from "./apiStore";
 
 function Bars() {
-	const {auth} = useApi();
+	const {auth, twofa} = useApi();
 	
   return (
 	<div>
-		{auth === true && <ApiDataProvider/>}
+		{(auth === true || twofa === false) && <ApiDataProvider/>}
 		<Sidebar />
 		<Topbar />
 	</div>
