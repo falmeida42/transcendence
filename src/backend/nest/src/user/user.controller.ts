@@ -118,6 +118,19 @@ export class UserController {
       }
   }
 
+  @Get('joinable-rooms')
+  async joinableRooms(@Req() req: any) {
+    return this.userService.getJoinableRooms(String(req.user.id))
+  }
+
+
+  @Post('join-room')
+  async joinRoom(
+  @Req() req: any,
+  @Body() body: any
+){
+    return this.userService.joinRoom(body.username, body.roomId, body.password, body.roomType)
+};
   // In your resolver or service file
 
 //...
