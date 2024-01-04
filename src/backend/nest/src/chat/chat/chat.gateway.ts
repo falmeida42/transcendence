@@ -9,14 +9,21 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Logger, ParseUUIDPipe } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
+import { UserStatus } from './User';
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: 'http://localhost:5173', credentials: true } })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  
+  constructor (private userService: UserService) {}
+  
   @WebSocketServer()
   private io: Server;
-
+  
   private logger: Logger = new Logger('ChatGateway');
+  private users = [];
+
 
   afterInit(server: Server) {
     this.io = server;
@@ -33,7 +40,41 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   handleDisconnect(client: Socket): void {
     this.logger.log(`Client disconnected ${client.id}`);
+  
+    const existingUserIndex = this.users.findIndex(user => user.id === client.id);
+  
+    if (existingUserIndex !== -1) {
+      this.users.splice(existingUserIndex, 1); // Remove 1 element at the found index
+      this.io.emit('getUsersConnected', this.users); // Update the connected users list
+    }
   }
+  
+
+  @SubscribeMessage('userConnected')
+  handleUserConnected(client: Socket, payload: any): void {
+    this.logger.log(`new user connected ${payload.socketId}: ${payload.username}`);
+
+    const existingUserIndex = this.users.findIndex(user => user.username === payload.username);
+
+    if (existingUserIndex !== -1) {
+      // User with the same username already exists, update the data
+      this.users[existingUserIndex] = {
+        id: payload.socketId,
+        username: payload.username,
+        userStatus: UserStatus.ONLINE
+      };
+    } else {
+      // User with the username doesn't exist, add a new user
+      this.users.push({
+        id: payload.socketId,
+        username: payload.username,
+        userStatus: UserStatus.ONLINE
+      });
+    }
+
+    this.io.emit('getUsersConnected', this.users);
+  }
+
 
   @SubscribeMessage('messageToServer')
   handleMessage(client: Socket, payload: any): void {
