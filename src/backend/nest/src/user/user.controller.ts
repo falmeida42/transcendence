@@ -8,12 +8,13 @@ import {
   Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from '../auth/guard';
+import { FTGuard, JwtAuthGuard } from '../auth/guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetMe } from 'src/decorators';
 import { User } from '@prisma/client';
+import { twoFAGuard } from 'src/auth/guard/2FA.guard';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(FTGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -22,12 +23,14 @@ export class UserController {
   ) {}
 
   private readonly logger = new Logger('UserController');
-
+  
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers() {
     return this.userService.getUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@GetMe() user: User) {
     const logInfo = {
@@ -37,11 +40,25 @@ export class UserController {
     return this.findById(String(user.id));
   }
 
+  @UseGuards(twoFAGuard)
+  @Get('auth')
+  async getAuth(@GetMe() user: User) {
+    const logInfo = {
+      // user: user, // Log only the user property
+      user: {id: user.id, twoFactorAuthEnabled: user.twoFactorAuthEnabled},
+
+    };
+    this.logger.debug(JSON.stringify(logInfo));
+    return (await this.findById(String(user.id))).twoFactorAuthEnabled;
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findById(@Param('id') id: string) {
     return this.userService.getUserById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':login')
   async delete(@Param('login') login: string) {
     const user = await this.prisma.user.findUnique({ where: { login } });
@@ -53,6 +70,7 @@ export class UserController {
     return this.prisma.user.delete({ where: { login } });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':username')
   async changeUsername(
     @GetMe() userInfo: User,

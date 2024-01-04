@@ -83,7 +83,7 @@ export class AuthService {
     if (!user.twoFactorAuthSecret) {
       throw new ForbiddenException('2FA secret is not set');
     }
-
+    this.logger.debug(twoFactorAuthenticationCode, user.twoFactorAuthSecret);
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,

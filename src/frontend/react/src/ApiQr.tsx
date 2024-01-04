@@ -1,12 +1,12 @@
 import React, { useEffect, ReactNode } from 'react';
 import { useApi } from './apiStore';
 
-interface ApiDataProviderProps {
+interface ApiQrProps {
   children?: ReactNode;
 }
 
-const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
-  const { auth, setInfo } = useApi();
+const ApiQr: React.FC<ApiQrProps> = (props) => {
+  const { setqrcode } = useApi();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,7 +14,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
       const token = urlParams.get('token');
 
       try {
-        const response = await fetch('http://localhost:3000/user/me', {
+        const response = await fetch('http://localhost:3000/auth/2fa/generate', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -23,21 +23,21 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch user data');
+          throw new Error('Failed to get QRCODE.');
         }
 
         const data = await response.json();
-        console.log(data);
-        setInfo(data.user, data.first_name, data.last_name, data.login, data.email, data.image, data.twoFactorAuthEnabled);
+        console.log(JSON.stringify(data));
+        setqrcode(data);
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchData();
-  }, [setInfo]);
+  }, []);
 
   return <>{props.children}</>;
 };
 
-export default ApiDataProvider;
+export default ApiQr;

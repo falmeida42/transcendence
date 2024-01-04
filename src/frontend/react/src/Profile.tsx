@@ -1,19 +1,89 @@
-// import { useEffect, useState } from 'react';
+import { useState } from 'react';
+
 // import { Mapping } from './App';
 import { useApi } from './apiStore';
+import useUpdateUserData from './UpdateUserData';
+import ApiDataProvider from './ApiDataProvider';
+import Usetwofa from './Api2fa';
+import Api2fa from './Api2fa';
+import ApiQr from './ApiQr';
 
 export var token: string | null;
 
 function Profile() {
 	
-	const { user, first_name, last_name, login, email, image } = useApi();
+	const { user, first_name, last_name, login, email, image, qrcode ,auth , setUsername, setImage } = useApi();
+	
+	/////////////// Username update /////////////////
+	
+	const [isEditing, setIsEditing] = useState(false);
+	const [textValue, setTextValue] = useState<string | undefined>(user);
+	const [name, setName] = useState("");
+
+	const handleEditClick = () => {
+		setIsEditing(true);
+	};
+	
+	const handleSubmitClick = () => {
+		setIsEditing(false);
+		// You can add logic here to handle the submission of changes
+		setUsername(textValue);
+		updateFunction();
+		console.log('Submitted changes:', textValue);
+	};
+	
+	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setTextValue(event.target.value);
+	};
+	
+
+	/////////////// Image update /////////////////
+	
+	
+	const [isEditingImage, setIsEditingImage] = useState(false);
+  	const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
+	  
+	  const handleEditClickImage = () => {
+		setIsEditingImage(true);
+	};
+	
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files && event.target.files[0];
+		
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				setSelectedImage(e.target?.result as string);
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
+	const { updateFunction } = useUpdateUserData({
+		updateFunction: () => ({
+		  username: textValue, // Assuming you want to update the username with the current textValue
+		  image: selectedImage,
+		}),
+	  });
+	
+	const handleSubmitClickImage = () => {
+		setIsEditingImage(false);
+		// You can add logic here to handle the submission of the new image
+		setImage(selectedImage);
+		updateFunction();
+		console.log('Submitted new image:', selectedImage);
+	};
+
+	const handleClickCode = () => {
+		Usetwofa({code:name});
+	};
 
 	return (
-		<div className="middle-cont">
-		<div className="container-fluid">
+		// <div className="middle-cont">
+		<div className="container-fluid profile_container">
 		   <div className="row column1">
-			  <div className="col-md-2"></div>
-			  <div className="col-md-8">
+			  {/* <div className="col-md-2"></div>
+			  <div className="col-md-8"> */}
 				 <div className="white_shd full margin_bottom_30">
 					<div className="full graph_head">
 					   <div className="heading1 margin_0">
@@ -24,16 +94,118 @@ function Profile() {
 					   <div className="row">
 						  <div className="col-lg-12">
 							 <div className="full dis_flex center_text">
-								<div className="profile_img"><img width="180" className="rounded-circle" src={image} alt="#" /></div>
-								<div className="profile_contant">
+
+								{/* <div className="profile_img"><img width="180" className="rounded-circle" src={image} alt="#" /></div> */}
+								<div className="container flex-item">
+									<div className="form-group">
+										{/* <label htmlFor="imageField">Image:</label> */}
+										<div className="input-group d-flex flex-column">
+										{isEditingImage ? (
+											<>
+											<input
+												type="file"
+												id="imageField"
+												className="form-control-file"
+												accept="image/*"
+												onChange={handleImageChange}
+											/>
+											{/* <div className="input-group-append">
+												<button
+												className="btn btn-outline-secondary"
+												type="button"
+												style={{width: "fit-content"}}
+												onClick={handleEditClickImage}
+												>
+												<i className="fa fa-pencil green_color " style={{}}> </i>
+												</button>
+											</div> */}
+											</>
+										) : (
+											<>
+											<div className="profile_img">
+
+											<img
+												//width="180"
+												//height="300"
+												style={{maxHeight: 300, maxWidth: 300}}
+												src={selectedImage || 'placeholder.jpg'}
+												alt="Selected"
+												className=" rounded-circle"
+											/>
+											</div>
+											<button
+												className="btn btn-outline-secondary ml-2"
+												style={{width: "fit-content"}}
+												type="button"
+												onClick={handleEditClickImage}
+											>
+												<i className="fa fa-pencil green_color " > </i>
+											</button>
+											</>
+										)}
+										</div>
+									</div>
+
+									{isEditingImage && (
+										<button className="btn btn-primary" onClick={handleSubmitClickImage}>
+										Submit New Image
+										</button>
+									)}
+									</div> 
+
+
+								<div className="profile_contant flex-item">
 								   <div className="contact_inner">
 									  <h3>{first_name} {last_name}</h3>
-									  <p><strong>Username: </strong>{login}</p>
-									  <ul className="list-unstyled">
+
+
+									  <div className="">
+										<div className="form-group" style={{marginBottom: "4px"}}>
+											{/* <label htmlFor="textField">Username:</label> */}
+											<div className="input-group">
+											<span className="mr-2" style={{maxHeight: "20px"}}><p><strong>Username: </strong></p></span>
+											<input
+												type="text"
+												id="textField"
+												className="form-control"
+												value={textValue}
+												readOnly={!isEditing}
+												onChange={handleTextChange}
+												style={{maxHeight: "25px",  maxWidth: "200px"}}
+											/>
+											<div className="input-group-append" style={{maxHeight: "25px"}}>
+												<button
+												className="btn btn-outline-secondary"
+												type="button"
+												style={{maxHeight: "25px"}}
+												onClick={handleEditClick}
+												>
+												<i className="fa fa-pencil green_color " style={{verticalAlign: "super"}}> </i>
+												</button>
+											</div>
+											</div>
+										</div>
+
+										{isEditing && (
+											<button className="btn btn-secondary btn-sm mb-2" onClick={handleSubmitClick}>
+											Submit Changes
+											</button>
+										)}
+										</div>
+
+
+										
+										{/* <div className="">
+											<span className="mr-2"><p><strong>Username: </strong>{login}</p></span>
+									  		<i className="fa fa-pencil green_color "> </i>
+										</div> */}
+									  {!auth && <ul className="list-unstyled">
 										 <li><i className="fa fa-envelope-o"></i> : {email}</li>
-										 <li><i className="fa fa-phone"></i> : 987 654 3210</li>
-									  </ul>
+										 <ApiQr/>
+										 <img src={qrcode}></img>
+									  </ul>}
 								   </div>
+								   {!auth && <Usetwofa code={""}/>}
 								   <div className="user_progress_bar">
 									<h2>
 										 <span className="skill">Match results (wins | losses)<span className="info_valume"></span></span>                   
@@ -111,8 +283,8 @@ function Profile() {
 				 <div className="col-md-2"></div>
 			  </div>
 		   </div>
-		</div>
-	 </div>		
+		// </div>
+	//  </div>		
 	)
 }
 
