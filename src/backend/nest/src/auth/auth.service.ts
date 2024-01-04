@@ -6,6 +6,7 @@ import { authenticator } from 'otplib';
 import { User } from '@prisma/client';
 import { toDataURL } from 'qrcode';
 import { AuthDto } from './dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -24,8 +25,16 @@ export class AuthService {
       });
 
       if (user) {
-        const token = await this.signToken(Number(user.id), user.login);
-        return { token: token, user: user };
+        const accessToken = await this.signAccessToken(
+          Number(user.id),
+          user.login,
+        );
+        const refreshToken = await this.signRefreshToken(Number(user.id));
+        return {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          user: user,
+        };
       }
 
       const newUser = await this.prisma.user.create({
@@ -41,11 +50,19 @@ export class AuthService {
           twoFactorAuthEnabled: false,
         },
       });
-      this.logger.log('New user: ', newUser);
+      this.logger.debug('New user: ', newUser);
 
       if (newUser) {
-        const token = await this.signToken(Number(newUser.id), newUser.login);
-        return { token: token, user: newUser };
+        const accessToken = await this.signAccessToken(
+          Number(newUser.id),
+          newUser.login,
+        );
+        const refreshToken = await this.signRefreshToken(Number(user.id));
+        return {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          user: user,
+        };
       }
     } catch (error) {
       this.logger.error(error);
@@ -53,11 +70,20 @@ export class AuthService {
     return null;
   }
 
-  async signToken(userId: number, login: string): Promise<string> {
+  async signAccessToken(userId: number, login: string): Promise<string> {
     const payload = { sub: userId, login: login };
 
     return this.jwtService.signAsync(payload, {
       expiresIn: '15m',
+      secret: this.config.get('JWT_SECRET'),
+    });
+  }
+
+  async signRefreshToken(userId: number): Promise<string> {
+    const payload = { sub: userId, tokenId: uuidv4() };
+
+    return this.jwtService.signAsync(payload, {
+      expiresIn: '7d',
       secret: this.config.get('JWT_SECRET'),
     });
   }
@@ -110,4 +136,12 @@ export class AuthService {
       secret: this.config.get('JWT_2FA_SECRET'),
     });
   }
+
+  // async verifyToken(token: Object): Promise<boolean> {}
+  //   try {
+  //     return await
+  //   } catch(error) {
+  //     console.error(error);
+  //     return false
+  //   }
 }

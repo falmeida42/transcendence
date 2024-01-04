@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   UseGuards,
-  Req,
   Res,
   Body,
   Post,
@@ -10,6 +9,7 @@ import {
   Query,
   UnauthorizedException,
   ForbiddenException,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FTGuard, JwtAuthGuard } from '../auth/guard';
@@ -18,6 +18,7 @@ import { GetMe } from 'src/decorators';
 import { User } from '@prisma/client';
 import { twoFAGuard } from './guard/2FA.guard';
 import { Response } from 'express';
+import { Req } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -38,6 +39,7 @@ export class AuthController {
     this.logger.debug('Request user:', req.user);
 
     if (await this.authService.is2FAActive(String(req.user.id))) {
+      // Execute 2FA logic
       this.logger.debug('2FA IS ENABLED');
 
       const user = await this.userService.getUserById(req.user.id);
@@ -45,16 +47,32 @@ export class AuthController {
         throw new ForbiddenException('User not found');
       }
 
-      // TODO: send to frontend here
       const token2fa = await this.authService.sign2FAToken(req.user.id);
-      res.cookie('token', token2fa, { expires: new Date(Date.now() + 300000), httpOnly: true });
+      res.cookie('token', token2fa, {
+        expires: new Date(Date.now() + 300000),
+        httpOnly: true,
+      });
       return res.redirect(`${process.env.FRONTEND_URL}`);
     }
+    // Execute login without 2FA
 
     const data = await this.authService.signup(req.user);
-    this.logger.debug('Token:', data.token);
 
-    return res.redirect(`${process.env.FRONTEND_URL}/?token=${data.token}`);
+    if (!data) {
+      return { message: 'Login was unsuccessfull' };
+    }
+
+    this.logger.debug('Access token:', data.accessToken);
+
+    res.cookie('refreshToken', data.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/?token=${data.accessToken}&2faOn=false`,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -71,7 +89,6 @@ export class AuthController {
     // if no secret
     if (!user.twoFactorAuthSecret) {
       try {
-        console.debug('PASSOU!!!!!!!!');
         // generate 2FA secret
         secret = await this.authService.generate2FASecret();
         // update user data
@@ -100,7 +117,7 @@ export class AuthController {
     this.logger.debug(code);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
-        // TODO: Check if 2FA has been generated before, generate if not
+        throw new ForbiddenException('2FA secret not set');
       }
 
       const isCodeValid = this.authService.is2FACodeValid(code, user);
@@ -137,7 +154,9 @@ export class AuthController {
 
   @UseGuards(twoFAGuard)
   @Post('2fa/authentication')
-  async authenticate2FA(@Res() res: Response, @Query('token') token: string,
+  async authenticate2FA(
+    @Res() res: Response,
+    @Query('token') token: string,
     @GetMe() id: any,
     @Body('code') code: string,
   ) {
@@ -155,10 +174,16 @@ export class AuthController {
       throw new UnauthorizedException('Wrong 2FA code');
     }
 
-    const tokenPerm = await this.authService.signToken(Number(user.id), user.login);
+    const tokenPerm = await this.authService.signAccessToken(
+      Number(user.id),
+      user.login,
+    );
 
     this.logger.log('Token: ', token);
-    res.cookie('token', tokenPerm, { expires: new Date(Date.now() + 300000), httpOnly: true });
+    res.cookie('token', tokenPerm, {
+      expires: new Date(Date.now() + 300000),
+      httpOnly: true,
+    });
     return res.redirect(`${process.env.FRONTEND_URL}`);
   }
 }
