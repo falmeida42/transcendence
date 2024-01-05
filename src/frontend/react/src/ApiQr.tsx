@@ -10,8 +10,10 @@ const ApiQr: React.FC<ApiQrProps> = (props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
 
       try {
         const response = await fetch('http://localhost:3000/auth/2fa/generate', {

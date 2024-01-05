@@ -9,20 +9,24 @@ const UseAuth = ({ code }: UseAuthProps) => {
   const [name, setName] = useState(code);
   const {setauth} = useApi();
 
-  const handleSendClick = () => {
+  const handleSendClick = async () => {
     // Move the logic from UseAuth to handleSendClick
     // Make sure not to call hooks here
     try {
       const newUserData = name;
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token2fa');
+      const token = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('token2fa='))
+      ?.split('=')[1];
+      console.log(token, '@');
 
-      fetch('http://localhost:3000/auth/2fa/authentication', {
+      await fetch('http://localhost:3000/auth/2fa/authentication', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({code: newUserData}),
       })
         .then((updateResponse) => {

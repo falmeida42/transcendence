@@ -9,8 +9,13 @@ const useUpdateUserData = ({ updateFunction }: UseUpdateUserDataProps) => {
     const updateUserData = async () => {
       try {
         const newUserData = updateFunction();
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+        const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
+        if (token === undefined){
+          return;
+        }
 
         const updateResponse = await fetch('http://localhost:3000/user/me', {
           method: 'POST',

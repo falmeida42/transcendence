@@ -35,7 +35,7 @@ export class AuthController {
   @UseGuards(FTGuard)
   @Get('intra-clbk')
   async callbackIntra(@Req() req: any, @Res() res: Response): Promise<any> {
-    this.logger.debug('Request user:', req.user);
+    // this.logger.debug('Request user:', req.user);
 
     if (await this.authService.is2FAActive(String(req.user.id))) {
       this.logger.debug('2FA IS ENABLED');
@@ -46,15 +46,19 @@ export class AuthController {
       }
 
       // TODO: send to frontend here
-      const token2fa = await this.authService.sign2FAToken(req.user.id);
-      res.cookie('token', token2fa, { expires: new Date(Date.now() + 300000), httpOnly: true });
-      return res.redirect(`${process.env.FRONTEND_URL}`);
+      const token = await this.authService.sign2FAToken(req.user.id);
+      res
+      // .cookie('token', token, { expires: new Date(Date.now() + 300000), httpOnly: true, domain: 'localhost', path: '/', sameSite: 'none', secure: true })
+      .redirect(`${process.env.FRONTEND_URL}?token2fa=${token}`);
+    return;
     }
 
     const data = await this.authService.signup(req.user);
     this.logger.debug('Token:', data.token);
-
-    return res.redirect(`${process.env.FRONTEND_URL}/?token=${data.token}`);
+    res
+    // .cookie('token', data.token, { expires: new Date(Date.now() + 30000000), httpOnly: true, domain: 'localhost' })
+    .redirect(`${process.env.FRONTEND_URL}?token=${data.token}`);
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -97,7 +101,7 @@ export class AuthController {
   async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
     // const user = await this.userService.getUserById(id);
 
-    this.logger.debug(code);
+    // this.logger.debug('ass', code, user);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
         // TODO: Check if 2FA has been generated before, generate if not
@@ -137,7 +141,7 @@ export class AuthController {
 
   @UseGuards(twoFAGuard)
   @Post('2fa/authentication')
-  async authenticate2FA(@Res() res: Response, @Query('token') token: string,
+  async authenticate2FA(@Req() req: any, @Res() res: Response,
     @GetMe() id: any,
     @Body('code') code: string,
   ) {
@@ -152,12 +156,13 @@ export class AuthController {
     const isCodeValid = this.authService.is2FACodeValid(code, user);
 
     if (!isCodeValid) {
+      this.logger.debug('fuck');
       throw new UnauthorizedException('Wrong 2FA code');
     }
 
     const tokenPerm = await this.authService.signToken(Number(user.id), user.login);
 
-    this.logger.log('Token: ', token);
+    // this.logger.log('Token: ', token);
     res.cookie('token', tokenPerm, { expires: new Date(Date.now() + 300000), httpOnly: true });
     return res.redirect(`${process.env.FRONTEND_URL}`);
   }

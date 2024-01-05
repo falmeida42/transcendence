@@ -14,8 +14,11 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
     // Make sure not to call hooks here
     try {
       const newUserData = name;
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
+      const token = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('token='))
+      ?.split('=')[1];
+      console.log(token);
 
       fetch('http://localhost:3000/auth/2fa/turn-on', {
         method: 'POST',

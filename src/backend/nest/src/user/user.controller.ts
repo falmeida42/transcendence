@@ -43,12 +43,12 @@ export class UserController {
   @UseGuards(twoFAGuard)
   @Get('auth')
   async getAuth(@GetMe() user: User) {
-    const logInfo = {
-      // user: user, // Log only the user property
-      user: {id: user.id, twoFactorAuthEnabled: user.twoFactorAuthEnabled},
+    // const logInfo = {
+    //   // user: user, // Log only the user property
+    //   user: {id: user.id, twoFactorAuthEnabled: user.twoFactorAuthEnabled},
 
-    };
-    this.logger.debug(JSON.stringify(logInfo));
+    // };
+    // this.logger.debug(JSON.stringify(logInfo));
     return (await this.findById(String(user.id))).twoFactorAuthEnabled;
   }
 

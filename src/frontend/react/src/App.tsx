@@ -33,8 +33,8 @@ function App() {
   return (
 	console.log(twofa, auth),
 	<div>
-		
-		{(twofa === true && auth === false) && <ApiData2faProvider/> && (<AuthApi code="" />)}
+		<ApiData2faProvider/>
+		{(twofa === true && auth === false) && (<AuthApi code="" />)}
 		
 		{(twofa === false || (twofa === true && auth === true)) && <Bars />}
 			{showHash === '#Game' && (
