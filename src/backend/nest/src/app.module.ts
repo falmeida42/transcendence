@@ -5,7 +5,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { JwtModule } from '@nestjs/jwt';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TokenExpirationInterceptor } from './auth/interceptors';
 
 @Module({
   imports: [
@@ -15,6 +16,9 @@ import { JwtModule } from '@nestjs/jwt';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    { provide: APP_INTERCEPTOR, useClass: TokenExpirationInterceptor },
+    AppService,
+  ],
 })
 export class AppModule {}
