@@ -25,10 +25,7 @@ export class AuthService {
       });
 
       if (user) {
-        const accessToken = await this.signAccessToken(
-          Number(user.id),
-          user.login,
-        );
+        const accessToken = await this.signAccessToken(Number(user.id));
         const refreshToken = await this.signRefreshToken(Number(user.id));
         return {
           accessToken: accessToken,
@@ -53,10 +50,7 @@ export class AuthService {
       this.logger.debug('New user: ', newUser);
 
       if (newUser) {
-        const accessToken = await this.signAccessToken(
-          Number(newUser.id),
-          newUser.login,
-        );
+        const accessToken = await this.signAccessToken(Number(newUser.id));
         const refreshToken = await this.signRefreshToken(Number(user.id));
         return {
           accessToken: accessToken,
@@ -70,11 +64,11 @@ export class AuthService {
     return null;
   }
 
-  async signAccessToken(userId: number, login: string): Promise<string> {
-    const payload = { sub: userId, login: login };
+  async signAccessToken(userId: number): Promise<string> {
+    const payload = { sub: userId };
 
     return this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '1m',
       secret: this.config.get('JWT_SECRET'),
     });
   }

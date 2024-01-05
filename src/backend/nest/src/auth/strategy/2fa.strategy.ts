@@ -15,7 +15,6 @@ export class TwoFAStrategy extends PassportStrategy(Strategy, '2fa') {
   }
 
   async validate(payload: any) {
-    console.debug('2FAStrategy.validate', payload);
     return { id: payload.sub, code: payload.code };
   }
 }

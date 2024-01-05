@@ -16,7 +16,7 @@ import { FTGuard, JwtAuthGuard } from '../auth/guard';
 import { UserService } from '../user/user.service';
 import { GetMe } from 'src/decorators';
 import { User } from '@prisma/client';
-import { twoFAGuard } from './guard/2FA.guard';
+import { TwoFAGuard } from './guard/2FA.guard';
 import { Response } from 'express';
 import { Req } from '@nestjs/common';
 
@@ -77,9 +77,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('2fa/generate')
-  async register(@Res() res: any, @GetMe('id') id: string) {
-    const user = await this.userService.getUserById(id);
-
+  async register(@Res() res: any, @GetMe() user: User) {
     if (!user) {
       throw new ForbiddenException('User does not exist');
     }
@@ -112,8 +110,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-on')
   async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
-    // const user = await this.userService.getUserById(id);
-
     this.logger.debug(code);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
@@ -133,36 +129,35 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-off')
-  async turn2FAOff(@GetMe('id') id: string, @Body('code') code: string) {
-    const user = await this.userService.getUserById(id);
+  async turn2FAOff(@GetMe() user: User, @Body('code') code: string) {
     if (!user) {
       throw new ForbiddenException('No such user');
     }
 
-    if ((await this.userService.is2FAEnabled(id)) === true) {
+    if ((await this.userService.is2FAEnabled(user.id)) === true) {
       const isCodeValid = this.authService.is2FACodeValid(code, user);
 
       if (!isCodeValid) {
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
-      const updated = await this.userService.set2FAOff(id);
+      const updated = await this.userService.set2FAOff(user.id);
       this.logger.debug(updated);
     }
     return { message: '2FA is already off' };
   }
 
-  @UseGuards(twoFAGuard)
+  @UseGuards(TwoFAGuard)
   @Post('2fa/authentication')
   async authenticate2FA(
     @Res() res: Response,
     @Query('token') token: string,
-    @GetMe() id: any,
+    @GetMe('id') id: string,
     @Body('code') code: string,
   ) {
     this.logger.debug('code: ', code);
 
-    const user = await this.userService.getUserById(id.id);
+    const user = await this.userService.getUserById(id);
 
     if (!user) {
       throw new ForbiddenException('No such id ', user.id);
@@ -174,10 +169,7 @@ export class AuthController {
       throw new UnauthorizedException('Wrong 2FA code');
     }
 
-    const tokenPerm = await this.authService.signAccessToken(
-      Number(user.id),
-      user.login,
-    );
+    const tokenPerm = await this.authService.signAccessToken(Number(user.id));
 
     this.logger.log('Token: ', token);
     res.cookie('token', tokenPerm, {
