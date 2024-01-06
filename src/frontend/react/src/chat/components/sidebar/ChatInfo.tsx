@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { ChatContext } from "../../context/ChatContext";
+
 export interface ChatData {
   id: string;
   name: string;
@@ -12,6 +15,10 @@ interface ChatInfoProps {
 }
 
 const ChatInfo = (chatInfoProps: ChatInfoProps) => {
+
+  const { setChannelSelected } = useContext(ChatContext) ?? {};
+
+
   const onlineStatus =
     (() => {
       switch (chatInfoProps.data.status) {
@@ -25,6 +32,8 @@ const ChatInfo = (chatInfoProps: ChatInfoProps) => {
     })();
 
   const handleClick = () => {
+    if (setChannelSelected)
+      setChannelSelected(chatInfoProps.data.id)
     chatInfoProps.passSelectedChatData(chatInfoProps.data);
   };
 

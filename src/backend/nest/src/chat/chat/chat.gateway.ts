@@ -55,14 +55,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
     const existingUserIndex = this.users.findIndex(user => user.username === payload.username);
   
-    const channelRooms = await this.userService.getChatRoomsByLogin(payload.username);
+    const user = await this.userService.getChatRoomsByLogin(payload.username);
   
-    console.log("CHANNEL ROOMS: ", channelRooms);
+    console.log("CHANNEL ROOMS: ", user);
 
-    channelRooms.forEach((room) => {
+    // user.forEach((room) => {
       
-      client.join(room.id)
-    })
+    //   client.join(room.id)
+    // })
   
     if (existingUserIndex !== -1) {
       // User with the same username already exists, update the data

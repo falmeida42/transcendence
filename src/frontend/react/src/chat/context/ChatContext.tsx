@@ -1,11 +1,14 @@
 import React, { createContext, ReactNode, useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import { useApi } from "../../apiStore";
+import { MessageData } from "../components/chat/Messages";
 
 interface ChatContextProps {
   socket: SocketIoReference.Socket | null;
   chatRooms: any,
-  usersOnline: any
+  usersOnline: any,
+  setChannelSelected: React.Dispatch<React.SetStateAction<string>>,
+  channelHistory: any
 }
 
 interface ChatProviderProps {
@@ -23,10 +26,12 @@ function ChatProvider({ children }: ChatProviderProps) {
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
   const [chatRooms, setChatRooms] = useState([])
   const [usersOnline, setUsersOnline] = useState([])
+  const [channelSelected, setChannelSelected] = useState("")
+  const [channelHistory, setChannelHistory] = useState([])
 
   const {login} = useApi()
 
-  console.log()
+  console.log("channel selected", channelSelected)
 
   updateChatRooms = () => {
 
@@ -85,6 +90,38 @@ function ChatProvider({ children }: ChatProviderProps) {
 
     setSocket(socketInstance);
 
+    fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+      })
+      .then((data) => {
+        if (data) {
+          console.log("Daaaata received ", data);
+          
+          setChannelHistory(data.map( (message: any): MessageData => ({
+            id: message.id,
+            username: message.sender.login,
+            userImage: message.sender.image,
+            message: message.content
+            })
+          ))
+        } else {
+          console.log("No data received");
+        }
+
+      })
+      .catch((error) => console.error("Fetch error:", error));
+
     fetch(`http://localhost:3000/user/chatRooms`, {
       method: "GET",
       headers: {
@@ -115,12 +152,16 @@ function ChatProvider({ children }: ChatProviderProps) {
         socketInstance.disconnect();
       }
     };
-  }, []);
+
+    
+  }, [channelSelected]);
 
   const contextValue: ChatContextProps = {
     socket: socket,
     chatRooms: chatRooms,
-    usersOnline: usersOnline
+    usersOnline: usersOnline,
+    setChannelSelected: setChannelSelected,
+    channelHistory: channelHistory
   };
 
   return (

@@ -81,6 +81,15 @@ export class UserService {
     }
     return null; // or handle the case when userWithChatRooms is null
   }
+
+  async getChatRoomsByLogin(username: string) {
+    return await this.prisma.user.findUnique({
+      where: { login: username },
+      include: {
+        chatRooms: true
+      }
+    });
+  }
   
   async getChatHistory(userId: string, chatId: string) {
     const user = await this.prisma.user.findUnique({ 
