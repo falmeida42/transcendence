@@ -8,6 +8,7 @@ import KickPopup from "./KickPopup"
 import MutePopup from "./MutePopup"
 import BanPopup from "./BanPopup"
 import LockPopup from "./LockPopup"
+import AdminPopup from "./AdminPopup"
 
 export const toggleChatVisibility = () => {
     const element = (document.getElementById("chat") as HTMLDivElement);
@@ -27,6 +28,7 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
     const [isVisibleBan, setIsVisibleBan] = useState(false);
     const [isVisibleMute, setIsVisibleMute] = useState(false);
     const [isVisibleLock, setIsVisibleLock] = useState(false);
+    const [isVisibleAdmin, setIsVisibleAdmin] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [isHovered, setIsHovered] = useState("");
 
@@ -55,6 +57,9 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
     const handleClickLock = () => {
         setIsVisibleLock(!isVisibleLock);
     };
+    const handleClickAdmin = () => {
+        setIsVisibleAdmin(!isVisibleAdmin);
+    };
 
     
     return (
@@ -65,8 +70,9 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
             {isVisibleKick && <KickPopup isVisible={isVisibleKick} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickKick}/>}
             {isVisibleMute && <MutePopup isVisible={isVisibleMute} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickMute}/>}            
             {isVisibleBan && <BanPopup isVisible={isVisibleBan} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickBan}/>}
-            {/* only if chatroom is not protected */}
-            {isVisibleLock && <LockPopup isVisible={isVisibleLock} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickLock}/>}                       
+            {/* only if user is the owner */}
+            {isVisibleLock && <LockPopup isVisible={isVisibleLock} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickLock}/>}
+            {isVisibleAdmin && <AdminPopup isVisible={isVisibleAdmin} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickAdmin}/>}                        
             <div className="chat-header clearfix">
                 <div className="chat-about">
                     <div className="chat-with">Chat with {chatContentProps.selectedChatData.name}</div>
@@ -76,6 +82,7 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
                     <i onClick={handleClickMute} onMouseEnter={() => handleMouseEnter("mute user")} onMouseLeave={handleMouseLeave} className="fa fa-microphone-slash fa-lg clickable" ></i>
                     <i onClick={handleClickBan} onMouseEnter={() => handleMouseEnter("ban user")} onMouseLeave={handleMouseLeave} className="fa fa-ban fa-lg clickable" ></i>
                     <i onClick={handleClickLock} onMouseEnter={() => handleMouseEnter("set password")} onMouseLeave={handleMouseLeave} className="fa fa-lock fa-lg clickable" ></i>
+                    <i onClick={handleClickAdmin} onMouseEnter={() => handleMouseEnter("appoint admin")} onMouseLeave={handleMouseLeave} className="fa fa-support fa-lg clickable" ></i>
                     {isHovered !== "" && <div className="hover-label">{isHovered}</div>}
                 </div>
                 <img src={chatContentProps.selectedChatData.image} 
