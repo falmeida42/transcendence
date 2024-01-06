@@ -6,10 +6,8 @@ import {
   Body,
   Post,
   Logger,
-  Query,
   UnauthorizedException,
   ForbiddenException,
-  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FTGuard, JwtAuthGuard } from '../auth/guard';
@@ -64,12 +62,6 @@ export class AuthController {
 
     this.logger.debug('Access token:', data.accessToken);
 
-    res.cookie('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
-
     return res.redirect(
       `${process.env.FRONTEND_URL}/?token=${data.accessToken}&2faOn=false`,
     );
@@ -83,12 +75,11 @@ export class AuthController {
     }
 
     let secret: string;
-    this.logger.debug(user.twoFactorAuthSecret);
     // if no secret
     if (!user.twoFactorAuthSecret) {
       try {
         // generate 2FA secret
-        secret = await this.authService.generate2FASecret();
+        secret = this.authService.generate2FASecret();
         // update user data
         await this.userService.set2FASecret(String(user.id), secret);
       } catch (error) {
@@ -151,7 +142,6 @@ export class AuthController {
   @Post('2fa/authentication')
   async authenticate2FA(
     @Res() res: Response,
-    @Query('token') token: string,
     @GetMe('id') id: string,
     @Body('code') code: string,
   ) {
@@ -171,7 +161,6 @@ export class AuthController {
 
     const tokenPerm = await this.authService.signAccessToken(Number(user.id));
 
-    this.logger.log('Token: ', token);
     res.cookie('token', tokenPerm, {
       expires: new Date(Date.now() + 300000),
       httpOnly: true,

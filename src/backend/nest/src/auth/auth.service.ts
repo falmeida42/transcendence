@@ -26,10 +26,10 @@ export class AuthService {
 
       if (user) {
         const accessToken = await this.signAccessToken(Number(user.id));
-        const refreshToken = await this.signRefreshToken(Number(user.id));
+        // const refreshToken = await this.signRefreshToken(Number(user.id));
         return {
           accessToken: accessToken,
-          refreshToken: refreshToken,
+          // refreshToken: refreshToken,
           user: user,
         };
       }
@@ -51,10 +51,10 @@ export class AuthService {
 
       if (newUser) {
         const accessToken = await this.signAccessToken(Number(newUser.id));
-        const refreshToken = await this.signRefreshToken(Number(user.id));
+        // const refreshToken = await this.signRefreshToken(Number(user.id));
         return {
           accessToken: accessToken,
-          refreshToken: refreshToken,
+          // refreshToken: refreshToken,
           user: user,
         };
       }
@@ -68,21 +68,12 @@ export class AuthService {
     const payload = { sub: userId };
 
     return this.jwtService.signAsync(payload, {
-      expiresIn: '1m',
+      expiresIn: '20m',
       secret: this.config.get('JWT_SECRET'),
     });
   }
 
-  async signRefreshToken(userId: number): Promise<string> {
-    const payload = { sub: userId, tokenId: uuidv4() };
-
-    return this.jwtService.signAsync(payload, {
-      expiresIn: '7d',
-      secret: this.config.get('JWT_SECRET'),
-    });
-  }
-
-  async generate2FASecret() {
+  generate2FASecret() {
     return authenticator.generateSecret();
   }
 
@@ -126,16 +117,8 @@ export class AuthService {
     const payload = { sub: id };
 
     return this.jwtService.signAsync(payload, {
-      expiresIn: '5m',
+      expiresIn: '10m',
       secret: this.config.get('JWT_2FA_SECRET'),
     });
   }
-
-  // async verifyToken(token: Object): Promise<boolean> {}
-  //   try {
-  //     return await
-  //   } catch(error) {
-  //     console.error(error);
-  //     return false
-  //   }
 }
