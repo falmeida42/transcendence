@@ -48,16 +48,16 @@ export class AuthController {
       // TODO: send to frontend here
       const token = await this.authService.sign2FAToken(req.user.id);
       res
-      // .cookie('token', token, { expires: new Date(Date.now() + 300000), httpOnly: true, domain: 'localhost', path: '/', sameSite: 'none', secure: true })
-      .redirect(`${process.env.FRONTEND_URL}?token2fa=${token}`);
+      .cookie('token2fa', token, { expires: new Date(Date.now() + 2 * 60 * 1000), domain: 'localhost', path: '/', sameSite: 'none', secure: true })
+      .redirect(`${process.env.FRONTEND_URL}`);
     return;
     }
 
     const data = await this.authService.signup(req.user);
     this.logger.debug('Token:', data.token);
     res
-    // .cookie('token', data.token, { expires: new Date(Date.now() + 30000000), httpOnly: true, domain: 'localhost' })
-    .redirect(`${process.env.FRONTEND_URL}?token=${data.token}`);
+    .cookie('token', data.token, { expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), domain: 'localhost', path:'/', sameSite: 'none', secure:true })
+    .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
@@ -101,15 +101,15 @@ export class AuthController {
   async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
     // const user = await this.userService.getUserById(id);
 
-    // this.logger.debug('ass', code, user);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
         // TODO: Check if 2FA has been generated before, generate if not
       }
-
-      const isCodeValid = this.authService.is2FACodeValid(code, user);
-
-      if (!isCodeValid) {
+      
+      const isCodeValid = await this.authService.is2FACodeValid(code, user);
+      
+      if (isCodeValid === false) {
+        this.logger.debug('ass', code, user);
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
@@ -127,7 +127,7 @@ export class AuthController {
     }
 
     if ((await this.userService.is2FAEnabled(id)) === true) {
-      const isCodeValid = this.authService.is2FACodeValid(code, user);
+      const isCodeValid = await this.authService.is2FACodeValid(code, user);
 
       if (!isCodeValid) {
         throw new UnauthorizedException('Wrong 2FA code');

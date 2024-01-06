@@ -8,7 +8,7 @@ function Bars() {
 	
   return (
 	<div>
-		{(auth === true || twofa === false) && <ApiDataProvider/>}
+		{(auth === true || twofa === false)}
 		<Sidebar />
 		<Topbar />
 	</div>

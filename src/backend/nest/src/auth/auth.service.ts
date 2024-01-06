@@ -77,17 +77,19 @@ export class AuthService {
     return toDataURL(otpAuthURL);
   }
 
-  is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
+  async is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
     this.logger.debug(twoFactorAuthenticationCode, user);
 
     if (!user.twoFactorAuthSecret) {
       throw new ForbiddenException('2FA secret is not set');
     }
     this.logger.debug(twoFactorAuthenticationCode, user.twoFactorAuthSecret);
-    return authenticator.verify({
+    const ass = await authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,
     });
+    this.logger.debug('ass2:', ass, twoFactorAuthenticationCode, user.twoFactorAuthSecret);
+    return ass;
   }
 
   async is2FAActive(id: string) {

@@ -34,6 +34,7 @@ function App() {
 	console.log(twofa, auth),
 	<div>
 		<ApiData2faProvider/>
+		<ApiDataProvider/>
 		{(twofa === true && auth === false) && (<AuthApi code="" />)}
 		
 		{(twofa === false || (twofa === true && auth === true)) && <Bars />}

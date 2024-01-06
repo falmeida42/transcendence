@@ -14,6 +14,10 @@ const ApiQr: React.FC<ApiQrProps> = (props) => {
         .split('; ')
         .find((row) => row.startsWith('token='))
         ?.split('=')[1];
+      if (token === undefined)
+        return;
+
+      // console.log(token, 'QR');
 
       try {
         const response = await fetch('http://localhost:3000/auth/2fa/generate', {
@@ -29,7 +33,7 @@ const ApiQr: React.FC<ApiQrProps> = (props) => {
         }
 
         const data = await response.json();
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data));
         setqrcode(data);
       } catch (error) {
         console.error(error);

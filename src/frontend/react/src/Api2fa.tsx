@@ -18,7 +18,10 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
       .split('; ')
       .find((row) => row.startsWith('token='))
       ?.split('=')[1];
-      console.log(token);
+      if (token === undefined)
+        return;
+
+      // console.log(token, 'turn on');
 
       fetch('http://localhost:3000/auth/2fa/turn-on', {
         method: 'POST',
@@ -26,6 +29,7 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({code: newUserData}),
       })
         .then((updateResponse) => {

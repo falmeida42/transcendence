@@ -18,7 +18,9 @@ const UseAuth = ({ code }: UseAuthProps) => {
       .split('; ')
       .find((row) => row.startsWith('token2fa='))
       ?.split('=')[1];
-      console.log(token, '@');
+      // console.log(token, '@');
+      if (token === undefined)
+        return;
 
       await fetch('http://localhost:3000/auth/2fa/authentication', {
         method: 'POST',

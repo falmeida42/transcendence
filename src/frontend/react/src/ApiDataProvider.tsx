@@ -7,23 +7,27 @@ interface ApiDataProviderProps {
 
 const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
   const { auth, setInfo} = useApi();
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token');
-  if (token != null) {
-    console.log('token: ', token)
-    const newUrl = window.location.href.split('?')[0]; // Remove query parameters
-    window.history.replaceState({}, document.title, newUrl);
-    document.cookie = `token=${token}; expires=${new Date(Date.now() + 300000).toUTCString()}; path=/;`;
-  }
-
+  
   useEffect(() => {
     const fetchData = async () => {
+      // const urlParams = new URLSearchParams(window.location.search);
+      // const token = urlParams.get('token');
+      // if (token != null) {
+      //   console.log('token: ', token)
+      //   const newUrl = window.location.href.split('?')[0]; // Remove query parameters
+      //   window.history.replaceState({}, document.title, newUrl);
+      //   document.cookie = `token=${token}; expires=${new Date(Date.now() + 300000).toUTCString()}; path=/;`;
+      // }
 
       try {
-        // const token = document.cookie
-        // .split('; ')
-        // .find((row) => row.startsWith('token='))
-        // ?.split('=')[1];
+        // console.log(document.cookie, '123');
+        const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
+        if (token === undefined)
+          return;
+
         // if (token === undefined){
         //   setInfo("", "", "", "", "", "", true);
         //   return;
@@ -34,6 +38,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
         });
 
         if (!response.ok) {
