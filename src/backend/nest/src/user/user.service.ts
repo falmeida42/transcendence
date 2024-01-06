@@ -107,6 +107,16 @@ export class UserService {
     return null;
   }
   
+
+  async getChatRoomsByLogin(username: string) {
+    return await this.prisma.user.findUnique({
+      where: { login: username },
+      include: {
+        chatRooms: true
+      }
+    });
+  }
+  
   async getChatHistory(userId: string, chatId: string) {
     const user = await this.prisma.user.findUnique({ 
       where: { id: userId },
@@ -236,4 +246,42 @@ export class UserService {
     return allChatRooms
   }
 
+  async addMessage(userId: string, chatId: string, content: string) {
+
+    try {
+      // Check if the chat room exists
+      const chatRoom = await this.prisma.chatRoom.findUnique({
+        where: { id: chatId },
+      });
+  
+      if (!chatRoom) {
+        throw 'Chat room not found';
+      }
+  
+      // Check if the sender user exists
+      const sender = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+  
+      if (!sender) {
+        throw 'Sender user not found';
+      }
+  
+      // Create a new message
+      const newMessage = await this.prisma.message.create({
+        data: {
+          content: content,
+          chat_id: chatId,
+          sender_id: userId,
+          userId: userId,
+        },
+      });
+  
+      return newMessage;
+    } catch (error) {
+      console.error('Error adding message:', error);
+      throw 'Internal server error';
+    }
+  }
+  
 }

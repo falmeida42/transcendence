@@ -1,11 +1,17 @@
 import React, { createContext, ReactNode, useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import { useApi } from "../../apiStore";
+import { MessageData } from "../components/chat/Messages";
+import JoinRoomPopup from "../components/chat/JoinRoomPopup";
+import { socketIoRef } from "../../network/SocketConnection";
+import { DefaultEventsMap } from "@socket.io/component-emitter";
 
 interface ChatContextProps {
   socket: SocketIoReference.Socket | null;
   chatRooms: any,
-  usersOnline: any
+  usersOnline: any,
+  setChannelSelected: React.Dispatch<React.SetStateAction<string>>,
+  channelMessagesSelected: MessageData[]
 }
 
 interface ChatProviderProps {
@@ -18,15 +24,19 @@ export var tk: string | null;
 
 let updateChatRooms: () => void;
 
+let socketInstance: Socket<DefaultEventsMap, DefaultEventsMap>;
+
 function ChatProvider({ children }: ChatProviderProps) {
 
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
   const [chatRooms, setChatRooms] = useState([])
   const [usersOnline, setUsersOnline] = useState([])
+  const [channelSelected, setChannelSelected] = useState("")
+  const [channelMessages, setChannelMessages] = useState([])
 
-  const {login} = useApi()
+  const { login } = useApi()
 
-  console.log()
+  console.log("channel selected", channelSelected)
 
   updateChatRooms = () => {
 
@@ -62,7 +72,7 @@ function ChatProvider({ children }: ChatProviderProps) {
 
     console.log("Frontend: token", tk);
 
-    const socketInstance = io("http://localhost:3000/chat", {
+    socketInstance = io("http://localhost:3000/chat", {
       withCredentials: true,
     }).connect();
 
@@ -80,10 +90,49 @@ function ChatProvider({ children }: ChatProviderProps) {
       console.log("Users connected ", data)
 
       setUsersOnline(data)
-  });
+    });
 
 
     setSocket(socketInstance);
+
+    fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+      })
+      .then((data) => {
+        if (data) {
+          console.log("Daaaata received ", data);
+
+          setChannelMessages((prevChannelMessages) => ({
+            ...prevChannelMessages,
+            [channelSelected]: data.map((message) => ({
+              id: message.id,
+              username: message.sender.login,
+              userImage: message.sender.image,
+              message: message.content,
+            })),
+          }));
+
+          console.log("This is the channelMessages: ", channelMessages)
+          console.log("This is the current channel message: ", channelMessages[channelSelected])
+
+
+        } else {
+          console.log("No data received");
+        }
+
+      })
+      .catch((error) => console.error("Fetch error:", error));
 
     fetch(`http://localhost:3000/user/chatRooms`, {
       method: "GET",
@@ -109,19 +158,60 @@ function ChatProvider({ children }: ChatProviderProps) {
       })
       .catch((error) => console.error("Fetch error:", error));
 
-    return () => {
-      // Cleanup socket connection on component unmount
-      if (socketInstance) {
-        socketInstance.disconnect();
-      }
-    };
+
+
+
+  }, [channelSelected]);
+
+  useEffect(() => {
+
+    socketInstance.on("messageToClient", (payload) => {
+      console.log("MESSAGE TO CLIENT: ", JSON.stringify(payload));
+
+      setChannelMessages((prevChannelMessages) => {
+        const channelId = payload.channelId;
+
+        // Criar uma cópia do estado anterior
+        const newChannelMessages = { ...prevChannelMessages };
+        console.log("newChannelMessages before: ", newChannelMessages)
+
+        // Criar uma cópia do array de mensagens do canal específico
+        const updatedMessages = [
+          ...newChannelMessages[channelId],
+          {
+            id: payload.id,
+            username: payload.sender,
+            message: payload.message,
+            userImage: payload.senderImage,
+          },
+        ];
+        console.log("newChannelMessages during: ", newChannelMessages)
+
+
+        // Atualizar apenas o array de mensagens do canal específico
+        newChannelMessages[channelId] = updatedMessages;
+        console.log("newChannelMessages after: ", newChannelMessages)
+        console.log("newChannelMessages after: ", newChannelMessages[channelId])
+
+
+
+        console.log("channel messages during construction: ", updatedMessages);
+
+        return newChannelMessages;
+      });
+    });
+
   }, []);
 
   const contextValue: ChatContextProps = {
     socket: socket,
     chatRooms: chatRooms,
-    usersOnline: usersOnline
+    usersOnline: usersOnline,
+    setChannelSelected: setChannelSelected,
+    channelMessagesSelected: channelMessages[channelSelected] ?? []
   };
+
+
 
   return (
     <ChatContext.Provider value={contextValue}>
