@@ -75,6 +75,17 @@ export class UserController {
     return ChatRooms
   }
 
+  @Get('chatRoom/:id')
+  async getChatRoomById(@Req() req: any, @Param('id') id: string) {
+    
+    console.log("backend getting ChatRoom with id ", id)
+    
+    const ChatRoom = this.userService.getChatRoomById(id);
+    
+    console.log("chat room receeeeived ", ChatRoom)
+    return ChatRoom
+  }
+
   @Get('chatHistory/:id')
   async getChatHistory(@Req() req: any, @Param('id') id: string) {
     
@@ -115,6 +126,19 @@ export class UserController {
         console.log("Add room")
         console.log(JSON.stringify(body))
         await this.userService.createRoom(String(req.user.id), body.roomdata)
+      }
+  }
+
+  @Post('update-room-privacy/:roomId')
+  async updateRoomPrivacy(
+    @Req() req: any,
+    @Body() body: any,
+    @Param('roomId') roomId: string,
+  ) {
+      if (body) {
+        console.log("Updated room privacy")
+        console.log(JSON.stringify(body))
+        await this.userService.updateChatRoomPrivacy(roomId, body.type, body.password)
       }
   }
 

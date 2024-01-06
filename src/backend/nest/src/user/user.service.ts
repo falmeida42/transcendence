@@ -81,6 +81,31 @@ export class UserService {
     }
     return null; // or handle the case when userWithChatRooms is null
   }
+
+  async getChatRoomById(chatId: string) {
+    const chatRoom = await this.prisma.chatRoom.findUnique({
+      where: { id: chatId },
+      include: {
+        participants: true
+        }
+    });
+  
+    if (chatRoom) {
+      return chatRoom;
+    }
+    return null;
+  }
+
+  async updateChatRoomPrivacy(chatId: string, newType: ChatType, newPassword: string) {
+    await this.prisma.chatRoom.update({
+      where: { id: chatId },
+      data: { 
+        type: newType,
+        password: newPassword,
+      }
+    });
+    return null;
+  }
   
   async getChatHistory(userId: string, chatId: string) {
     const user = await this.prisma.user.findUnique({ 
@@ -123,6 +148,7 @@ export class UserService {
           name: roomData.name,
           image: roomData.image,
           type: roomData.type,
+          password: roomData.password,
           participants: {
             connect: roomData.participants.map((login : string) => ({
               login: login

@@ -1,10 +1,12 @@
 import { useApi } from "../../../apiStore";
 import { tk, updateChatRooms } from "../../context/ChatContext";
+import { ChatData } from "../sidebar/ChatInfo";
 
 interface LeaveChannelProps {
     channelId: string,
     isVisible: boolean;
     handleClose: () => void;
+    passSelectedChatData: (data: ChatData) => void;
   }
 
 const LeaveChannelPopUp: React.FC<LeaveChannelProps> = (props: LeaveChannelProps) => {
@@ -47,6 +49,12 @@ const LeaveChannelPopUp: React.FC<LeaveChannelProps> = (props: LeaveChannelProps
                 .then(
                     updateChatRooms
                 )
+                .then(() => {
+                    if (props.passSelectedChatData) {
+                        props.passSelectedChatData({id: "", name: "", image: "", type: "", status: 0});
+                    }
+                })
+                
                 
         props.handleClose();
     }; 

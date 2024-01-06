@@ -21,7 +21,7 @@ function Chat() {
       <div className="container container_chat clearfix">
         <ChatProvider>
           <ChatSidebar passSelectedChatData={passSelectedChatData}/>
-          <ChatContent selectedChatData={selectedChatData}/>
+          {selectedChatData.id !== "" && <ChatContent selectedChatData={selectedChatData} passSelectedChatData={passSelectedChatData}/>}
         </ChatProvider>
       </div>
     );

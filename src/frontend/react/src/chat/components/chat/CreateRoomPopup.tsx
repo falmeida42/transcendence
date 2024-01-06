@@ -110,7 +110,8 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                         name: inputName,
                         image: inputImage,
                         type: inputPrivacy,
-                        participants: checkboxValues
+                        participants: checkboxValues,
+                        password: inputPassword
                     }
                 })
                 })

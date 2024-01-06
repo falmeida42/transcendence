@@ -62,7 +62,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({ isVisible, handleClose })
         toggleVisibility(false);
         if (channel.type !== "PROTECTED")
             setInputPassword("");
-      };
+    };
 
 
     const handleClickClose = () => {

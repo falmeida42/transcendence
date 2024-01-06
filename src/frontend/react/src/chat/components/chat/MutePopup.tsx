@@ -2,13 +2,13 @@ import { useState } from "react";
 import { tk } from "../../context/ChatContext";
 import { useApi } from "../../../apiStore";
 
-interface MatchPopupProps {
+interface MutePopupProps {
     isVisible: boolean;
     handleClose: () => void;
     channelId: string;
   }
 
-const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
+const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
 
     const [chatData, setChatData] = useState<Data>();
     const [userToInvite, setUserToInvite] = useState<Participant>({id: "", login: "", image: "", chatRoomId: ""});
@@ -81,16 +81,16 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
                 <div className="modal-dialog">
                     <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">Challenge User</h5>
+                        <h5 className="modal-title">Mute User</h5>
                         <button type="button" className="close" onClick={handleClickClose}>
                         <span>&times;</span>
                         </button>
                     </div>
                     <div>
                         <div className="modal-body">
-                            <p>Select a user to challenge to a match of Pong:</p>
+                            <p>Select a user to mute temporarily:</p>
                             <ul className="popup-input">
-                                {
+                            {
                                     chatData?.participants.map((data) => (
                                         login !== data.login && (
                                             <li>
@@ -112,7 +112,7 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
                             {isVisibleWarning && <p style={{color: "red"}}>{warningText}</p>}
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-clear" onClick={handleClickYes}>Send Invite</button>
+                            <button type="button" className="btn btn-clear" onClick={handleClickYes}>Submit</button>
                             <button type="button" className="btn btn-secondary" onClick={handleClickClose}>Cancel</button>
                         </div>
                     </div>                   
@@ -124,4 +124,4 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
     )
 }
 
-export default MatchPopup;
+export default MutePopup;

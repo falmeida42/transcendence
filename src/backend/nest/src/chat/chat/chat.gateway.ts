@@ -55,7 +55,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
     const existingUserIndex = this.users.findIndex(user => user.username === payload.username);
   
-    const channelRooms = await this.userService.getChatRoomsByLogin(payload.username);
+    const channelRooms = await this.userService.getChatRooms(payload.username);
   
     console.log("CHANNEL ROOMS: ", channelRooms);
 
