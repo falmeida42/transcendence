@@ -38,7 +38,6 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -46,7 +45,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         }
 
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         setInfo(data.user, data.first_name, data.last_name, data.login, data.email, data.image, data.twoFactorAuthEnabled);
       } catch (error) {
         console.error(error);

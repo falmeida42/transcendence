@@ -31,7 +31,7 @@ function App() {
 	const {twofa, auth} = useApi();
 	
   return (
-	console.log(twofa, auth),
+	// console.log(twofa, auth),
 	<div>
 		<ApiData2faProvider/>
 		<ApiDataProvider/>

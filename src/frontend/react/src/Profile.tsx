@@ -29,7 +29,7 @@ function Profile() {
 		// You can add logic here to handle the submission of changes
 		setUsername(textValue);
 		updateFunction();
-		console.log('Submitted changes:', textValue);
+		// console.log('Submitted changes:', textValue);
 	};
 	
 	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +71,7 @@ function Profile() {
 		// You can add logic here to handle the submission of the new image
 		setImage(selectedImage);
 		updateFunction();
-		console.log('Submitted new image:', selectedImage);
+		// console.log('Submitted new image:', selectedImage);
 	};
 
 	const handleClickCode = () => {

@@ -47,7 +47,7 @@ export class AuthService {
           twoFactorAuthEnabled: false,
         },
       });
-      this.logger.debug('New user: ', newUser);
+      // this.logger.debug('New user: ', newUser);
 
       if (newUser) {
         const accessToken = await this.signAccessToken(Number(newUser.id));
@@ -67,7 +67,7 @@ export class AuthService {
   async signAccessToken(userId: number): Promise<string> {
     const payload = { sub: userId };
 
-    return this.jwtService.signAsync(payload, {
+    return await this.jwtService.signAsync(payload, {
       expiresIn: '20m',
       secret: this.config.get('JWT_SECRET'),
     });
@@ -89,18 +89,18 @@ export class AuthService {
   }
 
   async is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
-    this.logger.debug(twoFactorAuthenticationCode, user);
+    // this.logger.debug(twoFactorAuthenticationCode, user);
 
     if (!user.twoFactorAuthSecret) {
       throw new ForbiddenException('2FA secret is not set');
     }
-    this.logger.debug(twoFactorAuthenticationCode, user.twoFactorAuthSecret);
-    const ass = await authenticator.verify({
+    // this.logger.debug(twoFactorAuthenticationCode, user.twoFactorAuthSecret);
+    const res = await authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,
     });
-    this.logger.debug('ass2:', ass, twoFactorAuthenticationCode, user.twoFactorAuthSecret);
-    return ass;
+    // this.logger.debug('res',res)
+    return res;
   }
 
   async is2FAActive(id: string) {

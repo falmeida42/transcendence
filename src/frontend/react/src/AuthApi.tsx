@@ -18,7 +18,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
       .split('; ')
       .find((row) => row.startsWith('token2fa='))
       ?.split('=')[1];
-      // console.log(token, '@');
+      console.log(token, '@');
       if (token === undefined)
         return;
 
@@ -28,19 +28,9 @@ const UseAuth = ({ code }: UseAuthProps) => {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({code: newUserData}),
       })
-        .then((updateResponse) => {
-          if (!updateResponse.ok) {
-            console.log(updateResponse);
-            console.log(newUserData);
-            throw new Error('Authentication failed.');
-          }
-          setauth(true);
-          console.log(JSON.stringify(updateResponse.json))
-          return updateResponse.json();
-        })
+        setauth(true);
     } catch (error) {
       console.error(error);
     }

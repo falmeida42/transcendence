@@ -29,7 +29,6 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({code: newUserData}),
       })
         .then((updateResponse) => {

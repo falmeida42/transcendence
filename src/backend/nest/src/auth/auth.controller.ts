@@ -50,12 +50,12 @@ export class AuthController {
       res
       .cookie('token2fa', token, { expires: new Date(Date.now() + 2 * 60 * 1000), domain: 'localhost', path: '/', sameSite: 'none', secure: true })
       .redirect(`${process.env.FRONTEND_URL}`);
-    return;
+      return;
     }
     // Execute login without 2FA
 
     const data = await this.authService.signup(req.user);
-    this.logger.debug('Token:', data.accessToken);
+    // this.logger.debug('Token:', data.accessToken);
     res
     .cookie('token', data.accessToken, { expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), domain: 'localhost', path:'/', sameSite: 'none', secure:true })
     .redirect(`${process.env.FRONTEND_URL}`);
@@ -86,8 +86,8 @@ export class AuthController {
     // generate key uri
     const otpAuthURL = await this.authService.generate2FAKeyURI(user, secret);
 
-    this.logger.debug('secret: ', secret);
-    this.logger.debug('otp url: ', otpAuthURL);
+    // this.logger.debug('secret: ', secret);
+    // this.logger.debug('otp url: ', otpAuthURL);
 
     // generate QR code
     return res.json(await this.authService.generateQrCodeURL(otpAuthURL));
@@ -96,21 +96,21 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-on')
   async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
-    this.logger.debug(code);
+    // this.logger.debug(code);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
         throw new ForbiddenException('2FA secret not set');
       }
       
       const isCodeValid = await this.authService.is2FACodeValid(code, user);
-      
+            
       if (isCodeValid === false) {
-        this.logger.debug('ass', code, user);
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
       await this.userService.set2FAOn(user.id);
-    }
+      return { message: '2FA is on' };
+  }
     return { message: '2FA is already on' };
   }
 
@@ -129,7 +129,7 @@ export class AuthController {
       }
 
       const updated = await this.userService.set2FAOff(user.id);
-      this.logger.debug(updated);
+      // this.logger.debug(updated);
     }
     return { message: '2FA is already off' };
   }
@@ -141,7 +141,7 @@ export class AuthController {
     @GetMe('id') id: string,
     @Body('code') code: string,
   ) {
-    this.logger.debug('code: ', code);
+    // this.logger.debug('code: ', code);
 
     const user = await this.userService.getUserById(id);
 
@@ -149,17 +149,19 @@ export class AuthController {
       throw new ForbiddenException('No such id ', user.id);
     }
 
-    const isCodeValid = this.authService.is2FACodeValid(code, user);
+    const isCodeValid = await this.authService.is2FACodeValid(code, user);
 
     if (!isCodeValid) {
-      this.logger.debug('fuck');
+      // this.logger.debug('fuck');
       throw new UnauthorizedException('Wrong 2FA code');
     }
 
     const tokenPerm = await this.authService.signAccessToken(Number(user.id));
 
     // this.logger.log('Token: ', token);
-    res.cookie('token', tokenPerm, { expires: new Date(Date.now() + 300000), httpOnly: true });
-    return res.redirect(`${process.env.FRONTEND_URL}`);
+    res
+    .cookie('token', tokenPerm, { expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), domain: 'localhost', path:'/', sameSite: 'none', secure:true })
+    .redirect(`${process.env.FRONTEND_URL}`);
+    return;
   }
 }

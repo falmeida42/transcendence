@@ -36,7 +36,7 @@ export class UserController {
     const logInfo = {
       user: user, // Log only the user property
     };
-    this.logger.debug(JSON.stringify(logInfo));
+    // this.logger.debug(JSON.stringify(logInfo));
     return this.findById(String(user.id));
   }
 

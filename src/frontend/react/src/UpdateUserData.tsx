@@ -23,7 +23,6 @@ const useUpdateUserData = ({ updateFunction }: UseUpdateUserDataProps) => {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          credentials: 'include',
           body: JSON.stringify(newUserData),
         });
 
