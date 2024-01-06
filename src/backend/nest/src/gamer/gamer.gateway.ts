@@ -48,9 +48,17 @@ export class GamerGateway
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected ${client.id}`);
-    if (this.rooms[client.id]) {
-      delete this.rooms[client.id];
+    const player = this.players[client.id];
+    if (player) {
+      console.log(`${player.name} desconectou`);
+
+      const playerId = client.id;
+      const timerId = setTimeout(() => {
+        this.removePlayer(playerId);
+      }, 5000);
+      this.players[playerId].disconnectedId = timerId;
     }
+
     delete this.players[client.id];
   }
 
@@ -155,6 +163,49 @@ export class GamerGateway
     player.onQueue = false;
     client.emit('QueueLeft');
     this.logger.log(`Client ${client.id} left the queue`);
+  }
+
+  @SubscribeMessage('PauseMatch')
+  pauseMatch(@ConnectedSocket() client: Socket) {
+    const socketId = client.id;
+    const player = this.players[socketId];
+    const roomId = player.room;
+    const match = this.match[roomId];
+    match.player1.ready = false;
+    match.player2.ready = false;
+
+    if (match.status === 'PLAY') match.status = 'PAUSE';
+  }
+
+  removePlayer(playerId: string) {
+    this.leaveRoom(playerId);
+    delete this.players[playerId];
+  }
+
+  leaveRoom(socketId: string) {
+    const player = this.players[socketId];
+    const roomId = player && player.room;
+    const room = this.rooms[roomId];
+
+    if (room) {
+      const match = this.match[roomId];
+
+      player.room = undefined;
+
+      const playerNumber = 'player' + (socketId === room.player1 ? 1 : 2);
+      room[playerNumber] = undefined;
+
+      if (match) {
+        match[playerNumber] = undefined;
+
+        if (match.status !== 'END') match.status = 'END';
+      }
+
+      if (!room.player1 && !room.player2) {
+        delete this.rooms[roomId];
+        if (match) delete this.match[roomId];
+      }
+    }
   }
 
   createMatch(player1Id: string, againstAi: boolean, player2Id?: string) {

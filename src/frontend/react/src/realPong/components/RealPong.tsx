@@ -1,21 +1,28 @@
 import { useContext, useEffect } from "react";
 import SVG, { Circle, Line, Rect } from "react-svg-draw";
-import { SocketContext, gameLoaded, sendKey } from "../context/SocketContext";
+import {
+  SocketContext,
+  gameLoaded,
+  pauseGame,
+  sendKey,
+} from "../context/SocketContext";
 
-const RealPong = () => {
-  const { match, winner } = useContext(SocketContext);
-  const { gameConfig, ball, player1, player2 } = match!;
+interface props {
+  setPage: (value: React.SetStateAction<number>) => void;
+}
+
+const RealPong = (props: props) => {
+  const { match } = useContext(SocketContext);
+  const { gameConfig, ball, player1, player2, status } = match!;
+  // const [page, setPage] = useState(0);
 
   useEffect(() => {
     console.log("RealPong.tsx: useEffect");
-    gameLoaded();
 
     const sendKeyEvent = (e: KeyboardEvent) => {
       const { key, type } = e;
       if (e.repeat) return;
       if (key === "ArrowUp" || key === "ArrowDown") {
-        console.log("boas");
-
         sendKey(key, type);
         e.preventDefault();
       }
@@ -28,10 +35,32 @@ const RealPong = () => {
       document.removeEventListener("keydown", sendKeyEvent);
       document.removeEventListener("keyup", sendKeyEvent);
     };
-  }, []);
+  }, [status]);
 
+  // if (page === 0) {
+  // console.log(`Page: ${page}`);
   return (
-    <div>
+    <div className="gamePage">
+      {status === "START" && (
+        <button className="pauseButton" onClick={() => gameLoaded()}>
+          Ready
+        </button>
+      )}
+      {status === "PLAY" && (
+        <button className="pauseButton" onClick={() => pauseGame()}>
+          Pause
+        </button>
+      )}
+      {status === "PAUSE" && (
+        <button className="pauseButton" onClick={() => gameLoaded()}>
+          Resume
+        </button>
+      )}
+      {status === "END" && (
+        <button className="pauseButton" onClick={() => props.setPage(3)}>
+          Leave
+        </button>
+      )}
       <SVG
         width={gameConfig.width.toString()}
         height={gameConfig.height.toString()}
@@ -55,7 +84,6 @@ const RealPong = () => {
               y="0"
               width={gameConfig.width.toString()}
               height={gameConfig.height.toString()}
-              // xlinkHref="https://images.unsplash.com/photo-1697484452652-6ac6e917ecc8?q=80&w=1943&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               xlinkHref="https://cdnb.artstation.com/p/assets/images/images/060/251/939/large/kazu_arts-image4.jpg?1678154083"
             ></image>
           </pattern>
@@ -75,13 +103,11 @@ const RealPong = () => {
           height={gameConfig.height.toString()}
           style={{ fill: "url(#image)" }}
         />
-
         <Line
           x1={(gameConfig.width / 2).toString()}
           y1={"0"}
           x2={(gameConfig.width / 2).toString()}
           y2={gameConfig.height.toString()}
-          // strokeDasharray="5,5"
           strokeWidth="5"
           style={{ stroke: "rgb(255, 255, 255)" }}
         />
@@ -119,8 +145,6 @@ const RealPong = () => {
         >
           {match?.score2 + " " + match?.player2.name}
         </text>
-
-        <text>{`${winner} ganhou o jogo!`}</text>
 
         {ball && (
           <Circle

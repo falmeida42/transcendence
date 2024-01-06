@@ -31,5 +31,5 @@ export interface Match {
   ball: ballConfig;
   score1: number;
   score2: number;
-  status: "START" | "PLAY" | "END";
+  status: "START" | "PLAY" | "PAUSE" | "END";
 }

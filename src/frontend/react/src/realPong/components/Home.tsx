@@ -102,7 +102,7 @@ const Home = () => {
     );
   }
 
-  return <RealPong />;
+  if (page === 4) return <RealPong setPage={setPage} />;
 };
 
 export default Home;

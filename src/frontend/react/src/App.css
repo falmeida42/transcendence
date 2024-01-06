@@ -120,3 +120,20 @@ input {
       -70px 90px 0 rgba(0, 0, 0, 0);
   }
 }
+
+.gamePage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pauseButton {
+  background-color: #000;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.pauseButton:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}

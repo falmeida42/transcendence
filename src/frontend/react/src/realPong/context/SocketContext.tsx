@@ -142,6 +142,10 @@ const leaveQueue = () => {
   socket.emit("LeaveQueue");
 };
 
+const pauseGame = () => {
+  socket.emit("PauseMatch");
+};
+
 export {
   SocketContext,
   SocketProvider,
@@ -149,6 +153,7 @@ export {
   gameLoaded,
   joinQueue,
   leaveQueue,
+  pauseGame,
   sendKey,
   set_name,
 };
