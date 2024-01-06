@@ -20,12 +20,19 @@ interface MessagesProps {
 
 const Messages = (props: MessagesProps) => {
   const {channelMessagesSelected} = useContext(ChatContext) ?? {}
+
+  useEffect(() => {
+    const elem = document.getElementById("chat-history");
+    if (elem) {
+      elem.scrollTop = elem.scrollHeight;
+    }
+  })
   
 
   console.log("Current messages:", JSON.stringify(channelMessagesSelected));
 
   return (
-    <div className="chat-history">
+    <div className="chat-history" id="chat-history">
       {channelMessagesSelected?.map((message : any ) => (
         <Message key={message.id} username={message.username} text={message.message} image={message.userImage}/>
       ))}
