@@ -86,7 +86,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   
   @SubscribeMessage('messageToServer')
-  async handleMessage(client: Socket, payload: any): void {
+  handleMessage(client: Socket, payload: any) {
     this.logger.log(`Message received from ${client.id}: ${JSON.stringify(payload)}`);
 
     // const user = await this.userService.getChatRoomsByLogin(payload.username);

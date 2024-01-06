@@ -28,6 +28,7 @@ const Input = (content: any) => {
   const handleKey: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === 'Enter') {
       sendMessage();
+      event.preventDefault()
     }
   };
 
@@ -43,6 +44,7 @@ const Input = (content: any) => {
         onChange={(e) => setText(e.target.value)}
         onClick={() => setPlaceHolder("")}
         onBlur={() => setPlaceHolder("Type your message")}
+        onKeyDown={(e) => handleKey(e)}
         ></textarea>
 
     <button onClick={() => sendMessage()}> <i className="fa fa-paper-plane clickable" style={{color: "grey"}}></i></button>
