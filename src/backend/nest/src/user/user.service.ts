@@ -16,7 +16,8 @@ export class UserService {
     try {
       return this.prisma.user.findUnique({ where: { id: userId } });
     } catch (error) {
-      return error;
+      this.logger.error(error);
+      throw new Error(`Failed to return user with id ${userId}`);
     }
   }
 
@@ -54,7 +55,6 @@ export class UserService {
       where: { id: id },
       data: {
         twoFactorAuthEnabled: false,
-        twoFactorAuthSecret: null,
       },
     });
   }

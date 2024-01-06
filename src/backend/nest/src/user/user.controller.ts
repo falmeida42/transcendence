@@ -27,28 +27,24 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers() {
-    return this.userService.getUsers();
+    try {
+      return await this.userService.getUsers();
+    } catch (error) {
+      this.logger.error(error);
+      return { error: error, message: 'Unable to get users' };
+    }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@GetMe() user: User) {
-    const logInfo = {
-      user: user, // Log only the user property
-    };
-    // this.logger.debug(JSON.stringify(logInfo));
-    return this.findById(String(user.id));
+    // this.logger.debug(JSON.stringify(user));
+    return user;
   }
 
   @UseGuards(TwoFAGuard)
   @Get('auth')
   async getAuth(@GetMe() user: User) {
-    // const logInfo = {
-    //   // user: user, // Log only the user property
-    //   user: {id: user.id, twoFactorAuthEnabled: user.twoFactorAuthEnabled},
-
-    // };
-    // this.logger.debug(JSON.stringify(logInfo));
     return (await this.findById(String(user.id))).twoFactorAuthEnabled;
   }
 
@@ -73,20 +69,17 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post(':username')
   async changeUsername(
-    @GetMe() userInfo: User,
+    @GetMe() user: User,
     @Param('username') username: string,
   ) {
     try {
-      const user = this.prisma.user.update({
-        where: { id: userInfo.id },
+      this.prisma.user.update({
+        where: { id: user.id },
         data: { username: username },
       });
-
-      if (!user) {
-        throw new Error('Failed to update username');
-      }
     } catch (error) {
-      return { error: error.message };
+      this.logger.error(error);
+      throw new Error(error.message);
     }
   }
 }
