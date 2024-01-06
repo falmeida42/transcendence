@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class twoFAGuard extends AuthGuard('2fa') {
+export class TwoFAGuard extends AuthGuard('2fa') {
   constructor() {
     super();
   }

@@ -8,11 +8,11 @@ import {
   Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { FTGuard, JwtAuthGuard } from '../auth/guard';
+import { JwtAuthGuard } from '../auth/guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetMe } from 'src/decorators';
 import { User } from '@prisma/client';
-import { twoFAGuard } from 'src/auth/guard/2FA.guard';
+import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
 
 // @UseGuards(FTGuard)
 @Controller('user')
@@ -23,7 +23,7 @@ export class UserController {
   ) {}
 
   private readonly logger = new Logger('UserController');
-  
+
   @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers() {
@@ -40,7 +40,7 @@ export class UserController {
     return this.findById(String(user.id));
   }
 
-  @UseGuards(twoFAGuard)
+  @UseGuards(TwoFAGuard)
   @Get('auth')
   async getAuth(@GetMe() user: User) {
     // const logInfo = {

@@ -2,12 +2,10 @@ import {
   Controller,
   Get,
   UseGuards,
-  Req,
   Res,
   Body,
   Post,
   Logger,
-  Query,
   UnauthorizedException,
   ForbiddenException,
 } from '@nestjs/common';
@@ -16,8 +14,9 @@ import { FTGuard, JwtAuthGuard } from '../auth/guard';
 import { UserService } from '../user/user.service';
 import { GetMe } from 'src/decorators';
 import { User } from '@prisma/client';
-import { twoFAGuard } from './guard/2FA.guard';
+import { TwoFAGuard } from './guard/2FA.guard';
 import { Response } from 'express';
+import { Req } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -38,6 +37,7 @@ export class AuthController {
     // this.logger.debug('Request user:', req.user);
 
     if (await this.authService.is2FAActive(String(req.user.id))) {
+      // Execute 2FA logic
       this.logger.debug('2FA IS ENABLED');
 
       const user = await this.userService.getUserById(req.user.id);
@@ -52,32 +52,29 @@ export class AuthController {
       .redirect(`${process.env.FRONTEND_URL}`);
     return;
     }
+    // Execute login without 2FA
 
     const data = await this.authService.signup(req.user);
-    this.logger.debug('Token:', data.token);
+    this.logger.debug('Token:', data.accessToken);
     res
-    .cookie('token', data.token, { expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), domain: 'localhost', path:'/', sameSite: 'none', secure:true })
+    .cookie('token', data.accessToken, { expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), domain: 'localhost', path:'/', sameSite: 'none', secure:true })
     .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('2fa/generate')
-  async register(@Res() res: any, @GetMe('id') id: string) {
-    const user = await this.userService.getUserById(id);
-
+  async register(@Res() res: any, @GetMe() user: User) {
     if (!user) {
       throw new ForbiddenException('User does not exist');
     }
 
     let secret: string;
-    this.logger.debug(user.twoFactorAuthSecret);
     // if no secret
     if (!user.twoFactorAuthSecret) {
       try {
-        console.debug('PASSOU!!!!!!!!');
         // generate 2FA secret
-        secret = await this.authService.generate2FASecret();
+        secret = this.authService.generate2FASecret();
         // update user data
         await this.userService.set2FASecret(String(user.id), secret);
       } catch (error) {
@@ -99,11 +96,10 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-on')
   async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
-    // const user = await this.userService.getUserById(id);
-
+    this.logger.debug(code);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
-        // TODO: Check if 2FA has been generated before, generate if not
+        throw new ForbiddenException('2FA secret not set');
       }
       
       const isCodeValid = await this.authService.is2FACodeValid(code, user);
@@ -120,34 +116,34 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-off')
-  async turn2FAOff(@GetMe('id') id: string, @Body('code') code: string) {
-    const user = await this.userService.getUserById(id);
+  async turn2FAOff(@GetMe() user: User, @Body('code') code: string) {
     if (!user) {
       throw new ForbiddenException('No such user');
     }
 
-    if ((await this.userService.is2FAEnabled(id)) === true) {
-      const isCodeValid = await this.authService.is2FACodeValid(code, user);
+    if ((await this.userService.is2FAEnabled(user.id)) === true) {
+      const isCodeValid = this.authService.is2FACodeValid(code, user);
 
       if (!isCodeValid) {
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
-      const updated = await this.userService.set2FAOff(id);
+      const updated = await this.userService.set2FAOff(user.id);
       this.logger.debug(updated);
     }
     return { message: '2FA is already off' };
   }
 
-  @UseGuards(twoFAGuard)
+  @UseGuards(TwoFAGuard)
   @Post('2fa/authentication')
-  async authenticate2FA(@Req() req: any, @Res() res: Response,
-    @GetMe() id: any,
+  async authenticate2FA(
+    @Res() res: Response,
+    @GetMe('id') id: string,
     @Body('code') code: string,
   ) {
     this.logger.debug('code: ', code);
 
-    const user = await this.userService.getUserById(id.id);
+    const user = await this.userService.getUserById(id);
 
     if (!user) {
       throw new ForbiddenException('No such id ', user.id);
@@ -160,7 +156,7 @@ export class AuthController {
       throw new UnauthorizedException('Wrong 2FA code');
     }
 
-    const tokenPerm = await this.authService.signToken(Number(user.id), user.login);
+    const tokenPerm = await this.authService.signAccessToken(Number(user.id));
 
     // this.logger.log('Token: ', token);
     res.cookie('token', tokenPerm, { expires: new Date(Date.now() + 300000), httpOnly: true });
