@@ -48,8 +48,14 @@ export class AuthController {
       // TODO: send to frontend here
       const token = await this.authService.sign2FAToken(req.user.id);
       res
-      .cookie('token2fa', token, { expires: new Date(Date.now() + 2 * 60 * 1000), domain: 'localhost', path: '/', sameSite: 'none', secure: true })
-      .redirect(`${process.env.FRONTEND_URL}`);
+        .cookie('token2fa', token, {
+          expires: new Date(Date.now() + 2 * 60 * 1000),
+          domain: 'localhost',
+          path: '/',
+          sameSite: 'none',
+          secure: true,
+        })
+        .redirect(`${process.env.FRONTEND_URL}`);
       return;
     }
     // Execute login without 2FA
@@ -57,8 +63,14 @@ export class AuthController {
     const data = await this.authService.signup(req.user);
     // this.logger.debug('Token:', data.accessToken);
     res
-    .cookie('token', data.accessToken, { expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), domain: 'localhost', path:'/', sameSite: 'none', secure:true })
-    .redirect(`${process.env.FRONTEND_URL}`);
+      .cookie('token', data.accessToken, {
+        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        domain: 'localhost',
+        path: '/',
+        sameSite: 'none',
+        secure: true,
+      })
+      .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
@@ -101,35 +113,30 @@ export class AuthController {
       if (!user.twoFactorAuthSecret) {
         throw new ForbiddenException('2FA secret not set');
       }
-      
+
       const isCodeValid = await this.authService.is2FACodeValid(code, user);
-            
+
       if (isCodeValid === false) {
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
       await this.userService.set2FAOn(user.id);
       return { message: '2FA is on' };
-  }
+    }
     return { message: '2FA is already on' };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-off')
-  async turn2FAOff(@GetMe() user: User, @Body('code') code: string) {
-    if (!user) {
-      throw new ForbiddenException('No such user');
-    }
-
+  async turn2FAOff(@GetMe() user: User) {
     if ((await this.userService.is2FAEnabled(user.id)) === true) {
-      const isCodeValid = this.authService.is2FACodeValid(code, user);
-
-      if (!isCodeValid) {
-        throw new UnauthorizedException('Wrong 2FA code');
+      try {
+        await this.userService.set2FAOff(user.id);
+      } catch (error) {
+        console.error(error);
+        return { error: error, message: 'Failed to turn off 2FA' };
       }
-
-      const updated = await this.userService.set2FAOff(user.id);
-      // this.logger.debug(updated);
+      return { message: '2FA disabled' };
     }
     return { message: '2FA is already off' };
   }
@@ -160,8 +167,14 @@ export class AuthController {
 
     // this.logger.log('Token: ', token);
     res
-    .cookie('token', tokenPerm, { expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), domain: 'localhost', path:'/', sameSite: 'none', secure:true })
-    .redirect(`${process.env.FRONTEND_URL}`);
+      .cookie('token', tokenPerm, {
+        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        domain: 'localhost',
+        path: '/',
+        sameSite: 'none',
+        secure: true,
+      })
+      .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 }
