@@ -131,9 +131,6 @@ export class UserController {
 ){
     return this.userService.joinRoom(body.username, body.roomId, body.password, body.roomType)
 };
-  // In your resolver or service file
-
-//...
 
 @Post('leave-room')
 async leaveRoom(
@@ -142,7 +139,5 @@ async leaveRoom(
 ){
     return this.userService.leaveRoom(body.username, body.roomId)
 };
-
-//...
 
 }

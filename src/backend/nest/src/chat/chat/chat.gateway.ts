@@ -48,22 +48,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
   
-
+  
   @SubscribeMessage('userConnected')
   async handleUserConnected(client: Socket, payload: any): Promise<void> {
     this.logger.log(`new user connected ${payload.socketId}: ${payload.username}`);
-  
+    
     const existingUserIndex = this.users.findIndex(user => user.username === payload.username);
-  
+    
     const user = await this.userService.getChatRoomsByLogin(payload.username);
-  
-    console.log("CHANNEL ROOMS: ", user);
-
-    // user.forEach((room) => {
-      
-    //   client.join(room.id)
-    // })
-  
+    
+    console.log("CHANNEL ROOMS: ", user.chatRooms);
+    
+    user.chatRooms.forEach((room) => {
+      console.log("ROOM ID: ", room.id)
+      client.join(room.id)  
+    })
+    
     if (existingUserIndex !== -1) {
       // User with the same username already exists, update the data
       this.users[existingUserIndex] = {
@@ -79,16 +79,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         userStatus: UserStatus.ONLINE
       });
     }
-  
+    
     this.io.emit('getUsersConnected', this.users);
   }
   
-
-
+  
+  
   @SubscribeMessage('messageToServer')
-  handleMessage(client: Socket, payload: any): void {
+  async handleMessage(client: Socket, payload: any): void {
     this.logger.log(`Message received from ${client.id}: ${JSON.stringify(payload)}`);
-    this.io.to(payload.to).emit('messageToClient', { message: payload.message, from: payload.sender });
+
+    // const user = await this.userService.getChatRoomsByLogin(payload.username);
+
+  
+    // this.userService.addMessage(user.id, payload.channelId, payload.message)
+    this.io.to(payload.to).emit('messageToClient', { id: crypto.randomUUID(), channelId: payload.to, message: payload.message, sender: payload.sender, senderImage: payload.senderImage });
   }
 
   @SubscribeMessage('joinChannel')

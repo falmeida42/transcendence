@@ -19,14 +19,14 @@ interface MessagesProps {
 
 
 const Messages = (props: MessagesProps) => {
-  const {channelHistory} = useContext(ChatContext) ?? {}
+  const {channelMessagesSelected} = useContext(ChatContext) ?? {}
   
 
-  console.log("Current messages:", channelHistory);
+  console.log("Current messages:", JSON.stringify(channelMessagesSelected));
 
   return (
     <div className="chat-history">
-      {channelHistory.map((message : any ) => (
+      {channelMessagesSelected?.map((message : any ) => (
         <Message key={message.id} username={message.username} text={message.message} image={message.userImage}/>
       ))}
     </div>

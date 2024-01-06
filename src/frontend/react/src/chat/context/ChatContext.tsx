@@ -2,13 +2,14 @@ import React, { createContext, ReactNode, useState, useEffect, useRef } from "re
 import io from "socket.io-client";
 import { useApi } from "../../apiStore";
 import { MessageData } from "../components/chat/Messages";
+import JoinRoomPopup from "../components/chat/JoinRoomPopup";
 
 interface ChatContextProps {
   socket: SocketIoReference.Socket | null;
   chatRooms: any,
   usersOnline: any,
   setChannelSelected: React.Dispatch<React.SetStateAction<string>>,
-  channelHistory: any
+  channelMessagesSelected: MessageData[]
 }
 
 interface ChatProviderProps {
@@ -27,7 +28,7 @@ function ChatProvider({ children }: ChatProviderProps) {
   const [chatRooms, setChatRooms] = useState([])
   const [usersOnline, setUsersOnline] = useState([])
   const [channelSelected, setChannelSelected] = useState("")
-  const [channelHistory, setChannelHistory] = useState([])
+  const [channelMessages, setChannelMessages] = useState([])
 
   const {login} = useApi()
 
@@ -108,13 +109,20 @@ function ChatProvider({ children }: ChatProviderProps) {
         if (data) {
           console.log("Daaaata received ", data);
           
-          setChannelHistory(data.map( (message: any): MessageData => ({
-            id: message.id,
-            username: message.sender.login,
-            userImage: message.sender.image,
-            message: message.content
-            })
-          ))
+          setChannelMessages((prevChannelMessages) => ({
+            ...prevChannelMessages,
+            [channelSelected]: data.map((message) => ({
+              id: message.id,
+              username: message.sender.login,
+              userImage: message.sender.image,
+              message: message.content,
+            })),
+          }));
+          
+          console.log("This is the channelMessages: ", channelMessages)
+          console.log("This is the current channel message: ", channelMessages[channelSelected])
+
+
         } else {
           console.log("No data received");
         }
@@ -146,14 +154,37 @@ function ChatProvider({ children }: ChatProviderProps) {
       })
       .catch((error) => console.error("Fetch error:", error));
 
-    return () => {
-      // Cleanup socket connection on component unmount
-      if (socketInstance) {
-        socketInstance.disconnect();
-      }
-    };
+      socketInstance.on("messageToClient", (payload) => {
+        console.log("MESSAGE TO CLIENT: ", JSON.stringify(payload));
+      
+        setChannelMessages((prevChannelMessages) => {
+          const channelId = payload.channelId;
+      
+          // Criar uma cópia do estado anterior
+          const newChannelMessages = { ...prevChannelMessages };
+      
+          // Criar uma cópia do array de mensagens do canal específico
+          const updatedMessages = [
+            ...newChannelMessages[channelId],
+            {
+              id: payload.id,
+              username: payload.sender,
+              message: payload.message,
+              userImage: payload.senderImage,
+            },
+          ];
+      
+          // Atualizar apenas o array de mensagens do canal específico
+          newChannelMessages[channelId] = updatedMessages;
+      
+          console.log("channel messages during construction: ", updatedMessages);
+      
+          return newChannelMessages;
+        });
+      });
+      
 
-    
+
   }, [channelSelected]);
 
   const contextValue: ChatContextProps = {
@@ -161,7 +192,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     chatRooms: chatRooms,
     usersOnline: usersOnline,
     setChannelSelected: setChannelSelected,
-    channelHistory: channelHistory
+    channelMessagesSelected: channelMessages[channelSelected] ?? []
   };
 
   return (
