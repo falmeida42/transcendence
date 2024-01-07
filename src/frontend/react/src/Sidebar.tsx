@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
 
@@ -38,20 +39,30 @@ const Sidebar = () => {
         <h4>Menu</h4>
         <ul className="list-unstyled components">
           <li>
-            <a href="#Profile">
+            <Link href="/Profile">
               <i className="fa fa-user green_color"></i> <span>Profile</span>
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#Game">
+            <Link href="/Game">
               <i className="fa fa-gamepad orange_color"></i> <span>Game</span>
-            </a>
+            </Link>
           </li>
+          {/* <li>
+            <Link href="/Friends">
+              <i className="fa fa-users purple_color2"></i> <span>Friends</span>
+            </Link>
+          </li> */}
           <li>
-            <a href="#Chat">
+            <Link href="/Chat">
               <i className="fa fa-paper-plane red_color"></i> <span>Chat</span>
-            </a>
+            </Link>
           </li>
+          {/* <li>
+            <Link href="/Settings">
+              <i className="fa fa-cog yellow_color"></i> <span>Settings</span>
+            </Link>
+          </li> */}
         </ul>
       </div>
     </nav>

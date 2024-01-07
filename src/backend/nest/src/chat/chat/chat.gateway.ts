@@ -9,7 +9,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, ParseUUIDPipe } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger, ParseUUIDPipe } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { UserStatus } from './User';
 import { use } from 'passport';
@@ -53,12 +53,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('userConnected')
   async handleUserConnected(client: Socket, payload: any): Promise<void> {
     this.logger.log(`new user connected ${payload.socketId}: ${payload.username}`);
-    
+    this.logger.debug(JSON.stringify(payload))
     const existingUserIndex = this.users.findIndex(user => user.username === payload.username);
     
     const user = await this.userService.getChatRoomsByLogin(payload.username);
     
-    console.log("CHANNEL ROOMS: ", user.chatRooms);
+    if (!user)
+    {
+      console.log("NO USER!!!");
+      throw new HttpException('no user ', HttpStatus.BAD_REQUEST);
+    }
+    console.log("CHANNEL ROOMS: ", user);
     
     user.chatRooms.forEach((room) => {
       console.log("ROOM ID: ", room.id)

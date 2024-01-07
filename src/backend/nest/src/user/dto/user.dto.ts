@@ -1,4 +1,4 @@
-import { IsDataURI, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDataURI, IsOptional, IsString } from 'class-validator';
 
 export class UserDto {
   @IsString()
@@ -26,4 +26,15 @@ export class UserDto {
   @IsString()
   @IsOptional()
   last_name: string;
+
+  @IsString()
+  @IsOptional()
+  twoFactorAuthSecret: string;
+
+  @IsBoolean()
+  twoFactorAuthEnabled: boolean;
+
+  @IsString()
+  @IsOptional()
+  chatRoomId: string;  
 }

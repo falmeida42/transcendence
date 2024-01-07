@@ -7,6 +7,7 @@ import { FTStrategy } from './strategy/42.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { TwoFAStrategy } from './strategy/2fa.strategy';
 
 @Module({
   imports: [
@@ -16,10 +17,14 @@ import { PassportModule } from '@nestjs/passport';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '2h' },
     }),
+    JwtModule.register({
+      secret: process.env.JWT_2FA_SECRET,
+      signOptions: { expiresIn: '5m' },
+    }),
     PrismaModule,
     UserModule,
   ],
-  providers: [AuthService, FTStrategy, JwtStrategy],
+  providers: [AuthService, FTStrategy, JwtStrategy, TwoFAStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

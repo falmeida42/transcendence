@@ -18,7 +18,7 @@ interface ChatProviderProps {
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
-export var tk: string | null;
+export var tk: string | undefined;
 
 let updateChatRooms: () => void;
 
@@ -66,7 +66,12 @@ function ChatProvider({ children }: ChatProviderProps) {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    tk = urlParams.get("token");
+    tk = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    ?.split('=')[1];
+    if (tk === undefined)
+      return;
 
     console.log("Frontend: token", tk);
 
@@ -77,7 +82,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     console.log("socketInstance", socketInstance)
 
     socketInstance.on("connect", () => {
-      console.log("Client connected");
+      console.log("Client connected!!!!!!!!!!!!!!!!!  ", login, "   ", socketInstance.id);
 
 
       socketInstance.emit("userConnected", { username: login, socketId: socketInstance.id });

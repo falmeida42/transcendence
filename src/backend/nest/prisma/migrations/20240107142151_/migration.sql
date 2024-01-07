@@ -10,6 +10,8 @@ CREATE TABLE "User" (
     "first_name" TEXT,
     "last_name" TEXT,
     "username" TEXT,
+    "twoFactorAuthSecret" TEXT,
+    "twoFactorAuthEnabled" BOOLEAN NOT NULL DEFAULT false,
     "chatRoomId" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -20,6 +22,7 @@ CREATE TABLE "ChatRoom" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "image" TEXT NOT NULL,
+    "password" TEXT NOT NULL DEFAULT '',
     "type" "ChatType" NOT NULL,
     "userId" TEXT,
 
@@ -35,6 +38,18 @@ CREATE TABLE "Message" (
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Match" (
+    "id" TEXT NOT NULL,
+    "playerwinScore" INTEGER NOT NULL,
+    "playerlosScore" INTEGER NOT NULL,
+    "userwinId" TEXT,
+    "userlosId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Match_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -81,6 +96,12 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_chat_id_fkey" FOREIGN KEY ("chat_i
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Match" ADD CONSTRAINT "Match_userwinId_fkey" FOREIGN KEY ("userwinId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Match" ADD CONSTRAINT "Match_userlosId_fkey" FOREIGN KEY ("userlosId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_UserFriends" ADD CONSTRAINT "_UserFriends_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1975,4 +1975,120 @@ td ul.list-inline li {
     display: inline;
     margin: 0 5px;
 }
+.special-button {
+    --border-radius: 15px;
+    --border-width: 4px;
+    appearance: none;
+    position: relative;
+    padding: 1em 2em;
+    border: 0;
+    background-color: rgba(33, 33, 33, 0);;
+    font-family: "Roboto", Arial, "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+    z-index: 2;
+  }
+  
+  .special-button::after {
+    --m-i: linear-gradient(#000, #000);
+    --m-o: content-box, padding-box;
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: var(--border-width);
+    border-radius: var(--border-radius);
+    background-image: conic-gradient(
+      #488cfb,
+      #29dbbc,
+      #ddf505,
+      #ff9f0e,
+      #e440bb,
+      #655adc,
+      #488cfb
+    );
+    -webkit-mask-image: var(--m-i), var(--m-i);
+    mask-image: var(--m-i), var(--m-i);
+    -webkit-mask-origin: var(--m-o);
+    mask-origin: var(--m-o);
+    -webkit-mask-clip: var(--m-o);
+    mask-composite: exclude;
+    -webkit-mask-composite: destination-out;
+    filter: hue-rotate(0);
+    animation: rotate-hue linear 500ms infinite;
+    animation-play-state: paused;
+  }
+  
+  .special-button:hover::after {
+    animation-play-state: running;
+  }
+  
+  @keyframes rotate-hue {
+    to {
+      filter: hue-rotate(1turn);
+    }
+  }
+  
+  .special-button,
+  .special-button::after {
+    box-sizing: border-box;
+  }
+  
+  .special-button:active {
+    --border-width: 5px;
+  }
 
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", Arial, "Segoe UI", sans-serif;
+  }
+  
+  .background-image {
+    background-image: url('https://media.istockphoto.com/id/1329920974/photo/blue-watercolor-background-grunge-vignette.webp?b=1&s=170667a&w=0&k=20&c=bb-ho5LRuTJcrhtKAjqRg_2-iuzUptuXRkBf-D3YFZA='); /* Replace with the path to your background image */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .centered-container {
+    width: 50%; /* Adjust the width as needed */
+    text-align: center;
+  }
+
+  .lock-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .lock-checkbox input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .lock-icon {
+    fill: #00ff40;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  
+  .lock-checkbox input[type="checkbox"]:checked + .lock-icon {
+    fill: #ff0000;
+  }
+  

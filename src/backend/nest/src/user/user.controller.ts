@@ -12,49 +12,86 @@ import {
 import { User } from '@prisma/client';
 import { GetMe } from 'src/decorators';
 import { JwtAuthGuard } from '../auth/guard';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
 import { UserService } from './user.service';
 
-@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private prisma: PrismaService,
+  ) {}
 
   private readonly logger = new Logger('UserController');
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers() {
-    return this.userService.getUsers();
+    try {
+      return await this.userService.getUsers();
+    } catch (error) {
+      this.logger.error(error);
+      return { error: error, message: 'Unable to get users' };
+    }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@GetMe() user: User) {
-    const logInfo = {
-      user: user, // Log only the user property
-    };
-    this.logger.debug(JSON.stringify(logInfo));
-    return this.findById(String(user.id));
+    return user;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('findlogin/:login')
   async findByLogin(@Param('login') login: string) {
 
     return this.userService.getUserByLogin(login);
   }
 
+  
+  @UseGuards(TwoFAGuard)
+  @Get('auth')
+  async getAuth(@GetMe() user: User) {
+    return (await this.findById(String(user.id))).twoFactorAuthEnabled;
+  }
 
+  @UseGuards(JwtAuthGuard)
   @Get('find/:id')
   async findById(@Param('id') id: string) {
     return this.userService.getUserById(id);
   }
 
-  @Delete('/login')
+  @UseGuards(JwtAuthGuard)
+  @Delete(':login')
   async delete(@Param('login') login: string) {
-    if (!login) {
-      return 'No value inserted';
+    const user = await this.prisma.user.findUnique({ where: { login } });
+
+    if (!user) {
+      return 'User not found';
     }
-    return this.userService.delete(login);
+
+    return this.prisma.user.delete({ where: { login } });
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post(':username')
+  async changeUsername(
+    @GetMe() user: User,
+    @Param('username') username: string,
+  ) {
+    try {
+      this.prisma.user.update({
+        where: { id: user.id },
+        data: { username: username },
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new Error(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('friends')
   async getFriends(@Req() req: any) {
     
@@ -66,6 +103,7 @@ export class UserController {
     return friends
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('chatRooms')
   async getChatRooms(@Req() req: any) {
     
@@ -77,6 +115,7 @@ export class UserController {
     return ChatRooms
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('chatRoom/:id')
   async getChatRoomById(@Req() req: any, @Param('id') id: string) {
     
@@ -88,6 +127,7 @@ export class UserController {
     return ChatRoom
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('chatHistory/:id')
   async getChatHistory(@Req() req: any, @Param('id') id: string) {
     
@@ -96,6 +136,7 @@ export class UserController {
     return chatHistory
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('add-friend/:friendName')
   async addFriend(
     @Req() req: any,
@@ -118,6 +159,7 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('add-room')
   async addRoom(
     @Req() req: any,
@@ -131,6 +173,7 @@ export class UserController {
       }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('update-room-privacy/:roomId')
   async updateRoomPrivacy(
     @Req() req: any,
@@ -144,12 +187,14 @@ export class UserController {
       }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('joinable-rooms')
-  async joinableRooms(@Req() req: any) {
-    return this.userService.getJoinableRooms(String(req.user.id))
+  async joinableRooms(@GetMe('id') id: string) {
+    // this.logger.debug("joinable-rooms req", JSON.stringify(req.user))
+    return await this.userService.getJoinableRooms(id)
   }
 
-
+  @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
   @Req() req: any,
@@ -158,6 +203,7 @@ export class UserController {
     return this.userService.joinRoom(body.username, body.roomId, body.password, body.roomType)
 };
 
+@UseGuards(JwtAuthGuard)
 @Post('leave-room')
 async leaveRoom(
   @Req() req: any,

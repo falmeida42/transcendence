@@ -1,22 +1,29 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ChatType } from '@prisma/client';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto';
-import { error } from 'console';
-import { ChatRoom, ChatType } from '@prisma/client';
+
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+
+  private readonly logger = new Logger('UserService');
 
   async getUsers() {
     return this.prisma.user.findMany();
   }
 
   async getUserById(userId: string): Promise<UserDto | null> {
-    return this.prisma.user.findUnique({ where: { id: userId } });
+    try {
+      return await this.prisma.user.findUnique({ where: { id: userId } });
+    } catch (error) {
+      this.logger.error(error);
+      throw new Error(`Failed to return user with id ${userId}`);
+    }
   }
 
   async getUserByLogin(userLogin: string): Promise<UserDto | null> {
-    return this.prisma.user.findUnique({ where: { login: userLogin } });
+    return await this.prisma.user.findUnique({ where: { login: userLogin } });
   }
 
   async create(user: UserDto) {
@@ -25,14 +32,41 @@ export class UserService {
     });
   }
 
-  async delete(login: string) {
-    const user = await this.prisma.user.findUnique({ where: { login } });
-
-    if (!user) {
-      return 'User not found';
+  async set2FASecret(id: string, secret: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id: id },
+        data: { twoFactorAuthSecret: secret },
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
+  }
 
-    return this.prisma.user.delete({ where: { login } });
+  
+  async set2FAOn(id: string) {
+    return await this.prisma.user.update({
+      where: { id: id },
+      data: { twoFactorAuthEnabled: true },
+    });
+  }
+
+  async set2FAOff(id: string) {
+    return await this.prisma.user.update({
+      where: { id: id },
+      data: {
+        twoFactorAuthEnabled: false
+      },
+    });
+  }
+
+  async is2FAEnabled(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: id } });
+    if (!user) {
+      throw new ForbiddenException('User does not exist');
+    }
+    return user.twoFactorAuthEnabled;
   }
 
   async getFriends(userId: string) {

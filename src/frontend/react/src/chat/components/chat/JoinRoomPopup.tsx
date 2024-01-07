@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
 import { tk, updateChatRooms } from "../../context/ChatContext";
 
@@ -24,29 +24,33 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({ isVisible, handleClose })
         type: string;
     }
 
-    fetch(`http://localhost:3000/user/joinable-rooms`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${tk}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.text();
-        return data ? JSON.parse(data) : null;
-      })
-      .then((data) => {
-        if (data) {
-          console.log("Rooms received ", JSON.stringify(data));
-          setChannels(data);
-        } else {
-          console.log("No data received");
-        }
-      })
-      .catch((error) => console.error("Fetch error:", error));
+    console.log("token:", tk);
+    useEffect(() => {
+
+        fetch(`http://localhost:3000/user/joinable-rooms`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tk}`,
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.text();
+            return data ? JSON.parse(data) : null;
+          })
+          .then((data) => {
+            if (data) {
+              console.log("Rooms received ", JSON.stringify(data));
+              setChannels(data);
+            } else {
+              console.log("No data received");
+            }
+          })
+          .catch((error) => console.error("Fetch error:", error));
+    }, []);
  
 
     const toggleVisibility = (visibility: boolean) => {

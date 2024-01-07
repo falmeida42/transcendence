@@ -26,6 +26,8 @@ model User {
   last_name  String?
   username   String?
   chatRooms  ChatRoom[] @relation("Participants")
+  twoFactorAuthSecret  String?
+  twoFactorAuthEnabled Boolean @default(false)
 
   ownerOf ChatRoom[] @relation("Owners")
 
