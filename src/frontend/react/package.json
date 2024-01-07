@@ -12,11 +12,12 @@
   "dependencies": {
     "@types/uuid": "^9.0.7",
     "@types/socket.io-client": "^3.0.0",
-    "axios": "^1.6.3",
+    "axios": "^1.6.5",
     "jquery": "^3.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "socket.io": "^4.7.2",
+    "react-svg-draw": "^0.0.12",
+    "socket.io": "^4.7.3",
     "socket.io-client": "^4.7.2",
     "zustand": "^4.4.7"
   },

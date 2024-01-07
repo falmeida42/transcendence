@@ -2,13 +2,11 @@ import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
 
 const Sidebar = () => {
-	
-  const { user, first_name, last_name, login, email, image } = useApi();
+  const { first_name } = useApi();
   const { isOpen } = usecollapseSidebar();
 
   return (
-    <nav id="sidebar" className = {isOpen ? "" : "active"}>
-
+    <nav id="sidebar" className={isOpen ? "" : "active"}>
       <div className="sidebar_blog_1">
         <div className="sidebar-header">
           <div className="logo_section">
@@ -52,11 +50,6 @@ const Sidebar = () => {
           <li>
             <a href="#Chat">
               <i className="fa fa-paper-plane red_color"></i> <span>Chat</span>
-            </a>
-          </li>
-          <li>
-            <a href="#Settings">
-              <i className="fa fa-cog yellow_color"></i> <span>Settings</span>
             </a>
           </li>
         </ul>

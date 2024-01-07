@@ -34,6 +34,8 @@ model User {
 
   chatRoomId String?
   Message    Message[]
+  wins   Match[] @relation("winner")
+  losses Match[] @relation("loser")
 }
 
 model ChatRoom {
@@ -57,4 +59,16 @@ model Message {
   sender_id      String
   sender         User     @relation(fields: [userId], references: [id])
   userId         String
+}
+
+
+model Match {
+  id             String   @id @default(uuid())
+  playerwinScore Int
+  playerlosScore Int
+  winner         User?    @relation("winner", fields: [userwinId], references: [id])
+  loser          User?    @relation("loser", fields: [userlosId], references: [id])
+  userwinId      String?
+  userlosId      String?
+  createdAt      DateTime @default(now())
 }
