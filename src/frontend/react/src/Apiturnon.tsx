@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useApi } from './apiStore';
+import { navigate } from 'wouter/use-location';
 
-interface UsetwofaProps {
+interface UseturnoffProps {
   code: string;
 }
 
-const Usetwofa = ({ code }: UsetwofaProps) => {
+const Useturnoff = ({ code }: UseturnoffProps) => {
   const [name, setName] = useState(code);
-  const {setauth} = useApi();
+  const {setauth, settwofa} = useApi();
 
   const handleSendClick = async () => {
-    // Move the logic from Usetwofa to handleSendClick
+    // Move the logic from Useturnoff to handleSendClick
     // Make sure not to call hooks here
     try {
       const newUserData = name;
@@ -35,7 +36,8 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
         console.error(error);
       }
       setauth(true);
-    
+      settwofa(true);
+      navigate('/');
   };
 
   return (
@@ -56,4 +58,4 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
   );
 };
 
-export default Usetwofa;
+export default Useturnoff;

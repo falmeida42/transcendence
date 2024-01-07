@@ -1,4 +1,4 @@
-import Usetwofa from "./Api2fa";
+import Usetwofa from "./Apiturnon";
 import ApiQr from "./ApiQr";
 import { useApi } from "./apiStore";
 

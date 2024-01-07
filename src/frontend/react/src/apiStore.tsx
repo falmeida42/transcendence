@@ -16,6 +16,7 @@ interface ap {
   setImage: (newImage: string | undefined) => void;
   setqrcode: (newqr: any | undefined) => void;
   setauth: (authorized: boolean | undefined) => void;
+  settwofa: (Twofa: boolean | undefined) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
@@ -47,6 +48,8 @@ export const useApi = create<ap>((set) => ({
     set(() => ({ qrcode: newqr, })),
   setauth: (authorized) =>
     set(() => ({ auth: authorized, })),
+  settwofa: (Twofa) =>
+    set(() => ({ twofa: Twofa, })),
   [Symbol.iterator]: function* () {
     yield this.user;
     yield this.first_name;

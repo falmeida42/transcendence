@@ -2,6 +2,7 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { FTAuthExceptionFilter } from './filters';
+import cors from 'cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,7 +12,6 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
-
   app.enableCors(corsOptions);
   app.useGlobalFilters(new FTAuthExceptionFilter());
   await app.listen(3000);

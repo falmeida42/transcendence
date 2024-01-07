@@ -54,7 +54,7 @@ export class UserService {
     return await this.prisma.user.update({
       where: { id: id },
       data: {
-        twoFactorAuthEnabled: false,
+        twoFactorAuthEnabled: false
       },
     });
   }

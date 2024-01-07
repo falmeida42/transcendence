@@ -41,13 +41,13 @@ export class AuthController {
     if (await this.authService.is2FAActive(String(dto.id))) {
       // Execute 2FA logic
       this.logger.debug('2FA IS ENABLED');
-
+      
       const user = await this.userService.getUserById(dto.id);
       if (!user) {
         throw new ForbiddenException('User not found');
       }
+      this.logger.debug('USER: ', user);
 
-      // this.logger.debug('USER: ', user);
 
       const token = await this.authService.sign2FAToken(user.id);
 
@@ -61,7 +61,7 @@ export class AuthController {
           sameSite: 'none',
           secure: true,
         })
-        .redirect(`${process.env.FRONTEND_URL}`);
+        // .redirect(`${process.env.FRONTEND_URL}`);
       return;
     }
     // Execute login without 2FA
@@ -76,7 +76,7 @@ export class AuthController {
         sameSite: 'none',
         secure: true,
       })
-      .redirect(`${process.env.FRONTEND_URL}`);
+      // .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
@@ -135,6 +135,7 @@ export class AuthController {
   @Post('2fa/turn-off')
   async turn2FAOff(@GetMe('id') id: string) {
     if ((await this.userService.is2FAEnabled(id)) === true) {
+      this.logger.debug('ass');
       try {
         await this.userService.set2FAOff(id);
       } catch (error) {
@@ -151,7 +152,7 @@ export class AuthController {
   async authenticate2FA(
     @Res() res: Response,
     @GetMe('id') id: string,
-    @Body('code') code: string,
+    @Body() body: any,
   ) {
     // this.logger.debug('code: ', code);
 
@@ -160,15 +161,15 @@ export class AuthController {
     if (!user) {
       throw new ForbiddenException('No such id ', user.id);
     }
+    // this.logger.debug('code: ', JSON.stringify(body));
 
-    const isCodeValid = await this.authService.is2FACodeValid(code, user);
+    const isCodeValid = await this.authService.is2FACodeValid(body.code, user);
 
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong 2FA code');
     }
     const tokenPerm = await this.authService.signAccessToken(Number(user.id));
 
-    // this.logger.debug('ACCESS TOKEN: ', tokenPerm);
     res
       .cookie('token', tokenPerm, {
         expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
@@ -177,7 +178,8 @@ export class AuthController {
         sameSite: 'none',
         secure: true,
       })
-      .redirect(`${process.env.FRONTEND_URL}`);
+      // .redirect(`${process.env.FRONTEND_URL}`);
+    // this.logger.debug('ACCESS TOKEN: ', tokenPerm);
     return;
   }
 }

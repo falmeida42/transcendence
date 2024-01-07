@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from './apiStore';
+import { navigate } from 'wouter/use-location';
 
 interface UseAuthProps {
   code: string;
@@ -21,13 +22,14 @@ const UseAuth = ({ code }: UseAuthProps) => {
       console.log(token, '@');
       if (token === undefined)
         return;
-
+      
       const UpResponse = await fetch('http://localhost:3000/auth/2fa/authentication', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({code: newUserData}),
       })
       if (!UpResponse.ok){
@@ -37,11 +39,13 @@ const UseAuth = ({ code }: UseAuthProps) => {
         }
         return;
       }
-      document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
-      setauth(true);
     } catch (error) {
       console.error(error);
     }
+    
+    document.cookie = `'token2fa'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+    setauth(true);
+    navigate('/');
   };
 
   return (

@@ -2040,3 +2040,34 @@ td ul.list-inline li {
     width: 50%; /* Adjust the width as needed */
     text-align: center;
   }
+
+  .lock-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .lock-checkbox input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .lock-icon {
+    fill: #00ff40;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  
+  .lock-checkbox input[type="checkbox"]:checked + .lock-icon {
+    fill: #ff0000;
+  }
+  

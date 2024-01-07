@@ -24,25 +24,20 @@ function App() {
     ?.split('=')[1];
 
   useEffect(() => {
-    // Check if both tokens exist
     if (token && token2fa) {
-      // Redirect to the appropriate page based on your logic
-      // For example, redirect to "/dashboard" if both tokens exist
+
       // document.cookie = `${'token'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
-      // document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
-      // navigate('/dashboard');
-    } else if (token) {
-      // Redirect to another page if only token exists
-      // document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
+      document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
       navigate('/');
     } else if (token2fa) {
-      // Redirect to another page if only token exists
       <ApiData2faProvider/>
       navigate('/2fa');
+    } else if (token) {
+      // document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
+      navigate('/');
     } else {
       navigate('/login');
     }
-    // Add more conditions based on your requirements
 
   }, [token, token2fa, navigate]);
     const handleButtonClick = () => {

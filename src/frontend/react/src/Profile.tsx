@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { useApi } from './apiStore';
 import useUpdateUserData from './UpdateUserData';
 import ApiDataProvider from './ApiDataProvider';
-import Usetwofa from './Api2fa';
-import Api2fa from './Api2fa';
+import Usetwofa from './Apiturnon';
+import Api2fa from './Apiturnon';
 import ApiQr from './ApiQr';
 import { Route } from "wouter";
 import Qrcode from './Qrcode';
+import Apiturnoff from './Apiturnoff';
 
 export var token: string | null;
 
@@ -203,10 +204,11 @@ function Profile() {
 										</div> */}
 										</div>
 										{/* <Route> */}
-											{/* {twofa ? null : } */}
-											<Qrcode />
+										{/* {twofa ? null : } */}
+										{twofa === false && <Qrcode />}
 										{/* </Route> */}
 										<div className="user_progress_bar">
+										{twofa === true && <Apiturnoff/>}
 											<h2>
 												<span className="skill">Match results (wins | losses)<span className="info_valume"></span></span>
 												<div className="progress skill-bar">
