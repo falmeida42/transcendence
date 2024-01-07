@@ -4,14 +4,14 @@ import {
   Get,
   Logger,
   Param,
-  UseGuards,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { GetMe } from 'src/decorators';
-import { JwtAuthGuard } from '../auth/guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
+import { GetMe } from 'src/decorators';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtAuthGuard } from '../auth/guard';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -78,6 +78,44 @@ export class UserController {
     } catch (error) {
       this.logger.error(error);
       throw new Error(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/matches/:id')
+  async getMatches(@Param('id') id: string) {
+    try {
+      this.logger.debug(id);
+      let matches = [];
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wins: true,
+          losses: true,
+        },
+      });
+      // const wins = await this.prisma.match.findMany({
+      //   where: {
+      //     userwinId: id,
+      //   },
+      // });
+      // const losses = await this.prisma.match.findMany({
+      //   where: {
+      //     userlosId: id,
+      //   },
+      // });
+      // matches = [...wins, ...losses];
+      // this.logger.debug();
+      matches = [...user.wins, ...user.losses].sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+      if (!matches) throw new Error('teste');
+      // const matches = user.
+      return matches;
+    } catch (e) {
+      this.logger.error(e.message);
     }
   }
 }
