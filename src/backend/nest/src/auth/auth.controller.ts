@@ -6,10 +6,11 @@ import {
   Body,
   Post,
   Logger,
-  // Param,
   UnauthorizedException,
   ForbiddenException,
   HttpStatus,
+  Param,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FTGuard, JwtAuthGuard } from '../auth/guard';
@@ -18,7 +19,6 @@ import { GetMe } from 'src/decorators';
 import { User } from '@prisma/client';
 import { TwoFAGuard } from './guard/2FA.guard';
 import { Response } from 'express';
-import { Param } from '@nestjs/common';
 import { AuthDto } from './dto';
 
 @Controller('auth')
@@ -36,10 +36,8 @@ export class AuthController {
 
   @UseGuards(FTGuard)
   @Get('intra-clbk')
-  async callbackIntra(
-    @Param('user') dto: AuthDto,
-    @Res() res: Response,
-  ): Promise<any> {
+  async callbackIntra(@Req() req: any, @Res() res: Response): Promise<any> {
+    const dto: AuthDto = req.user;
     if (await this.authService.is2FAActive(String(dto.id))) {
       // Execute 2FA logic
       this.logger.debug('2FA IS ENABLED');

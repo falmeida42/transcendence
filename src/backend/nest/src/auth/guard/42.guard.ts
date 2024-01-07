@@ -8,6 +8,7 @@ export class FTGuard extends AuthGuard('42') {
       return (await super.canActivate(context)) as boolean;
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 }
