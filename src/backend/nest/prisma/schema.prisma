@@ -18,6 +18,8 @@ model User {
   first_name String?
   last_name  String?
   username   String?
+  twoFactorAuthSecret  String?
+  twoFactorAuthEnabled Boolean @default(false)
 
   wins   Match[] @relation("winner")
   losses Match[] @relation("loser")

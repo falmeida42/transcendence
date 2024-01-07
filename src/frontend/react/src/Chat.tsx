@@ -37,7 +37,7 @@ function Chat() {
     };
 
     const handleFriendClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        console.log("HELLO2");
+        // console.log("HELLO2");
         const friendElement = event.currentTarget as HTMLDivElement;
 
         if (!friendElement) {

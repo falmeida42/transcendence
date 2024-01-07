@@ -1,43 +1,60 @@
-// hashStore.ts
-// import { useEffect, useState } from 'react';
-import { create } from "zustand";
+import { create } from 'zustand';
 export var token: string | null;
 
 interface ap {
+  id: string;
   user: string;
   first_name: string;
   last_name: string;
   login: string;
   email: string;
   image: string;
-  setInfo: (
-    user: string,
-    first_name: string,
-    last_name: string,
-    login: string,
-    email: string,
-    image: string
-  ) => void;
+  qrcode: any;
+  twofa: boolean;
+  auth: boolean;
+  setInfo: (id: string,user: string, first_name: string, last_name: string, login: string, email: string, image: string, twofa: boolean) => void;
+  setUsername: (user: string | undefined) => void;
+  setImage: (newImage: string | undefined) => void;
+  setqrcode: (newqr: any | undefined) => void;
+  setauth: (authorized: boolean | undefined) => void;
+  settwofa: (Twofa: boolean | undefined) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
 export const useApi = create<ap>((set) => ({
-  user: "",
-  first_name: "",
-  last_name: "",
-  login: "",
-  email: "",
-  image: "",
-  setInfo: (User, First_name, Last_name, Login, Email, Image) =>
+  user: '',
+  id: '',
+  first_name: '',
+  last_name: '',
+  login: '',
+  email: '',
+  image: '',
+  qrcode: '',
+  twofa: false,
+  auth: false,
+  setInfo: (Id, User, First_name, Last_name, Login, Email, Image, Twofa) =>
     set(() => ({
+      id: Id,
       user: User,
       first_name: First_name,
       last_name: Last_name,
       login: Login,
       email: Email,
       image: Image,
+      twofa: Twofa,
     })),
+  setUsername: (newUser) =>
+    set(() => ({ user: newUser, })),
+  setImage: (newImage) =>
+    set(() => ({ image: newImage, })),
+  setqrcode: (newqr) =>
+    set(() => ({ qrcode: newqr, })),
+  setauth: (authorized) =>
+    set(() => ({ auth: authorized, })),
+  settwofa: (Twofa) =>
+    set(() => ({ twofa: Twofa, })),
   [Symbol.iterator]: function* () {
+    yield this.id;
     yield this.user;
     yield this.first_name;
     yield this.last_name;
