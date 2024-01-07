@@ -1,8 +1,9 @@
-// import { useEffect, useState } from 'react';
-// import { Mapping } from './App';
 import { useEffect, useState } from 'react';
 import { useApi } from './apiStore';
-import AddFriendPopup from './AddFriendPopUp';
+import useUpdateUserData from './UpdateUserData';
+import Usetwofa from './Apiturnon';
+import Qrcode from './Qrcode';
+import Apiturnoff from './Apiturnoff';
 
 interface User {
 	id: string,
@@ -11,8 +12,73 @@ interface User {
 }
 
 function Profile() {
-	
-	const { first_name, last_name, login, email, image } = useApi();
+
+	const { user, first_name, last_name, login, email, image, twofa, setUsername, setImage } = useApi();
+
+	/////////////// Username update /////////////////
+
+	const [isEditing, setIsEditing] = useState(false);
+	const [textValue, setTextValue] = useState(login);
+	const [name, setName] = useState("");
+
+	const handleEditClick = () => {
+		setIsEditing(true);
+	};
+
+	const handleSubmitClick = () => {
+		setIsEditing(false);
+		// You can add logic here to handle the submission of changes
+		setUsername(textValue);
+		updateFunction();
+		// console.log('Submitted changes:', textValue);
+	};
+
+	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setTextValue(event.target.value);
+	};
+
+
+	/////////////// Image update /////////////////
+
+
+	const [isEditingImage, setIsEditingImage] = useState(false);
+	const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
+
+	const handleEditClickImage = () => {
+		setIsEditingImage(true);
+	};
+
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files && event.target.files[0];
+
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				setSelectedImage(e.target?.result as string);
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
+	const { updateFunction } = useUpdateUserData({
+		updateFunction: () => ({
+			username: textValue, // Assuming you want to update the username with the current textValue
+			image: selectedImage,
+		}),
+	});
+
+	const handleSubmitClickImage = () => {
+		setIsEditingImage(false);
+		// You can add logic here to handle the submission of the new image
+		setImage(selectedImage);
+		updateFunction();
+		// console.log('Submitted new image:', selectedImage);
+	};
+
+	const handleClickCode = () => {
+		Usetwofa({ code: name });
+	};
+
 	const [friends, setFriends] = useState<User[]>([])
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 
@@ -24,8 +90,14 @@ function Profile() {
 
 	useEffect(() => {
 		const urlParams = new URLSearchParams(window.location.search);
-     	const token = urlParams.get('token');
+		const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
+        if (token === undefined)
+          return;
 
+		  
 		fetch(`http://localhost:3000/user/friends`, {
 		method: "GET",
 		headers: {
@@ -53,43 +125,106 @@ function Profile() {
 
 	}, []);
 
-
 	return (
-		<div className="middle-cont">
-		<div className="container-fluid">
-				 		{isVisibleAddFriend && <AddFriendPopup isVisible={isVisibleAddFriend} handleClose={handleClickAddFriend} />}
-		   <div className="row column1">
-			  <div className="col-md-2"></div>
-			  <div className="col-md-8">
-				 <div className="white_shd full margin_bottom_30">
+		<div className="container-fluid profile_container">
+			<div className="row column1">
+				<div className="white_shd full margin_bottom_30">
 					<div className="full graph_head">
-					   <div className="heading1 margin_0">
-						  <h2>User profile</h2>
-					   </div>
+						<div className="heading1 margin_0">
+							<h2>User profile</h2>
+						</div>
 					</div>
 					<div className="full price_table padding_infor_info">
 					   <div className="row">
 						  <div className="col-lg-12">
 							 <div className="full dis_flex center_text">
-								<div className="profile_img"><img width="180" className="rounded-circle" src={image} alt="#" /></div>
-								<div className="profile_contant">
-								   <div className="contact_inner">
-									  <h3>{first_name} {last_name}</h3>
-									  <p><strong>Username: </strong>{login}</p>
-									  <ul className="list-unstyled">
-										 <li><i className="fa fa-envelope-o"></i> : {email}</li>
-									  </ul>
-								   </div>
-								   <div className="user_progress_bar">
-									<h2>
-										 <span className="skill">Match results (wins | losses)<span className="info_valume"></span></span>                   
-										 <div className="progress skill-bar">
-											<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style={{ width: '75%'}}> <h5 style={{textAlign: 'right', color: 'white', paddingRight: '4%', marginLeft: '-20px'}}>12</h5>
+								<div className="container flex-item">
+									<div className="form-group">
+										<div className="input-group d-flex flex-column">
+										{isEditingImage ? (
+											<>
+											<input
+												type="file"
+												id="imageField"
+												className="form-control-file"
+												accept="image/*"
+												onChange={handleImageChange}
+											/>
+											</>
+										) : (
+											<>
+											<div className="profile_img">
+
+											<img
+												style={{maxHeight: 300}}
+												src={selectedImage || 'placeholder.jpg'}
+												alt="Selected"
+												className=" rounded-circle"
+											/>
 											</div>
-											<h5 style={{lineHeight: "30px", paddingLeft: '3%', marginRight: '-39px'}}>3</h5 >
-										 </div>
-									</h2>
-								   </div>
+											<button
+												className="btn btn-outline-secondary ml-2"
+												style={{width: "fit-content"}}
+												type="button"
+												onClick={handleEditClickImage}
+											>
+												<i className="fa fa-pencil green_color " > </i>
+											</button>
+											</>
+										)}
+										</div>
+									</div>
+
+									{isEditingImage && (
+										<button className="btn btn-primary" onClick={handleSubmitClickImage}>
+										Submit New Image
+										</button>
+									)}
+									</div> 
+								
+								<div className="profile_contant flex-item">
+								<div className="contact_inner">
+											<h3>{first_name} {last_name}</h3>
+											<div className="">
+												<div className="form-group" style={{ marginBottom: "4px" }}>
+													<div className="input-group">
+														<span className="mr-2" style={{ maxHeight: "20px" }}><p><strong>Username: </strong></p></span>
+														<input
+															type="text"
+															id="textField"
+															className="form-control"
+															value={textValue}
+															readOnly={!isEditing}
+															onChange={handleTextChange}
+															style={{ maxHeight: "25px", maxWidth: "200px" }}
+														/>
+														<div className="input-group-append" style={{ maxHeight: "25px" }}>
+															<button
+																className="btn btn-outline-secondary"
+																type="button"
+																style={{ maxHeight: "25px" }}
+																onClick={handleEditClick}
+															>
+																<i className="fa fa-pencil green_color " style={{ verticalAlign: "super" }}> </i>
+															</button>
+														</div>
+													</div>
+												</div>
+
+												{isEditing && (
+													<button className="btn btn-secondary btn-sm mb-2" onClick={handleSubmitClick}>
+														Submit Changes
+													</button>
+												)}
+											</div>
+
+
+
+											{/* <div className="">
+											<span className="mr-2"><p><strong>Username: </strong>{login}</p></span>
+									  		<i className="fa fa-pencil green_color "> </i>
+										</div> */}
+										</div>
 								   <button onClick={handleClickAddFriend}>
 									Add Friend
 								   </button>
@@ -97,7 +232,29 @@ function Profile() {
 							 </div>
 							 <div className="full inner_elements margin_top_30">
 								<div className="tab_style2">
-								   <div className="tabbar">
+								{twofa === false && <Qrcode />}
+										{/* </Route> */}
+										<div className="user_progress_bar">
+										{twofa === true && <Apiturnoff/>}
+											<h2>
+												<span className="skill">Match results (wins | losses)<span className="info_valume"></span></span>
+												<div className="progress skill-bar">
+													<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style={{ width: '75%' }}> <h5 style={{ textAlign: 'right', color: 'white', paddingRight: '4%', marginLeft: '-20px' }}>12</h5>
+													</div>
+													<h5 style={{ lineHeight: "30px", paddingLeft: '3%', marginRight: '-39px' }}>3</h5 >
+												</div>
+											</h2>
+										</div>
+
+
+									<div className="profile_contant flex-item">
+										
+										{/* <Route> */}
+										{/* {twofa ? null : } */}
+								
+										</div>
+
+									<div className="tabbar">
 									  <nav>
 										 <div className="nav nav-tabs" id="nav-tab" role="tablist">
 											<a className="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#recent_activity" role="tab" aria-selected="true">Match History</a>
@@ -144,18 +301,23 @@ function Profile() {
 											</div>
 										 </div>								  
 										</div>
-								   </div>
+
+										{isEditingImage && (
+											<button className="btn btn-primary" onClick={handleSubmitClickImage}>
+												Submit New Image
+											</button>
+										)}
+									</div>
 								</div>
-							 </div>
-						  </div>
-					   </div>
+							</div>
+						</div>
 					</div>
-				 </div>
-				 <div className="col-md-2"></div>
-			  </div>
-		   </div>
+				</div>
+				<div className="col-md-2"></div>
+			</div>
 		</div>
-	 </div>		
+		 </div>
+		//  </div>		
 	)
 }
 

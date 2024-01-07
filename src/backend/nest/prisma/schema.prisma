@@ -18,13 +18,15 @@ enum FriendRequestType {
 
 
 model User {
-  id                  String  @id @default(uuid())
-  login               String  @unique
-  email               String?
-  image               String
-  first_name          String?
-  last_name           String?
-  username            String?
+  id         String  @id @default(uuid())
+  login      String  @unique
+  email      String?
+  image      String
+  first_name String?
+  last_name  String?
+  username   String?
+  twoFactorAuthSecret  String?
+  twoFactorAuthEnabled Boolean @default(false)
 
   friends  User[] @relation("UserFriends")
   friendOf User[] @relation("UserFriends")
@@ -32,7 +34,19 @@ model User {
   sentFriendRequests		FriendRequest[] @relation("FriendsRequestor")
 	receivedFriendRequests	FriendRequest[] @relation("FriendsRequestee")
 
+  wins   Match[] @relation("winner")
+  losses Match[] @relation("loser")
+}
 
+model Match {
+  id             String   @id @default(uuid())
+  playerwinScore Int
+  playerlosScore Int
+  winner         User?    @relation("winner", fields: [userwinId], references: [id])
+  loser          User?    @relation("loser", fields: [userlosId], references: [id])
+  userwinId      String?
+  userlosId      String?
+  createdAt      DateTime @default(now())
 }
 
 model FriendRequest {
