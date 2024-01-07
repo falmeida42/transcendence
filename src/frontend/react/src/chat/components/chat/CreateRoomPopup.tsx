@@ -202,6 +202,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                                     <li>
                                         <label>
                                             <input 
+                                            id="public"
                                             type="radio" 
                                             value="public"
                                             name="group"
@@ -213,6 +214,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                                     <li>
                                         <label>
                                             <input 
+                                            id="private"
                                             type="radio" 
                                             value="private"
                                             name="group"
@@ -224,6 +226,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                                     <li>
                                         <label>
                                             <input 
+                                            id="protected"
                                             type="radio" 
                                             value="protected"
                                             name="group"
@@ -262,7 +265,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                             <ul
                             className="popup-input">
                                 { 
-                                    friends.map((friend) => (
+                                    friends.map((friend : any) => (
                                     <li>
                                         <label>
                                             <input 
