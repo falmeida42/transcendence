@@ -120,6 +120,7 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
                             <input
                             className="password-input"
                             type="password"
+                            maxLength={12}
                             onClick={() => {
                                 setPlaceHolder(""),
                                 toggleVisibility(false)

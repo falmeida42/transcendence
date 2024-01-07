@@ -117,7 +117,6 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                 toggleVisibility(true);
                 return;
             }
-            console.log("image:", inputImage);
         } else if (modal === 3) {
             if (inputPrivacy === "" || (inputPrivacy === "protected" && inputPassword === ""))
             {
@@ -191,6 +190,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                             <input
                             className="popup-input"
                             type="text"
+                            maxLength={12}
                             onClick={() => {
                                 setPlaceHolder(""),
                                 toggleVisibility(false)
@@ -273,6 +273,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                                             <input
                                             className="popup-input"
                                             type="password"
+                                            maxLength={12}
                                             onClick={() => {
                                                 setPlaceHolder(""),
                                                 toggleVisibility(false)

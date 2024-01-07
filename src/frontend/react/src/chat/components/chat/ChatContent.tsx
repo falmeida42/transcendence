@@ -9,6 +9,7 @@ import MutePopup from "./MutePopup"
 import BanPopup from "./BanPopup"
 import LockPopup from "./LockPopup"
 import AdminPopup from "./AdminPopup"
+import { tk } from "../../context/ChatContext"
 
 export const toggleChatVisibility = () => {
     const element = (document.getElementById("chat") as HTMLDivElement);
@@ -21,7 +22,7 @@ interface ChatContentProps {
     passSelectedChatData: (data: ChatData) => void;
 }
 
-const ChatContent = (chatContentProps: ChatContentProps) => {
+const ChatContent = (props: ChatContentProps) => {
     const [isVisibleLeave, setIsVisibleLeave] = useState(false);
     const [isVisibleMatch, setIsVisibleMatch] = useState(false);
     const [isVisibleKick, setIsVisibleKick] = useState(false);
@@ -31,6 +32,7 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
     const [isVisibleAdmin, setIsVisibleAdmin] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [isHovered, setIsHovered] = useState("");
+    const [chatData, setChatData] = useState<Data>();
 
     const handleMouseEnter = (label: string) => {
         setIsHovered(label);
@@ -61,21 +63,55 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
         setIsVisibleAdmin(!isVisibleAdmin);
     };
 
+    interface Participant {
+        id: string;
+        login: string;
+        image: string;
+        chatRoomId: string | null;
+    }
+    
+    interface Data {
+        participants: Participant[]; 
+    }
+
+    fetch(`http://localhost:3000/user/chatRoom/${props.selectedChatData.id}`, {
+        method: "GET",
+        headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+        },
+    })
+        .then(async (response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+        })
+        .then((data) => {
+        if (data) {
+            console.log("Room info received ", JSON.stringify(data));
+            setChatData(data);
+        } else {
+            console.log("No data received");
+        }
+        })
+        .catch((error) => console.error("Fetch error:", error));
     
     return (
         <div className="chat">
-            {isVisibleLeave && <LeaveChannelPopUp isVisible={isVisibleLeave} channelId={chatContentProps.selectedChatData.id} passSelectedChatData={chatContentProps.passSelectedChatData} handleClose={handleClickLeave}/>}
-            {isVisibleMatch && <MatchPopup isVisible={isVisibleMatch} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickMatch}/>}
+            {isVisibleLeave && <LeaveChannelPopUp isVisible={isVisibleLeave} channelId={props.selectedChatData.id} passSelectedChatData={props.passSelectedChatData} handleClose={handleClickLeave}/>}
+            {isVisibleMatch && <MatchPopup isVisible={isVisibleMatch} channelId={props.selectedChatData.id} handleClose={handleClickMatch}/>}
             {/* only if user is an admin */}
-            {isVisibleKick && <KickPopup isVisible={isVisibleKick} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickKick}/>}
-            {isVisibleMute && <MutePopup isVisible={isVisibleMute} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickMute}/>}            
-            {isVisibleBan && <BanPopup isVisible={isVisibleBan} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickBan}/>}
+            {isVisibleKick && <KickPopup isVisible={isVisibleKick} channelId={props.selectedChatData.id} handleClose={handleClickKick}/>}
+            {isVisibleMute && <MutePopup isVisible={isVisibleMute} channelId={props.selectedChatData.id} handleClose={handleClickMute}/>}            
+            {isVisibleBan && <BanPopup isVisible={isVisibleBan} channelId={props.selectedChatData.id} handleClose={handleClickBan}/>}
             {/* only if user is the owner */}
-            {isVisibleLock && <LockPopup isVisible={isVisibleLock} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickLock}/>}
-            {isVisibleAdmin && <AdminPopup isVisible={isVisibleAdmin} channelId={chatContentProps.selectedChatData.id} handleClose={handleClickAdmin}/>}                        
+            {isVisibleLock && <LockPopup isVisible={isVisibleLock} channelId={props.selectedChatData.id} handleClose={handleClickLock}/>}
+            {isVisibleAdmin && <AdminPopup isVisible={isVisibleAdmin} channelId={props.selectedChatData.id} handleClose={handleClickAdmin}/>}                        
             <div className="chat-header clearfix">
                 <div className="chat-about">
-                    <div className="chat-with">Chat with {chatContentProps.selectedChatData.name}</div>
+                    <div className="chat-with">Chat with {props.selectedChatData.name}</div>
                     <i onClick={handleClickLeave} onMouseEnter={() => handleMouseEnter("leave chatroom")} onMouseLeave={handleMouseLeave} className="fa fa-sign-out fa-lg clickable" ></i>
                     <i onClick={handleClickMatch} onMouseEnter={() => handleMouseEnter("invite user to match")} onMouseLeave={handleMouseLeave} className="fa fa-gamepad fa-lg clickable" ></i>
                     <i onClick={handleClickKick} onMouseEnter={() => handleMouseEnter("kick user")} onMouseLeave={handleMouseLeave} className="fa fa-user-times fa-lg clickable" ></i>
@@ -85,24 +121,24 @@ const ChatContent = (chatContentProps: ChatContentProps) => {
                     <i onClick={handleClickAdmin} onMouseEnter={() => handleMouseEnter("appoint admin")} onMouseLeave={handleMouseLeave} className="fa fa-support fa-lg clickable" ></i>
                     {isHovered !== "" && <div className="hover-label">{isHovered}</div>}
                 </div>
-                <img src={chatContentProps.selectedChatData.image} 
+                <img src={props.selectedChatData.image} 
                      alt="avatar"
                      onClick={() => {
-                        if (chatContentProps.selectedChatData.type === "DIRECT_MESSAGE") {
+                        if (props.selectedChatData.type === "DIRECT_MESSAGE") {
                             // go to profile
                         }
                      }}
                      style={{
-                        cursor: chatContentProps.selectedChatData.type === "DIRECT_MESSAGE" ? 'pointer' : 'default'
+                        cursor: props.selectedChatData.type === "DIRECT_MESSAGE" ? 'pointer' : 'default'
                      }}
                 />
             </div>
             <Messages 
-                chatId={chatContentProps.selectedChatData.id} 
-                chatName={chatContentProps.selectedChatData.name}
-                chatImage={chatContentProps.selectedChatData.image}
+                chatId={props.selectedChatData.id} 
+                chatName={props.selectedChatData.name}
+                chatImage={props.selectedChatData.image}
                 />
-            <Input content={chatContentProps}/>
+            <Input content={props}/>
         </div> 
     )
 }

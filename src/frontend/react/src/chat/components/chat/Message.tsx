@@ -18,8 +18,10 @@ const Message = (messageProps : MessageProps) => {
     
     return (
         <div>
-            <img src={messageProps.image} />
-            <p>{messageProps.username}</p>
+            <div className={`${messageProps.username === login ? "float-right" : ""}`}>
+                <img src={messageProps.image} />
+                <p>{messageProps.username}</p>
+            </div>
             <div className={`message ${messageProps.username === login ? "other-message float-right" : "my-message "}`}>
                 
                 {messageProps.text}     

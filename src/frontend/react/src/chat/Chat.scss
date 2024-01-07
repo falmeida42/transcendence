@@ -16,6 +16,10 @@ $gray: #92959E;
   width: 100%;
   height: 100%;
   padding-left: 4%;
+  display: flex;
+	justify-content: center;
+	position: relative;
+	z-index: 0;
 }
 
 .sidebar {
@@ -90,6 +94,8 @@ $gray: #92959E;
   .popup-input {
     color: black;
     background: #F2F5F8;
+    overflow-y: scroll;
+    max-height: 175px;
 
     li {
       
@@ -213,7 +219,7 @@ $gray: #92959E;
       
       &:after {
         bottom: 100%;
-        left: 7%;
+        left: 16px;
         border: solid transparent;
         content: " ";
         height: 0;
@@ -235,7 +241,7 @@ $gray: #92959E;
       
       &:after {
         border-bottom-color: $blue;
-        left: 93%;
+        left: calc(100% - 16px);
       }
     }
 
@@ -363,6 +369,8 @@ $gray: #92959E;
   color: black;
   background: #F2F5F8;
   padding: 4px 0px;
+  overflow-y: scroll;
+  max-height: 175px;
 
   li {
     
@@ -389,4 +397,8 @@ $gray: #92959E;
 
 .modal-title {
   color: #434651;
+}
+
+strong {
+  font-weight: bold;
 }

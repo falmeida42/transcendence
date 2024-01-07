@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { tk } from "../../context/ChatContext";
 import { useApi } from "../../../apiStore";
+import MatchInvite from "./MatchInvite";
 
 interface MatchPopupProps {
     isVisible: boolean;
@@ -37,7 +38,7 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
             toggleVisibility(true);
             return;
         }
-        //send to backend
+        //send invite to user: component <MatchInvite />
         props.handleClose();
     };
 

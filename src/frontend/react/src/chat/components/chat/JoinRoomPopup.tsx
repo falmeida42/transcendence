@@ -161,6 +161,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({ isVisible, handleClose })
                                             <input
                                             className="popup-input"
                                             type="password"
+                                            maxLength={12}
                                             onClick={() => {
                                                 setPlaceHolder(""),
                                                 toggleVisibility(false)
