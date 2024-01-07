@@ -19,7 +19,7 @@ import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: true,
+  cors: { origin: 'http://localhost:5173', credentials: true },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -50,17 +50,28 @@ export class GamerGateway
     this.logger.log(`Client disconnected ${client.id}`);
     const player = this.players[client.id];
     if (player) {
-      console.log(`${player.name} desconectou`);
+      console.log(`${client.id} desconectou`);
 
       const playerId = client.id;
-      const timerId = setTimeout(() => {
-        this.removePlayer(playerId);
-      }, 5000);
-      this.players[playerId].disconnectedId = timerId;
+      if (player.room && this.match[player.room]) {
+        this.match[player.room].status = 'PAUSE';
+        if (this.match[player.room].player1)
+          this.match[player.room].player1.ready = false;
+        if (this.match[player.room].player2)
+          this.match[player.room].player2.ready = false;
+      }
+      // const timerId = setTimeout(() => {
+      //   this.removePlayer(playerId);
+      // }, 5000);
+      // this.players[playerId].disconnectedId = timerId;
+      this.removePlayer(playerId);
     }
 
     delete this.players[client.id];
   }
+
+  // @SubscribeMessage('Reconnect')
+  // handleReconnect(@ConnectedSocket() client: Socket, @MessageBody('player') player: Player)
 
   @SubscribeMessage('Login')
   handleLogin(
@@ -171,20 +182,22 @@ export class GamerGateway
     const player = this.players[socketId];
     const roomId = player.room;
     const match = this.match[roomId];
-    match.player1.ready = false;
-    match.player2.ready = false;
+    if (match.status !== 'END') {
+      match.player1.ready = false;
+      match.player2.ready = false;
+    }
 
     if (match.status === 'PLAY') match.status = 'PAUSE';
   }
 
   removePlayer(playerId: string) {
     this.leaveRoom(playerId);
-    delete this.players[playerId];
+    // delete this.players[playerId];
   }
 
   leaveRoom(socketId: string) {
     const player = this.players[socketId];
-    const roomId = player && player.room;
+    const roomId = player.room;
     const room = this.rooms[roomId];
 
     if (room) {
@@ -196,12 +209,20 @@ export class GamerGateway
       room[playerNumber] = undefined;
 
       if (match) {
-        match[playerNumber] = undefined;
-
-        if (match.status !== 'END') match.status = 'END';
+        if (match.status !== 'END') {
+          match.status = 'END';
+          if (playerNumber === 'player1') {
+            match.score1 = 0;
+            match.score2 = 5;
+          } else {
+            match.score1 = 5;
+            match.score2 = 0;
+          }
+        }
+        this.refreshGame(roomId);
       }
 
-      if (!room.player1 && !room.player2) {
+      if (match.status === 'END') {
         delete this.rooms[roomId];
         if (match) delete this.match[roomId];
       }
@@ -400,7 +421,12 @@ export class GamerGateway
       this.logger.log('Game Over');
       match.status = 'END';
       await this.saveMatchOnDatabase(match);
-      this.server.to(roomId).emit('GameOver', match);
+      this.server
+        .to(roomId)
+        .emit(
+          'GameOver',
+          match.score1 > match.score2 ? match.player1.name : match.player1.name,
+        );
     }
   }
 

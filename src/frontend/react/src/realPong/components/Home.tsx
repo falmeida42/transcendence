@@ -9,8 +9,7 @@ import {
 import RealPong from "./RealPong";
 
 const Home = () => {
-  const { isConnected, room, username, onQueue, match, winner } =
-    useContext(SocketContext);
+  const { isConnected, room, username, onQueue } = useContext(SocketContext);
   const [name, setName] = useState<string>("");
   const [page, setPage] = useState<number>(0);
 
@@ -39,15 +38,11 @@ const Home = () => {
         setPage(3);
         return;
       }
-      if (!match && winner) {
-        setPage(4);
-        return;
-      }
-      setPage(4);
+      setPage(5);
     };
     changePage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, room, username, onQueue, !!match, !!winner]);
+  }, [isConnected, room, username, onQueue]);
 
   if (page === 0) {
     return (
@@ -97,12 +92,11 @@ const Home = () => {
       <div>
         <button onClick={() => createRoom(true)}>Play against AI</button>
         <button onClick={() => joinQueue()}>Play a random</button>
-        <button disabled>Play with a friend</button>
       </div>
     );
   }
 
-  if (page === 4) return <RealPong setPage={setPage} />;
+  if (page === 5) return <RealPong setPage={setPage} />;
 };
 
 export default Home;

@@ -74,6 +74,13 @@ const SocketProvider = (props: any) => {
   useEffect(() => {
     socket.on("connect", () => {
       console.log("Conectado!");
+      if (localStorage.getItem("player")) {
+        socket.emit(
+          "Reconnect",
+          JSON.parse(localStorage.getItem("player") || "")
+        );
+      }
+
       dispatch({ type: "CONNECTED", payload: true });
     });
 
@@ -107,6 +114,10 @@ const SocketProvider = (props: any) => {
     set_name = (name: string) => {
       if (!name.trim()) return;
       dispatch({ type: "NAME_SET", payload: name });
+      localStorage.setItem(
+        "player",
+        JSON.stringify({ name: name, socketId: socket.id })
+      );
       socket.emit("Login", { name: name.trim() });
     };
 

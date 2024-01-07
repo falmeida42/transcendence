@@ -36,9 +36,8 @@ const RealPong = (props: props) => {
       document.removeEventListener("keyup", sendKeyEvent);
     };
   }, [status]);
+  console.log(match?.status);
 
-  // if (page === 0) {
-  // console.log(`Page: ${page}`);
   return (
     <div className="gamePage">
       {status === "START" && (
@@ -134,7 +133,6 @@ const RealPong = (props: props) => {
         >
           {match?.score1 + " " + match?.player1.name}
         </text>
-
         <text
           x={(gameConfig.width / 2 + 20).toString()}
           y="45"
@@ -145,7 +143,6 @@ const RealPong = (props: props) => {
         >
           {match?.score2 + " " + match?.player2.name}
         </text>
-
         {ball && (
           <Circle
             cx={ball.x.toString()}
@@ -154,7 +151,6 @@ const RealPong = (props: props) => {
             style={{ fill: "#61ff22" }}
           />
         )}
-
         {player1 && (
           <Rect
             x={player1.x.toString()}
@@ -164,7 +160,7 @@ const RealPong = (props: props) => {
             style={{ fill: "#fff" }}
           />
         )}
-
+        user,
         {player2 && (
           <Rect
             x={player2.x.toString()}
