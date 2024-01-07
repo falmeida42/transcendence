@@ -6,6 +6,8 @@ import {
   Req,
   UseGuards,
   Logger,
+  Post,
+  Body
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard';
@@ -31,10 +33,27 @@ export class UserController {
     return this.findById(String(req.user.id));
   }
 
-  @Get(':id')
+  @Get('find/:id')
   async findById(@Param('id') id: string) {
     return this.userService.getUserById(id);
   }
+
+
+  @Get('find/:login')
+  async findByLogin(@Param('login') login: string) {   
+      return this.userService.getUserByLogin(login);
+  }
+
+  @Get('all')
+  async getAll() {   
+      return this.userService.getAll();
+  }
+
+  @Get('friends')
+  async getFriends(@Req() req: any) {   
+      return this.userService.getFriends(String(req.user.id));
+  }
+  
 
   @Delete('/login')
   async delete(@Param('login') login: string) {
@@ -43,4 +62,11 @@ export class UserController {
     }
     return this.userService.delete(login);
   }
+
+  // @Post('add-friend')
+  // async addFriend(@Req() req: any, @Body() body: any) {
+
+  //   if (!body.friendlogin)
+  //   return this.userService.addFriend()
+  // }
 }

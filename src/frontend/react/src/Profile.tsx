@@ -1,12 +1,50 @@
 // import { useEffect, useState } from 'react';
 // import { Mapping } from './App';
+import { useEffect, useState } from 'react';
 import { useApi } from './apiStore';
 
-export var token: string | null;
+interface User {
+	id: string,
+	username: string,
+	userImage: string
+}
 
 function Profile() {
 	
 	const { user, first_name, last_name, login, email, image } = useApi();
+	const [friends, setFriends] = useState<User[]>([])
+
+	useEffect(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+     	 const token = urlParams.get('token');
+
+		fetch(`http://localhost:3000/user/friends`, {
+		method: "GET",
+		headers: {
+			Authorization: `Bearer ${token}`,
+			"Content-Type": "application/json",
+		},
+		})
+		.then(async (response) => {
+			if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+			const data = await response.text();
+			return data ? JSON.parse(data) : null;
+		})
+		.then((data) => {
+			const mappedFriends = data.map((friend : any) => ({
+				id: friend.id,
+				username: friend.login,
+				userImage: friend.image,
+			  }));
+		  
+			  setFriends([...mappedFriends]);
+		})
+		.catch((error) => console.error("Fetch error:", error));
+
+	}, []);
+
 
 	return (
 		<div className="middle-cont">
@@ -31,7 +69,6 @@ function Profile() {
 									  <p><strong>Username: </strong>{login}</p>
 									  <ul className="list-unstyled">
 										 <li><i className="fa fa-envelope-o"></i> : {email}</li>
-										 <li><i className="fa fa-phone"></i> : 987 654 3210</li>
 									  </ul>
 								   </div>
 								   <div className="user_progress_bar">
@@ -44,6 +81,9 @@ function Profile() {
 										 </div>
 									</h2>
 								   </div>
+								   <button>
+									Add Friend
+								   </button>
 								</div>
 							 </div>
 							 <div className="full inner_elements margin_top_30">
@@ -81,22 +121,16 @@ function Profile() {
 										 <div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-home-tab">
 											<div className="msg_list_main">
 											   <ul className="msg_list">
-												  <li>
-													 <span><img src="images/layout_img/msg2.png" className="img-responsive" alt="#"></img></span>
-													 <span>
-													 <span className="name_user">Taison Jack</span>
-													 <span className="msg_user">Friend since: 1914</span>
-													 <span className="time_ago">online: 12 min ago</span>
-													 </span>
-												  </li>
-												  <li>
-													 <span><img src="images/layout_img/msg3.png" className="img-responsive" alt="#"></img></span>
-													 <span>
-													 <span className="name_user">Mike John</span>
-													 <span className="msg_user">Friend since: 2012</span>
-													 <span className="time_ago">online: 12 min ago</span>
-													 </span>
-												  </li>
+												{
+													friends.map((friend : User) => (
+														<li>
+														<span><img src={friend.userImage} className="img-responsive" alt="#"></img></span>
+														<span>
+														<span className="name_user">{friend.username}</span>
+														</span>
+												  		</li>
+													))
+												}
 											   </ul>
 											</div>
 										 </div>								  
