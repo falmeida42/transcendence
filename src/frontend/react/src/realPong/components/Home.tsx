@@ -91,7 +91,14 @@ const Home = () => {
     return (
       <div>
         <button onClick={() => createRoom(true)}>Play against AI</button>
-        <button onClick={() => joinQueue()}>Play a random</button>
+        <button
+          onClick={() => {
+            joinQueue();
+            console.log("entrei");
+          }}
+        >
+          Play a random
+        </button>
       </div>
     );
   }

@@ -207,16 +207,16 @@ export class GamerGateway
 
       const playerNumber = 'player' + (socketId === room.player1 ? 1 : 2);
       room[playerNumber] = undefined;
-
+      this.logger.log(playerNumber);
       if (match) {
         if (match.status !== 'END') {
           match.status = 'END';
-          if (playerNumber === 'player1') {
-            match.score1 = 0;
-            match.score2 = 5;
-          } else {
+          if (playerNumber === 'player2') {
             match.score1 = 5;
             match.score2 = 0;
+          } else {
+            match.score1 = 0;
+            match.score2 = 5;
           }
         }
         this.refreshGame(roomId);

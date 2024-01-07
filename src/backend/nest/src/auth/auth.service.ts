@@ -1,9 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto } from './dto/auth.dto';
-
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { AuthDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -18,12 +20,17 @@ export class AuthService {
   async signup(dto: AuthDto) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { login: dto.login },
+        where: { id: dto.id },
       });
 
       if (user) {
-        const token = await this.signToken(Number(user.id), user.login);
-        return { token: token, user: user };
+        const accessToken = await this.signAccessToken(Number(user.id));
+        // const refreshToken = await this.signRefreshToken(Number(user.id));
+        return {
+          accessToken: accessToken,
+          // refreshToken: refreshToken,
+          user: user,
+        };
       }
 
       const newUser = await this.prisma.user.create({
@@ -35,13 +42,20 @@ export class AuthService {
           username: dto.username,
           first_name: dto.first_name,
           last_name: dto.last_name,
+          twoFactorAuthSecret: '',
+          twoFactorAuthEnabled: false,
         },
       });
-      this.logger.log('New user: ', newUser);
+      // this.logger.debug('New user: ', newUser);
 
       if (newUser) {
-        const token = await this.signToken(Number(newUser.id), newUser.login);
-        return { token: token, user: newUser };
+        const accessToken = await this.signAccessToken(Number(newUser.id));
+        // const refreshToken = await this.signRefreshToken(Number(user.id));
+        return {
+          accessToken: accessToken,
+          // refreshToken: refreshToken,
+          user: user,
+        };
       }
     } catch (error) {
       this.logger.error(error);
@@ -49,12 +63,66 @@ export class AuthService {
     return null;
   }
 
-  async signToken(userId: number, login: string): Promise<string> {
-    const payload = { sub: userId, login: login };
+  async signAccessToken(userId: number): Promise<string> {
+    const payload = { sub: userId };
+
+    return await this.jwtService.signAsync(payload, {
+      expiresIn: '20m',
+      secret: this.config.get('JWT_SECRET'),
+    });
+  }
+
+  generate2FASecret() {
+    return authenticator.generateSecret();
+  }
+
+  async generate2FAKeyURI(user: User) {
+    if (!user) {
+      throw new ForbiddenException('User is undefined');
+    }
+    return authenticator.keyuri(
+      user.id,
+      'transcendence',
+      user.twoFactorAuthSecret,
+    );
+  }
+
+  async generateQrCodeURL(otpAuthURL: string) {
+    return toDataURL(otpAuthURL);
+  }
+
+  async is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
+    // this.logger.debug(twoFactorAuthenticationCode, user);
+
+    if (!user.twoFactorAuthSecret) {
+      throw new ForbiddenException('2FA secret is not set');
+    }
+    // this.logger.debug(twoFactorAuthenticationCode, user.twoFactorAuthSecret);
+    const res = await authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret: user.twoFactorAuthSecret,
+    });
+    // this.logger.debug('res',res)
+    return res;
+  }
+
+  async is2FAActive(id: string) {
+    try {
+      const user = await this.prisma.user.findUniqueOrThrow({
+        where: { id: id },
+      });
+      return user.twoFactorAuthEnabled;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async sign2FAToken(id: string): Promise<string> {
+    const payload = { sub: id };
 
     return this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
-      secret: this.config.get('JWT_SECRET'),
+      expiresIn: '10m',
+      secret: this.config.get('JWT_2FA_SECRET'),
     });
   }
 }
