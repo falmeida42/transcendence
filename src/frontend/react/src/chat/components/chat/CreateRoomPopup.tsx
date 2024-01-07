@@ -31,21 +31,54 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
         setInputPassword(event.target.value);
     };
 
-    const handleInputChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChangeImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
-            console.log("Reader", reader)
-            reader.onloadend = () => {
-                if (reader.readyState == FileReader.DONE) {                    
-                    setInputImage(reader.result as string);
+    
+            reader.onloadend = async () => {
+                if (reader.readyState === FileReader.DONE) {
+                    const image = new Image();
+                    image.src = reader.result as string;
+    
+                    image.onload = async () => {
+                        const canvas = document.createElement('canvas');
+                        const maxImageSize = 1024; // Set your maximum image size here
+    
+                        let width = image.width;
+                        let height = image.height;
+    
+                        if (width > maxImageSize || height > maxImageSize) {
+                            const aspectRatio = width / height;
+    
+                            if (width > height) {
+                                width = maxImageSize;
+                                height = maxImageSize / aspectRatio;
+                            } else {
+                                height = maxImageSize;
+                                width = maxImageSize * aspectRatio;
+                            }
+                        }
+    
+                        canvas.width = width;
+                        canvas.height = height;
+    
+                        const ctx = canvas.getContext('2d');
+                        ctx?.drawImage(image, 0, 0, width, height);
+    
+                        const resizedDataURL = canvas.toDataURL('image/jpeg'); // You can change the format if needed
+    
+                        setInputImage(resizedDataURL);
+                    };
                 }
             };
+    
             reader.readAsDataURL(file);
         }
+    
         toggleVisibility(false);
     };
-
+    
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputPrivacy(event.target.value);
         setPlaceHolder("Password");
