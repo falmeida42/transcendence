@@ -48,17 +48,6 @@ export class UserController {
     return (await this.findById(String(user.id))).twoFactorAuthEnabled;
   }
 
-  @Get('auth')
-  async getAuth(@GetMe() user: User) {
-    // const logInfo = {
-    //   // user: user, // Log only the user property
-    //   user: {id: user.id, twoFactorAuthEnabled: user.twoFactorAuthEnabled},
-
-    // };
-    // this.logger.debug(JSON.stringify(logInfo));
-    return (await this.findById(String(user.id))).twoFactorAuthEnabled;
-  }
-
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findById(@Param('id') id: string) {

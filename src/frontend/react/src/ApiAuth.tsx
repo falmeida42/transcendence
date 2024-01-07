@@ -37,7 +37,8 @@ const UseAuth = ({ code }: UseAuthProps) => {
         }
         return;
       }
-        setauth(true);
+      document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
+      setauth(true);
     } catch (error) {
       console.error(error);
     }

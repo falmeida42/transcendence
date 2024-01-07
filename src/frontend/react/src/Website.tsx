@@ -8,6 +8,7 @@ import Chat from "./Chat.tsx";
 // import { useApi } from "./apiStore.tsx";
 import ApiDataProvider from "./ApiDataProvider.tsx";
 import { useApi } from "./apiStore.tsx";
+import AuthApi from "./ApiAuth.tsx";
 import ApiData2faProvider from "./ApiData2faProvider.tsx";
 import { Route, Switch } from "wouter";
 
@@ -26,13 +27,12 @@ function Website() {
 		}
 	}, []);
 
-	const {twofa, auth} = useApi();
 	
   return (
 	<div>
-		<ApiData2faProvider/>
+		{/* <ApiData2faProvider/> */}
 		<ApiDataProvider/>
-		{(twofa === false || (twofa === true && auth === true)) && <Bars />}
+		<Bars />
 			<Switch>
 				<Route path="/Game">
 				<div className="game">

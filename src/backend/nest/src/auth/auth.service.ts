@@ -77,11 +77,11 @@ export class AuthService {
     return authenticator.generateSecret();
   }
 
-  async generate2FAKeyURI(user: User, secret: string) {
+  async generate2FAKeyURI(user: User) {
     if (!user) {
       throw new ForbiddenException('User is undefined');
     }
-    return authenticator.keyuri(user.id, 'transcendence', secret);
+    return authenticator.keyuri(user.id, 'transcendence', user.twoFactorAuthSecret);
   }
 
   async generateQrCodeURL(otpAuthURL: string) {

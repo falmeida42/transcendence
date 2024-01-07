@@ -87,12 +87,10 @@ export class AuthController {
       throw new ForbiddenException('User does not exist');
     }
 
-    let secret: string;
-    // if no secret
     if (!user.twoFactorAuthSecret) {
       try {
         // generate 2FA secret
-        secret = this.authService.generate2FASecret();
+        const secret = this.authService.generate2FASecret();
         // update user data
         await this.userService.set2FASecret(String(user.id), secret);
       } catch (error) {
@@ -102,7 +100,7 @@ export class AuthController {
     }
 
     // generate key uri
-    const otpAuthURL = await this.authService.generate2FAKeyURI(user, secret);
+    const otpAuthURL = await this.authService.generate2FAKeyURI(user);
 
     // this.logger.debug('secret: ', secret);
     // this.logger.debug('otp url: ', otpAuthURL);
@@ -113,7 +111,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-on')
-  async turn2FAOn(@GetMe() user: User, @Param('code') code: string) {
+  async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
     this.logger.debug(code);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
@@ -121,6 +119,7 @@ export class AuthController {
       }
 
       const isCodeValid = await this.authService.is2FACodeValid(code, user);
+      this.logger.debug(isCodeValid);
 
       if (isCodeValid === false) {
         throw new UnauthorizedException('Wrong 2FA code');

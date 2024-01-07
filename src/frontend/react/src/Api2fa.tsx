@@ -9,7 +9,7 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
   const [name, setName] = useState(code);
   const {setauth} = useApi();
 
-  const handleSendClick = () => {
+  const handleSendClick = async () => {
     // Move the logic from Usetwofa to handleSendClick
     // Make sure not to call hooks here
     try {
@@ -23,7 +23,7 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
 
       // console.log(token, 'turn on');
 
-      const UpResponse = fetch('http://localhost:3000/auth/2fa/turn-on', {
+      await fetch('http://localhost:3000/auth/2fa/turn-on', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -31,25 +31,10 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
         },
         body: JSON.stringify({code: newUserData}),
       })
-      .then((updateResponse) => {
-        if (!updateResponse.ok) {
-          console.log(updateResponse);
-            console.log(newUserData);
-            throw new Error('Failed to turn-on 2FA.');
-          }
-          setauth(true);
-          console.log(JSON.stringify(updateResponse.json))
-          return updateResponse.json();
-        })
-        .then((updatedData) => {
-          console.log(updatedData);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
       } catch (error) {
         console.error(error);
       }
+      setauth(true);
     
   };
 
