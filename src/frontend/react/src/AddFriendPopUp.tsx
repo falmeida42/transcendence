@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "./apiStore";
 
 interface AddFriendPopupProps {
     isVisible: boolean;
@@ -18,6 +19,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose 
     const [users, setUsers] = useState<User[]>([])
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
+    const { id } = useApi();
 
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -79,10 +81,26 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose 
             return;
         }
 
-        // fetch Post add friend
-
-        
-
+        fetch(`http://localhost:3000/user/friend-request`, {
+                method: "POST",
+                headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                requesterId : id,
+                requestedId : userToAdd.id
+                })
+            })
+            .then(async (response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.text();
+            return data ? JSON.parse(data) : null;
+            })
+            .catch((error) => console.error("Fetch error:", error));
+            handleClose()
     };
 
     return (

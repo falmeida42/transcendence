@@ -88,6 +88,14 @@ export class UserService {
         return { message: 'User not found' };
       }
   
+
+      const friends = await this.getFriends(requesterId);
+
+      // Check if the requestee is already a friend
+      if (friends.some((friend) => friend.id === requesteeId)) {
+       return { message: 'Requestee is already a friend' };
+      }
+
       // Check if a friend request already exists
       const existingFriendRequest = await this.prisma.friendRequest.findFirst({
         where: {

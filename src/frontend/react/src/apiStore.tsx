@@ -4,25 +4,28 @@ import { create } from 'zustand';
 export var token: string | null;
 
 interface ap {
+  id: string,
   user: string;
   first_name: string;
   last_name: string;
   login: string;
   email: string;
   image: string;
-  setInfo: (user: string, first_name: string, last_name: string, login: string, email: string, image: string) => void;
+  setInfo: (id: string, user: string, first_name: string, last_name: string, login: string, email: string, image: string) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
 export const useApi = create<ap>((set) => ({
+  id: '',
   user: '',
   first_name: '',
   last_name: '',
   login: '',
   email: '',
   image: '',
-  setInfo: (User, First_name, Last_name, Login, Email, Image) =>
+  setInfo: (Id, User, First_name, Last_name, Login, Email, Image) =>
     set(() => ({
+      id: Id,
       user: User,
       first_name: First_name,
       last_name: Last_name,
@@ -31,6 +34,7 @@ export const useApi = create<ap>((set) => ({
       image: Image,
     })),
   [Symbol.iterator]: function* () {
+    yield this.id;
     yield this.user;
     yield this.first_name;
     yield this.last_name;
