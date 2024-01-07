@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { Logger, ParseUUIDPipe } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { UserStatus } from './User';
+import { use } from 'passport';
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: 'http://localhost:5173', credentials: true } })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -86,13 +87,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   
   @SubscribeMessage('messageToServer')
-  handleMessage(client: Socket, payload: any) {
+  async handleMessage(client: Socket, payload: any) {
     this.logger.log(`Message received from ${client.id}: ${JSON.stringify(payload)}`);
 
-    // const user = await this.userService.getChatRoomsByLogin(payload.username);
+    const user = await this.userService.getUserByLogin(payload.sender);
 
-  
-    // this.userService.addMessage(user.id, payload.channelId, payload.message)
+    if (!user) {
+      return "user not found";
+    }
+
+    const channel = await this.userService.getChatRoomById(payload.to)
+
+    if (!channel) {
+      return "channel not found"
+    }
+
+
+    await this.userService.addMessage(user.id, channel.id, payload.message)
     this.io.to(payload.to).emit('messageToClient', { id: crypto.randomUUID(), channelId: payload.to, message: payload.message, sender: payload.sender, senderImage: payload.senderImage });
   }
 
