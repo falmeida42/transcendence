@@ -48,18 +48,8 @@ const Sidebar = () => {
             </a>
           </li>
           <li>
-            <a href="#Friends">
-              <i className="fa fa-users purple_color2"></i> <span>Friends</span>
-            </a>
-          </li>
-          <li>
             <a href="#Chat">
               <i className="fa fa-paper-plane red_color"></i> <span>Chat</span>
-            </a>
-          </li>
-          <li>
-            <a href="#Settings">
-              <i className="fa fa-cog yellow_color"></i> <span>Settings</span>
             </a>
           </li>
         </ul>
