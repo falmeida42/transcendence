@@ -1,5 +1,4 @@
 import "./App.css";
-import Game from "./game/Game.tsx";
 import Bars from './Bars.tsx';
 import { useHashStore } from "./hashStore.tsx";
 import { useEffect } from 'react';
@@ -11,6 +10,8 @@ import { useApi } from "./apiStore.tsx";
 import AuthApi from "./ApiAuth.tsx";
 import ApiData2faProvider from "./ApiData2faProvider.tsx";
 import { Route, Switch } from "wouter";
+import Home from "./realPong/components/Home.tsx";
+import { SocketProvider } from "./realPong/context/SocketContext.tsx";
 
 function Website() {
 	const { showHash } = useHashStore();
@@ -36,7 +37,9 @@ function Website() {
 			<Switch>
 				<Route path="/Game">
 				<div className="game">
-					<Game width={800} height={500} againstAi={true}/>
+					<SocketProvider >
+					<Home />
+					</SocketProvider>
 				</div>
 				</Route>
 				<Route path="/Profile">

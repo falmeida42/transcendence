@@ -6,7 +6,6 @@ import { authenticator } from 'otplib';
 import { User } from '@prisma/client';
 import { toDataURL } from 'qrcode';
 import { AuthDto } from './dto';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {

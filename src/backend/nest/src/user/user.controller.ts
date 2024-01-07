@@ -1,18 +1,18 @@
 import {
   Controller,
-  Get,
-  Param,
   Delete,
-  UseGuards,
+  Get,
   Logger,
+  Param,
+  UseGuards,
   Post,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { User } from '@prisma/client';
+import { GetMe } from 'src/decorators';
 import { JwtAuthGuard } from '../auth/guard';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { GetMe } from 'src/decorators';
-import { User } from '@prisma/client';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
+import { UserService } from './user.service';
 
 // @UseGuards(FTGuard)
 @Controller('user')

@@ -1,5 +1,5 @@
-import React, { useEffect, ReactNode } from 'react';
-import { useApi } from './apiStore';
+import React, { ReactNode, useEffect } from "react";
+import { useApi } from "./apiStore";
 
 interface ApiDataProviderProps {
   children?: ReactNode;
@@ -35,8 +35,8 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         const response = await fetch('http://localhost:3000/user/me', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
         if (!response.ok){
