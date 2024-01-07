@@ -41,13 +41,9 @@ const ApiData2faProvider: React.FC<ApiData2faProviderProps> = (props) => {
           },
           credentials: 'include',
         });
-        if (!UpResponse.ok){
-          if (UpResponse.status === 401) {
-            // Redirect to the login page
-            window.location.href = 'http://localhost:3000/auth/login';
-          }
-          return;
-        }
+        // if (!UpResponse.ok){
+        //   return;
+        // }
 
         const data = await UpResponse.json();
         console.log(data);

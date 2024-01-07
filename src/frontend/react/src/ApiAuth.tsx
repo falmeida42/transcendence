@@ -22,7 +22,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
       if (token === undefined)
         return;
 
-      await fetch('http://localhost:3000/auth/2fa/authentication', {
+      const UpResponse = await fetch('http://localhost:3000/auth/2fa/authentication', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -30,6 +30,13 @@ const UseAuth = ({ code }: UseAuthProps) => {
         },
         body: JSON.stringify({code: newUserData}),
       })
+      if (!UpResponse.ok){
+        if (UpResponse.status === 401) {
+          // Redirect to the login page
+          window.location.href = 'http://localhost:3000/auth/login';
+        }
+        return;
+      }
         setauth(true);
     } catch (error) {
       console.error(error);
@@ -37,7 +44,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
   };
 
   return (
-    <div>
+    <div className='.this-input'>
       <input
         type="string"
         name="name"
@@ -48,8 +55,10 @@ const UseAuth = ({ code }: UseAuthProps) => {
             handleSendClick();
           }
         }}
-      />
+    />
+      <div className='.this-button'>
       <button onClick={handleSendClick}>SEND</button>
+      </div>
     </div>
   );
 };

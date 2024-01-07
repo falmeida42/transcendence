@@ -27,9 +27,12 @@ const ApiQr: React.FC<ApiQrProps> = (props) => {
             'Content-Type': 'application/json',
           },
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to get QRCODE.');
+        if (!response.ok){
+          if (response.status === 401) {
+            // Redirect to the login page
+            window.location.href = 'http://localhost:3000/auth/login';
+          }
+          return;
         }
 
         const data = await response.json();

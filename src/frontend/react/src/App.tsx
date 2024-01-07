@@ -1,60 +1,70 @@
+import { useEffect, useState } from "react";
 import "./App.css";
-import Game from "./game/Game";
-import Bars from './Bars.tsx';
-import { useHashStore } from "./hashStore.tsx";
-import { useEffect } from 'react';
-import Profile from "./Profile.tsx";
-import Chat from "./Chat.tsx";
-// import { useApi } from "./apiStore.tsx";
-import ApiDataProvider from "./ApiDataProvider.tsx";
-import ApiQr from "./ApiQr.tsx";
+import Website from "./Website.tsx";
 import { useApi } from "./apiStore.tsx";
-import Api2fa from "./Api2fa.tsx";
-import AuthApi from "./AuthApi.tsx";
-import ApiData2faProvider from "./ApiData2faProvider.tsx";
+import { Link, Route, Switch, useLocation } from 'wouter';
+import { navigate } from "wouter/use-location";
+import AuthApi from "./ApiAuth.tsx";
+import React from "react";
+
 
 function App() {
-	const { showHash } = useHashStore();
-	useEffect(() => {
+  // const {auth} = useApi();
+  // const location = useLocation();
 
-		const handleHashChange = () => {
-			const hash = window.location.hash;
-			useHashStore.getState().togglehash(hash);
-		}
-		window.addEventListener('hashchange', handleHashChange);
+  const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    ?.split('=')[1];
 
-		return () => {
-			window.removeEventListener('hashchange', handleHashChange);
-		}
-	}, []);
+  const token2fa = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token2fa='))
+    ?.split('=')[1];
 
-	const {twofa, auth} = useApi();
-	
+  useEffect(() => {
+    // Check if both tokens exist
+    if (token && token2fa) {
+      // Redirect to the appropriate page based on your logic
+      // For example, redirect to "/dashboard" if both tokens exist
+      document.cookie = `${token}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
+      document.cookie = `${token2fa}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
+      // navigate('/dashboard');
+    } else if (token) {
+      // Redirect to another page if only token exists
+      navigate('/');
+    } else if (token2fa) {
+      // Redirect to another page if only token exists
+      navigate('/2fa');
+    } else {
+      navigate('/login');
+    }
+    // Add more conditions based on your requirements
+
+  }, [token, token2fa, navigate]);
+    const handleButtonClick = () => {
+      window.location.href = "http://localhost:3000/auth/login";
+    };
+
   return (
-	// console.log(twofa, auth),
-	<div>
-		<ApiData2faProvider/>
-		<ApiDataProvider/>
-		{(twofa === true && auth === false) && (<AuthApi code="" />)}
-		
-		{(twofa === false || (twofa === true && auth === true)) && <Bars />}
-			{showHash === '#Game' && (
-			<div className="game">
-				<Game width={800} height={500} againstAi={true}/>
-			</div>)
-			}
-			{showHash === '#Profile' && (
-			<div className="game">
-				<Profile/>
-			</div>)
-			}
-			{showHash === '#Chat' && (
-			<div className="game">
-				<Chat/>
-			</div>)
-			}
-	</div>
-	);
+      <Switch>
+        <Route path="/login">
+          <div className="background-image">
+            <div className="centered-container">
+              <div className="special-button" onClick={handleButtonClick}>
+                LOGIN
+              </div>
+            </div>
+          </div>
+        </Route>
+        <Route path="/">
+         <Website />
+        </Route>
+        <Route path="/2fa">
+          <AuthApi code="" />
+        </Route>
+      </Switch>
+  );
 }
 
 export default App;

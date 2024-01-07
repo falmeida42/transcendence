@@ -23,7 +23,7 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
 
       // console.log(token, 'turn on');
 
-      fetch('http://localhost:3000/auth/2fa/turn-on', {
+      const UpResponse = fetch('http://localhost:3000/auth/2fa/turn-on', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -31,9 +31,9 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
         },
         body: JSON.stringify({code: newUserData}),
       })
-        .then((updateResponse) => {
-          if (!updateResponse.ok) {
-            console.log(updateResponse);
+      .then((updateResponse) => {
+        if (!updateResponse.ok) {
+          console.log(updateResponse);
             console.log(newUserData);
             throw new Error('Failed to turn-on 2FA.');
           }
@@ -47,9 +47,10 @@ const Usetwofa = ({ code }: UsetwofaProps) => {
         .catch((error) => {
           console.error(error);
         });
-    } catch (error) {
-      console.error(error);
-    }
+      } catch (error) {
+        console.error(error);
+      }
+    
   };
 
   return (

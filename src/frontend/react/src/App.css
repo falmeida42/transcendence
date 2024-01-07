@@ -9,7 +9,7 @@ body {
   overflow: hidden;
 }
 
-button {
+.this-button {
   border: none;
   color: #fff;
   font-weight: bold;
@@ -19,17 +19,17 @@ button {
   padding: 8px 15px;
 }
 
-button:hover {
+.this-button:hover {
   cursor: pointer;
   background-color: rgba(92, 110, 244, 0.9);
 }
 
-button:disabled {
+.this-button:disabled {
   background-color: rgba(92, 110, 244, 0.5);
   cursor: not-allowed;
 }
 
-input {
+.this-input {
   font-size: 16px;
   padding: 8px;
   border: none;

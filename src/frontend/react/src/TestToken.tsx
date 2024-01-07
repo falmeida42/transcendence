@@ -10,17 +10,8 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
   
   useEffect(() => {
     const fetchData = async () => {
-      // const urlParams = new URLSearchParams(window.location.search);
-      // const token = urlParams.get('token');
-      // if (token != null) {
-      //   console.log('token: ', token)
-      //   const newUrl = window.location.href.split('?')[0]; // Remove query parameters
-      //   window.history.replaceState({}, document.title, newUrl);
-      //   document.cookie = `token=${token}; expires=${new Date(Date.now() + 300000).toUTCString()}; path=/;`;
-      // }
 
       try {
-        // console.log(document.cookie, '123');
         const token = document.cookie
         .split('; ')
         .find((row) => row.startsWith('token='))
@@ -28,10 +19,6 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         if (token === undefined)
           return;
 
-        // if (token === undefined){
-        //   setInfo("", "", "", "", "", "", true);
-        //   return;
-        // }
         const response = await fetch('http://localhost:3000/user/me', {
           method: 'GET',
           headers: {
@@ -39,12 +26,9 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
             'Content-Type': 'application/json',
           },
         });
-        if (!response.ok){
-          if (response.status === 401) {
-            // Redirect to the login page
-            window.location.href = 'http://localhost:3000/auth/login';
-          }
-          return;
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
         }
 
         const data = await response.json();
