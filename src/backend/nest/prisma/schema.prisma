@@ -10,6 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum FriendRequestType {
+  CANCELED
+  PENDING
+  ACCEPTED
+}
+
+
 model User {
   id                  String  @id @default(uuid())
   login               String  @unique
@@ -22,4 +29,20 @@ model User {
   friends  User[] @relation("UserFriends")
   friendOf User[] @relation("UserFriends")
 
+  sentFriendRequests		FriendRequest[] @relation("FriendsRequestor")
+	receivedFriendRequests	FriendRequest[] @relation("FriendsRequestee")
+
+
+}
+
+model FriendRequest {
+  id                  String @id @default(uuid()) @unique
+  type                FriendRequestType
+
+  requestor				    User @relation("FriendsRequestor", fields: [requesterId], references: [id])
+  requestee				    User @relation("FriendsRequestee", fields: [requesteeId], references: [id])
+  requesteeId         String 
+  requesterId         String
+
+  @@map("friendRequest")
 }

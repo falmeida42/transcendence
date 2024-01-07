@@ -2,6 +2,7 @@
 // import { Mapping } from './App';
 import { useEffect, useState } from 'react';
 import { useApi } from './apiStore';
+import AddFriendPopup from './AddFriendPopUp';
 
 interface User {
 	id: string,
@@ -11,12 +12,19 @@ interface User {
 
 function Profile() {
 	
-	const { user, first_name, last_name, login, email, image } = useApi();
+	const { first_name, last_name, login, email, image } = useApi();
 	const [friends, setFriends] = useState<User[]>([])
+	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
+
+	const handleClickAddFriend = () => {
+		console.log("Handle click add friend called")
+        setIsVisibleAddFriend(!isVisibleAddFriend);
+		console.log(isVisibleAddFriend)
+    };
 
 	useEffect(() => {
 		const urlParams = new URLSearchParams(window.location.search);
-     	 const token = urlParams.get('token');
+     	const token = urlParams.get('token');
 
 		fetch(`http://localhost:3000/user/friends`, {
 		method: "GET",
@@ -49,6 +57,7 @@ function Profile() {
 	return (
 		<div className="middle-cont">
 		<div className="container-fluid">
+				 		{isVisibleAddFriend && <AddFriendPopup isVisible={isVisibleAddFriend} handleClose={handleClickAddFriend} />}
 		   <div className="row column1">
 			  <div className="col-md-2"></div>
 			  <div className="col-md-8">
@@ -81,7 +90,7 @@ function Profile() {
 										 </div>
 									</h2>
 								   </div>
-								   <button>
+								   <button onClick={handleClickAddFriend}>
 									Add Friend
 								   </button>
 								</div>

@@ -7,7 +7,8 @@ import {
   UseGuards,
   Logger,
   Post,
-  Body
+  Body,
+  HttpStatus
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard';
@@ -54,13 +55,28 @@ export class UserController {
       return this.userService.getFriends(String(req.user.id));
   }
   
+  @Get('not-friends')
+  async getNotFriends(@Req() req: any) {   
+      return this.userService.getNotFriends(String(req.user.id));
+  }
 
   @Delete('/login')
   async delete(@Param('login') login: string) {
     if (!login) {
       return 'No value inserted';
     }
-    return this.userService.delete(login);
+    //return this.userService.delete(login);
+  }
+
+
+  @Post('friend-request')
+  async addFriendRequest(@Req() req: any, @Body() body: any) {
+    try {
+      const result = await this.userService.addFriendRequest(body.requesterId, body.requestedId);
+      return { statusCode: HttpStatus.CREATED, ...result };
+    } catch (error) {
+      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error creating friend request', error };
+    }
   }
 
   // @Post('add-friend')
