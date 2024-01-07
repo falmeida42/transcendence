@@ -39,13 +39,14 @@ const UseAuth = ({ code }: UseAuthProps) => {
         }
         return;
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
+      navigate('/2fa');
+      // console.error(error);
     }
     
     document.cookie = `'token2fa'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
     setauth(true);
-    navigate('/');
+    // navigate('/');
   };
 
   return (

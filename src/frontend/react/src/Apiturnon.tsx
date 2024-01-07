@@ -24,7 +24,7 @@ const Useturnoff = ({ code }: UseturnoffProps) => {
 
       // console.log(token, 'turn on');
 
-      await fetch('http://localhost:3000/auth/2fa/turn-on', {
+      const res = await fetch('http://localhost:3000/auth/2fa/turn-on', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -32,8 +32,16 @@ const Useturnoff = ({ code }: UseturnoffProps) => {
         },
         body: JSON.stringify({code: newUserData}),
       })
+      console.log(res.bodyUsed);
+      if (!res.ok) {
+        if (res.status === 401)
+        console.log('401');
+        navigate('/Profile');
+      }
       } catch (error) {
-        console.error(error);
+        console.log('catch');
+        navigate('/Profile');
+        return;
       }
       setauth(true);
       settwofa(true);

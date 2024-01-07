@@ -61,7 +61,7 @@ export class AuthController {
           sameSite: 'none',
           secure: true,
         })
-        // .redirect(`${process.env.FRONTEND_URL}`);
+        .redirect(`${process.env.FRONTEND_URL}`);
       return;
     }
     // Execute login without 2FA
@@ -76,7 +76,7 @@ export class AuthController {
         sameSite: 'none',
         secure: true,
       })
-      // .redirect(`${process.env.FRONTEND_URL}`);
+      .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
@@ -111,8 +111,8 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-on')
-  async turn2FAOn(@GetMe() user: User, @Body('code') code: string) {
-    this.logger.debug(code);
+  async turn2FAOn(@GetMe() user: User, @Body('code') code: string, @Res() res : Response) {
+    // this.logger.debug(code);
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
         throw new ForbiddenException('2FA secret not set');
@@ -122,6 +122,10 @@ export class AuthController {
       this.logger.debug(isCodeValid);
 
       if (isCodeValid === false) {
+        // res
+        // .redirect(`${process.env.FRONTEND_URL}/Profile`)
+        // .status(401)
+        // return { message : 'WRONG CODE' };
         throw new UnauthorizedException('Wrong 2FA code');
       }
 
@@ -161,11 +165,15 @@ export class AuthController {
     if (!user) {
       throw new ForbiddenException('No such id ', user.id);
     }
-    // this.logger.debug('code: ', JSON.stringify(body));
-
+    
     const isCodeValid = await this.authService.is2FACodeValid(body.code, user);
-
+    
     if (!isCodeValid) {
+      // this.logger.debug('code: ', JSON.stringify(body));
+      res
+        // .status(401)
+        .redirect(`${process.env.FRONTEND_URL}/2fa`)
+        return;
       throw new UnauthorizedException('Wrong 2FA code');
     }
     const tokenPerm = await this.authService.signAccessToken(Number(user.id));
@@ -178,7 +186,7 @@ export class AuthController {
         sameSite: 'none',
         secure: true,
       })
-      // .redirect(`${process.env.FRONTEND_URL}`);
+      .redirect(`${process.env.FRONTEND_URL}`);
     // this.logger.debug('ACCESS TOKEN: ', tokenPerm);
     return;
   }
