@@ -7,6 +7,7 @@ import { navigate } from "wouter/use-location";
 import AuthApi from "./ApiAuth.tsx";
 import React from "react";
 import ApiData2faProvider from "./ApiData2faProvider.tsx";
+import ApiDataProvider from "./ApiDataProvider.tsx";
 
 
 function App() {
@@ -34,7 +35,8 @@ function App() {
       navigate('/2fa');
     } else if (token) {
       // document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
-      navigate('/');
+		// <ApiDataProvider/>
+    navigate('/');
     } else {
       navigate('/login');
     }

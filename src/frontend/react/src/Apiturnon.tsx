@@ -8,6 +8,7 @@ interface UseturnoffProps {
 
 const Useturnoff = ({ code }: UseturnoffProps) => {
   const [name, setName] = useState(code);
+  const [err, setErr] = useState("SEND");
   const {setauth, settwofa} = useApi();
 
   const handleSendClick = async () => {
@@ -32,20 +33,27 @@ const Useturnoff = ({ code }: UseturnoffProps) => {
         },
         body: JSON.stringify({code: newUserData}),
       })
-      console.log(res.bodyUsed);
+      // console.log(res.status);
       if (!res.ok) {
-        if (res.status === 401)
+        if (res.status === 401) {
         console.log('401');
-        navigate('/Profile');
-      }
-      } catch (error) {
-        console.log('catch');
-        navigate('/Profile');
-        return;
+        // navigate('/Profile');
+        setErr("WRONG!");
+        const data = await res.json();
+        console.log('401', JSON.stringify(data));
+        return; }
       }
       setauth(true);
       settwofa(true);
       navigate('/');
+      setErr("DONE!")
+      } catch {
+        // console.log('catch', JSON.stringify(error));
+        navigate('/Profile');
+        return;
+      }
+
+      // return;
   };
 
   return (
@@ -61,7 +69,7 @@ const Useturnoff = ({ code }: UseturnoffProps) => {
           }
         }}
       />
-      <button onClick={handleSendClick}>SEND</button>
+      <button onClick={handleSendClick}>{err}</button>
     </div>
   );
 };

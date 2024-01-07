@@ -14,7 +14,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
 import { UserService } from './user.service';
 
-// @UseGuards(FTGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -38,7 +37,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@GetMe() user: User) {
-    // this.logger.debug(JSON.stringify(user));
     return user;
   }
 

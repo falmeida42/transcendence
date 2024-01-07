@@ -49,7 +49,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
 
         const data = await response.json();
         // console.log(data);
-        setInfo(data.user, data.first_name, data.last_name, data.login, data.email, data.image, data.twoFactorAuthEnabled);
+        setInfo(data.id, data.user, data.first_name, data.last_name, data.login, data.email, data.image, data.twoFactorAuthEnabled);
       } catch (error) {
         console.error(error);
       }

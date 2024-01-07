@@ -6,7 +6,6 @@ import {
   Res,
   Post,
   Logger,
-  UnauthorizedException,
   ForbiddenException,
   HttpStatus,
   Param,
@@ -82,7 +81,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('2fa/generate')
-  async register(@Res() res: any, @GetMe() user: User) {
+  async register(@Res() res: Response, @GetMe() user: User) {
     if (!user) {
       throw new ForbiddenException('User does not exist');
     }
@@ -122,15 +121,13 @@ export class AuthController {
       this.logger.debug(isCodeValid);
 
       if (isCodeValid === false) {
-        // res
-        // .redirect(`${process.env.FRONTEND_URL}/Profile`)
-        // .status(401)
-        // return { message : 'WRONG CODE' };
-        throw new UnauthorizedException('Wrong 2FA code');
+        return res.status(401).json({ error: 'Wrong 2FA code' });
+        // res.send(res);
+        // throw new ForbiddenException('Wrong 2FA code');
       }
 
       await this.userService.set2FAOn(user.id);
-      return { message: '2FA is on' };
+      return res.status(200).json({ message: '2FA ON' });
     }
     return { message: '2FA is already on' };
   }
@@ -174,7 +171,7 @@ export class AuthController {
         // .status(401)
         .redirect(`${process.env.FRONTEND_URL}/2fa`)
         return;
-      throw new UnauthorizedException('Wrong 2FA code');
+      throw new ForbiddenException('Wrong 2FA code');
     }
     const tokenPerm = await this.authService.signAccessToken(Number(user.id));
 
