@@ -104,14 +104,12 @@ export class AuthService {
 
   async is2FAActive(id: string) {
     try {
-      const user = await this.prisma.user.findUnique({ where: { id: id } });
+      const user = await this.prisma.user.findUnique({ where: { id } });
       if (!user) {
         throw new ForbiddenException('User is not in database. id: ', id);
       }
       return user.twoFactorAuthEnabled;
-    } catch (error) {
-      console.error(error);
-    }
+    } catch {}
   }
 
   async sign2FAToken(id: string): Promise<string> {
