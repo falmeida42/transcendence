@@ -6,6 +6,8 @@ import {
   Param,
   Post,
   UseGuards,
+  Req,
+  Body,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
@@ -38,6 +40,13 @@ export class UserController {
   @Get('me')
   async getMe(@GetMe() user: User) {
     return user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('me')
+  async updateMe(@GetMe() user: User, @Body() userData: any) {
+    const updatedUser = await this.userService.updateUserById(String(user.id), userData);
+    return updatedUser;
   }
 
   @UseGuards(TwoFAGuard)

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react';
 
 // import { Mapping } from './App';
 import Apiturnoff from "./Apiturnoff";
@@ -7,11 +7,13 @@ import MatchHistory from "./MatchHistory";
 import Qrcode from "./Qrcode";
 import useUpdateUserData from "./UpdateUserData";
 import { useApi } from "./apiStore";
+import getHookers from "./Hookers";
 
 export var token: string | null;
 
 function Profile() {
   const {
+    id,
     user,
     first_name,
     last_name,
@@ -22,68 +24,66 @@ function Profile() {
     setUsername,
     setImage,
   } = useApi();
+  const {isLoading, serverError, apiData} = getHookers(`/user/matches/${id}`)
 
-  /////////////// Username update /////////////////
+  console.log(isLoading);
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [textValue, setTextValue] = useState<string | undefined>(user);
-  const [name, setName] = useState("");
+	/////////////// Username update /////////////////
+	
+	const [isEditing, setIsEditing] = useState(false);
+	const [textValue, setTextValue] = useState<string | undefined>(user);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
+	const handleEditClick = () => {
+		setIsEditing(true);
+	};
+	
+	const handleSubmitClick = () => {
+		setIsEditing(false);
+		setUsername(textValue);
+		console.log('Submitted changes:', textValue);
+	};
+	
+	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setTextValue(event.target.value);
+	};
+	
 
-  const handleSubmitClick = () => {
-    setIsEditing(false);
-    // You can add logic here to handle the submission of changes
-    setUsername(textValue);
-    updateFunction();
-    // console.log('Submitted changes:', textValue);
-  };
+	/////////////// Image update /////////////////
+	
+	
+	const [isEditingImage, setIsEditingImage] = useState(false);
+  	const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
+	  
+	  const handleEditClickImage = () => {
+		setIsEditingImage(true);
+	};
+	
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files && event.target.files[0];
+		
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				setSelectedImage(e.target?.result as string);
+			};
+			reader.readAsDataURL(file);
+		}
+	};
 
-  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTextValue(event.target.value);
-  };
+	const { updateFunction } = useUpdateUserData({
+		updateFunction: () => ({
+		  username: textValue, // Assuming you want to update the username with the current textValue
+		  image: selectedImage,
+		}),
+	  });
+	
+	const handleSubmitClickImage = () => {
+		setIsEditingImage(false);
+		setImage(selectedImage);
+		console.log('Submitted new image:', selectedImage);
+	};
 
-  /////////////// Image update /////////////////
-
-  const [isEditingImage, setIsEditingImage] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
-
-  const handleEditClickImage = () => {
-    setIsEditingImage(true);
-  };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const { updateFunction } = useUpdateUserData({
-    updateFunction: () => ({
-      username: textValue, // Assuming you want to update the username with the current textValue
-      image: selectedImage,
-    }),
-  });
-
-  const handleSubmitClickImage = () => {
-    setIsEditingImage(false);
-    // You can add logic here to handle the submission of the new image
-    setImage(selectedImage);
-    updateFunction();
-    // console.log('Submitted new image:', selectedImage);
-  };
-
-  const handleClickCode = () => {
-    Usetwofa({ code: name });
-  };
+	useEffect(() => {},[twofa]);
 
   return (
     // <div className="middle-cont">

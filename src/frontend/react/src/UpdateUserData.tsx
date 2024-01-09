@@ -17,7 +17,7 @@ const useUpdateUserData = ({ updateFunction }: UseUpdateUserDataProps) => {
           return;
         }
 
-        const updateResponse = await fetch('http://localhost:3000/user/me', {
+        await fetch('http://localhost:3000/user/me', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -26,19 +26,12 @@ const useUpdateUserData = ({ updateFunction }: UseUpdateUserDataProps) => {
           body: JSON.stringify(newUserData),
         });
 
-        if (!updateResponse.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-
-        const updatedData = await updateResponse.json();
-        console.log(updatedData);
-      } catch (error) {
-        // console.error(error);
+      } catch {
+        console.error('error');
       }
     };
 
-    // Call updateUserData when the component mounts
-    // updateUserData();
+    updateUserData();
   }, [updateFunction]);
 
   return {updateFunction};

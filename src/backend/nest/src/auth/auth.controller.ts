@@ -57,7 +57,6 @@ export class AuthController {
             domain: 'localhost',
             path: '/',
             sameSite: 'none',
-            secure: true,
           })
           .redirect(`${process.env.FRONTEND_URL}`);
         return;
@@ -74,7 +73,6 @@ export class AuthController {
         domain: 'localhost',
         path: '/',
         sameSite: 'none',
-        secure: true,
       })
       .redirect(`${process.env.FRONTEND_URL}`);
     return;
@@ -186,7 +184,6 @@ export class AuthController {
         domain: 'localhost',
         path: '/',
         sameSite: 'none',
-        secure: true,
       })
       .redirect(`${process.env.FRONTEND_URL}`);
     // this.logger.debug('ACCESS TOKEN: ', tokenPerm);

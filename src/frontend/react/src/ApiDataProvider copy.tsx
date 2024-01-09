@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect } from "react";
 import { useApi } from "./apiStore";
+import { navigate } from "wouter/use-location";
 
 interface ApiDataProviderProps {
   children?: ReactNode;
@@ -41,8 +42,9 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         if (!response.ok) {
           if (response.status === 401) {
             // Redirect to the login page
-            window.location.href = "http://localhost:3000/auth/login";
+            // window.location.href = "http://localhost:3000/auth/login";
           }
+          navigate('/login');
           return;
         }
 

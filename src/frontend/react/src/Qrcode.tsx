@@ -1,9 +1,11 @@
 import Usetwofa from "./Apiturnon";
 import ApiQr from "./ApiQr";
 import { useApi } from "./apiStore";
+import { useEffect } from "react";
 
 function Qrcode() {
-    const {email, qrcode} = useApi();
+    const {email, qrcode, auth} = useApi();
+    useEffect(() => {},[auth]);
 
     return (
         <div>

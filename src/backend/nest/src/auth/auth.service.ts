@@ -6,6 +6,7 @@ import { authenticator } from 'otplib';
 import { User } from '@prisma/client';
 import { toDataURL } from 'qrcode';
 import { AuthDto } from './dto';
+import { UserDto } from 'src/user/dto';
 
 @Injectable()
 export class AuthService {
@@ -71,6 +72,7 @@ export class AuthService {
       secret: this.config.get('JWT_SECRET'),
     });
   }
+
 
   generate2FASecret() {
     return authenticator.generateSecret();

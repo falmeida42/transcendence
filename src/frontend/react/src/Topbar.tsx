@@ -3,7 +3,7 @@ import { usecollapseSidebar } from "./collapseSidebar.tsx";
 
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
-  const { first_name, image } = useApi();
+  const { user, image } = useApi();
 
   return (
     <div id="content">
@@ -45,8 +45,8 @@ const Topbar = () => {
                     />
                   </li>
                   <li className="user_list">
-                    <a href="#Profile">
-                      <span className="name_user">{first_name}</span>
+                    <a href="/Profile">
+                      <span className="name_user">{user}</span>
                     </a>
                   </li>
                 </ul>
