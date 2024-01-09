@@ -7,11 +7,8 @@ function Qrcode() {
 
     return (
         <div>
-            <ul className="list-unstyled">
-                <li><i className="fa fa-envelope-o"></i> : {email}</li>
                 <ApiQr />
                 <img src={qrcode}></img>
-            </ul>
             <Usetwofa code={""} />
         </div>
     )
