@@ -1,5 +1,5 @@
-import React, { useEffect, ReactNode } from 'react';
-import { useApi } from './apiStore';
+import React, { ReactNode, useEffect } from "react";
+import { useApi } from "./apiStore";
 
 interface ApiQrProps {
   children?: ReactNode;
@@ -11,26 +11,28 @@ const ApiQr: React.FC<ApiQrProps> = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       const token = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('token='))
-        ?.split('=')[1];
-      if (token === undefined)
-        return;
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1];
+      if (token === undefined) return;
 
       // console.log(token, 'QR');
 
       try {
-        const response = await fetch('http://localhost:3000/auth/2fa/generate', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok){
+        const response = await fetch(
+          "http://localhost:3000/auth/2fa/generate",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) {
           if (response.status === 401) {
             // Redirect to the login page
-            window.location.href = 'http://localhost:3000/auth/login';
+            window.location.href = "http://localhost:3000/auth/login";
           }
           return;
         }

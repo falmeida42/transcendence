@@ -15,8 +15,8 @@ type state = {
   username?: string;
   room?: Room;
   match?: Match;
-  winner?: string;
   onQueue: boolean;
+  socketId?: string;
 };
 
 const initialState: state = {
@@ -25,7 +25,7 @@ const initialState: state = {
   match: undefined,
   username: "",
   onQueue: false,
-  winner: undefined,
+  socketId: "",
 };
 
 const socket = io("http://localhost:3000/gamer", { autoConnect: false });
@@ -47,7 +47,7 @@ const SocketProvider = (props: any) => {
   const reducer = (state: state, action: action): state => {
     switch (action.type) {
       case "CONNECTED":
-        return { ...state, isConnected: action.payload };
+        return { ...state, isConnected: action.payload, socketId: socket.id };
       case "DISCONNECTED":
         return { ...state, isConnected: action.payload };
       case "NAME_SET":
@@ -61,8 +61,7 @@ const SocketProvider = (props: any) => {
       case "SET_WINNER":
         return {
           ...state,
-          winner: action.payload,
-          match: undefined,
+          match: action.payload,
         };
       default:
         return state;
@@ -74,50 +73,48 @@ const SocketProvider = (props: any) => {
   useEffect(() => {
     socket.on("connect", () => {
       console.log("Conectado!");
+      dispatch({ type: "CONNECTED", payload: true });
       if (localStorage.getItem("player")) {
         socket.emit(
           "Reconnect",
           JSON.parse(localStorage.getItem("player") || "")
         );
       }
-
-      dispatch({ type: "CONNECTED", payload: true });
     });
 
     socket.on("disconnect", () => {
-      console.log("Desconectado!");
       dispatch({ type: "DISCONNECTED", payload: false });
     });
 
     socket.on("RoomCreated", (room) => {
       dispatch({ type: "ROOM_CREATED", payload: room });
+      localStorage.setItem("player", JSON.stringify(state));
     });
 
     socket.on("MatchRefresh", (match) => {
-      // console.log("MatchRefresh", match.ball);
       dispatch({ type: "MATCH_REFRESH", payload: match });
     });
 
     socket.on("QueueJoined", () => {
       dispatch({ type: "QUEUE_JOINED", payload: true });
+      localStorage.setItem("player", JSON.stringify(state));
     });
 
     socket.on("QueueLeft", () => {
       dispatch({ type: "QUEUE_JOINED", payload: false });
+      localStorage.setItem("player", JSON.stringify(state));
     });
 
     // TODO: Make the winner be displayed
-    socket.on("GameOver", (winner) => {
-      dispatch({ type: "SET_WINNER", payload: winner });
+    socket.on("GameOver", () => {
+      dispatch({ type: "SET_WINNER", payload: undefined });
+      localStorage.setItem("player", JSON.stringify(state));
     });
 
     set_name = (name: string) => {
       if (!name.trim()) return;
       dispatch({ type: "NAME_SET", payload: name });
-      localStorage.setItem(
-        "player",
-        JSON.stringify({ name: name, socketId: socket.id })
-      );
+      localStorage.setItem("player", JSON.stringify(state));
       socket.emit("Login", { name: name.trim() });
     };
 

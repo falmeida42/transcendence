@@ -14,12 +14,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Match } from './utils/Match';
 import { Player } from './utils/Player';
 import Queue from './utils/Queue';
+import { state } from './utils/ReconnectedPlayer';
 import { Room } from './utils/Room';
 import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: { origin: 'http://localhost:5173', credentials: true },
+  cors: {
+    origin: ['http://localhost:5173'],
+    credentials: true,
+  },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -60,18 +64,21 @@ export class GamerGateway
         if (this.match[player.room].player2)
           this.match[player.room].player2.ready = false;
       }
-      // const timerId = setTimeout(() => {
-      //   this.removePlayer(playerId);
-      // }, 5000);
-      // this.players[playerId].disconnectedId = timerId;
-      this.removePlayer(playerId);
+      const timerId = setTimeout(() => {
+        this.removePlayer(playerId);
+      }, 5000);
+      this.players[playerId].disconnectedId = timerId;
     }
-
-    delete this.players[client.id];
   }
 
-  // @SubscribeMessage('Reconnect')
-  // handleReconnect(@ConnectedSocket() client: Socket, @MessageBody('player') player: Player)
+  @SubscribeMessage('Reconnect')
+  handleReconnect(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() reconnectedPlayer: state,
+  ) {
+    this.logger.log(`${client.id} reconectou`);
+    this.logger.log(reconnectedPlayer);
+  }
 
   @SubscribeMessage('Login')
   handleLogin(
@@ -80,7 +87,6 @@ export class GamerGateway
   ) {
     this.logger.log(`Client ${client.id} logged in as ${name}`);
     this.players[client.id].name = name;
-    this.logger.log(this.players);
   }
 
   @SubscribeMessage('CreateRoom')
@@ -148,8 +154,6 @@ export class GamerGateway
     const match = this.match[roomId];
 
     const direction = type === 'keyup' ? 'STOP' : key;
-    if (playerNumber === 'player2')
-      this.logger.debug(`player ${JSON.stringify(player)}`);
     match[playerNumber].direction = direction;
   }
 
@@ -457,8 +461,8 @@ export class GamerGateway
         },
       });
       this.logger.log(matchCreated);
-    } catch (e) {
-      this.logger.log(e);
+    } catch (error) {
+      this.logger.log('User not found');
     }
   }
 

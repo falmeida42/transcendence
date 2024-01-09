@@ -17,8 +17,6 @@ const RealPong = (props: props) => {
   // const [page, setPage] = useState(0);
 
   useEffect(() => {
-    console.log("RealPong.tsx: useEffect");
-
     const sendKeyEvent = (e: KeyboardEvent) => {
       const { key, type } = e;
       if (e.repeat) return;
