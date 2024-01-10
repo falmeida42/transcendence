@@ -436,12 +436,13 @@ export class GamerGateway
 
   async saveMatchOnDatabase(match: Match) {
     try {
+      this.logger.log(`${match.player1.name} vs ${match.player2.name}`);
       const user1Id = await this.prisma.user.findUniqueOrThrow({
         where: {
           login: match.player1.name,
         },
       });
-      const user2Id = await this.prisma.user.findFirstOrThrow({
+      const user2Id = await this.prisma.user.findUniqueOrThrow({
         where: {
           login: match.player2.name,
         },
@@ -462,7 +463,7 @@ export class GamerGateway
       });
       this.logger.log(matchCreated);
     } catch (error) {
-      this.logger.log('User not found');
+      this.logger.log(error);
     }
   }
 
