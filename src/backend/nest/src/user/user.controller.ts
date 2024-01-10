@@ -63,7 +63,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':login')
+  @Delete('delete/:login')
   async delete(@Param('login') login: string) {
     const user = await this.prisma.user.findUnique({ where: { login } });
 
@@ -75,7 +75,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':username')
+  @Post('change-user/:username')
   async changeUsername(
     @GetMe() user: User,
     @Param('username') username: string,
@@ -164,7 +164,8 @@ export class UserController {
   async addRoom(
     @Req() req: any,
     @Body() body: any,
-  ) {
+  ): Promise<any> {
+    console.log("adding room", JSON.stringify(body))
       if (body.roomdata) {
         body.roomdata.type = body.roomdata.type.toUpperCase()
         console.log("Add room")

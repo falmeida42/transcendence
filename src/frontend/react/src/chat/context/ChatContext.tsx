@@ -65,7 +65,6 @@ function ChatProvider({ children }: ChatProviderProps) {
 
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
     tk = document.cookie
     .split('; ')
     .find((row) => row.startsWith('token='))
