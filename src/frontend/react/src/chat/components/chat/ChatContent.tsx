@@ -73,30 +73,36 @@ const ChatContent = (props: ChatContentProps) => {
     interface Data {
         participants: Participant[]; 
     }
-
-    fetch(`http://localhost:3000/user/chatRoom/${props.selectedChatData.id}`, {
-        method: "GET",
-        headers: {
-        Authorization: `Bearer ${tk}`,
-        "Content-Type": "application/json",
-        },
-    })
-        .then(async (response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.text();
-        return data ? JSON.parse(data) : null;
-        })
-        .then((data) => {
-        if (data) {
+    
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const response = await fetch(
+              `http://localhost:3000/user/chatRoom/${props.selectedChatData.id}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${tk}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+    
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
             console.log("Room info received ", JSON.stringify(data));
             setChatData(data);
-        } else {
-            console.log("No data received");
-        }
-        })
-        .catch((error) => console.error("Fetch error:", error));
+          } catch (error) {
+            console.error("Fetch error:", error);
+          }
+        };
+    
+        fetchData();
+      }, [props.selectedChatData.id]);
+   
     
     return (
         <div className="chat">
