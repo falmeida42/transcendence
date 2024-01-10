@@ -1,9 +1,16 @@
+import { useState } from "react";
 import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
+import NotifList from "./NotifList.tsx";
 
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
   const { login, image } = useApi();
+  const [isVisibleNotif, setIsVisibleNotif] = useState(false);
+
+  const handleClickNotif = () => {
+    setIsVisibleNotif(!isVisibleNotif);
+  }
 
   return (
     <div id="content">
@@ -34,6 +41,12 @@ const Topbar = () => {
                   <li className="icons_list">
                     <a href="#">
                       <i className="fa fa-power-off"></i>
+                    </a>
+                  </li>
+                  <li className="icons_list">
+                    <a href="#" onClick={handleClickNotif}>
+                      <i className="fa fa-bell"></i>
+                      {isVisibleNotif && <NotifList />}
                     </a>
                   </li>
                   <li className="user_list">

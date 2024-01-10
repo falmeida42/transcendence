@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useApi } from "./apiStore";
+import "./Profile.css"
 
 interface AddFriendPopupProps {
     isVisible: boolean;
     handleClose: () => void;
+    token: string;
   }
   
   interface User {
@@ -13,17 +15,14 @@ interface AddFriendPopupProps {
 }
 
 
-const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose }) => {
+const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose, token }) => {
 
     const [userToAdd, setUserToAdd] = useState<User>({id: "", username: "", userImage: ""});
     const [users, setUsers] = useState<User[]>([])
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const { id } = useApi();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-
+ 
     useEffect(() => {
     fetch(`http://localhost:3000/user/not-friends`, {
       method: "GET",
@@ -37,6 +36,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose 
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
+        console.log("YOUR NON_FRIENDS ", data)
         return data ? JSON.parse(data) : null;
       })
       .then((data) => {
@@ -67,10 +67,6 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose 
     const handleClickClose = () => {
         handleClose();
     };
-
-    const style = {
-		zIndex: 999,
-	}
 
     const handleClickYes = () => {
 
@@ -106,7 +102,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose 
     return (
             <div>
                 {isVisible && (
-                <div className="pop" style={style}>
+                <div className="modal">
                 <div className="modal-dialog">
                     <div className="modal-content">
                     <div className="modal-header">
@@ -120,7 +116,6 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose 
                             <p>Select a user from the list:</p>
                             <ul
                             className="popup-input"
-                            style={{padding: "4px 0"}}
                             >
                                {users.map((user) => (
                                 <li key={user.id}>

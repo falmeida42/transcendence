@@ -18,7 +18,7 @@
 }
 
 .contact_inner {
-    margin-top: 50px;
+    margin-top: 40px;
     @media (max-width: 768px)
     {
         margin-top: 0;
@@ -32,3 +32,77 @@
 .progress.skill-bar {
     background: #f25959;
 }
+
+.modal {
+    display: block;
+    top: 40%;
+    left: 4%;
+  
+    .modal-dialog {
+      max-width: 300px;
+    }
+}
+  
+  
+.popup-input {
+    color: black;
+    background: #F2F5F8;
+    padding: 4px 0px;
+    overflow-y: scroll;
+    max-height: 175px;
+  
+    li {
+      
+      label {
+        display: flex;
+        align-items: center;
+      }
+  
+      input {
+        flex: 0;
+        width: 20px;
+        margin: 0 5px 0 10px;
+      }
+  
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        padding: 7px;
+      }
+    }
+  }
+  
+  .modal-title {
+    color: #434651;
+  }
+
+  .rounded-circle {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 50%;
+    /* padding: 7px; */
+  }
+
+  .msg_list {
+
+      .img-responsive {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      
+      .name_user {
+        margin-top: 12px!important;
+      }
+  }
+
+  .request-item {
+    padding: 4px;
+    display: flex;
+    flex-direction: row;
+    background-color: #F2F5F8;
+  }

@@ -5,6 +5,7 @@ import Usetwofa from './Apiturnon';
 import Qrcode from './Qrcode';
 import Apiturnoff from './Apiturnoff';
 import "./Profile.css";
+import AddFriendPopup from './AddFriendPopUp';
 
 interface User {
 	id: string,
@@ -88,15 +89,15 @@ function Profile() {
 		setIsVisibleAddFriend(!isVisibleAddFriend);
 		console.log(isVisibleAddFriend)
 	};
-
+	const token = document.cookie
+		.split('; ')
+		.find((row) => row.startsWith('token='))
+		?.split('=')[1];
+	if (token === undefined)
+		return;
+	
 	useEffect(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const token = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('token='))
-			?.split('=')[1];
-		if (token === undefined)
-			return;
+		// const urlParams = new URLSearchParams(window.location.search);
 
 
 		fetch(`http://localhost:3000/user/friends`, {
@@ -128,6 +129,7 @@ function Profile() {
 
 	return (
 		<div className="container-fluid profile_container">
+			<AddFriendPopup isVisible={isVisibleAddFriend} handleClose={handleClickAddFriend} token={token}/>
 				<div className="profile_contant flex-item">
 					<div className="form-group">
 						<div className="input-group d-flex flex-column">

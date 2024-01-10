@@ -80,8 +80,9 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('not-friends')
-  async getNotFriends(@Req() req: any) {   
-      return this.userService.getNotFriends(String(req.user.id));
+  async getNotFriends(@GetMe('id') id: string) {
+      console.log("USER ID: ", id);  
+      return this.userService.getNotFriends(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -114,7 +115,7 @@ export class UserController {
     //return this.userService.delete(login);
   }
 
-
+  @UseGuards(JwtAuthGuard)
   @Post('friend-request')
   async addFriendRequest(@Req() req: any, @Body() body: any) {
     try {
@@ -123,6 +124,13 @@ export class UserController {
     } catch (error) {
       return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error creating friend request', error };
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('friend-requests')
+  async getFriendRequests(@GetMe('id') id: string) {
+      console.log("USER ID: ", id);  
+      return this.userService.getFriendRequests(id);
   }
 
   // @Post('add-friend')
