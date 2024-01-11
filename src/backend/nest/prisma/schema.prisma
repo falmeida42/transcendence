@@ -30,27 +30,29 @@ model User {
   twoFactorAuthEnabled Boolean @default(false)
 
   ownerOf ChatRoom[] @relation("Owners")
+  adminOf ChatRoom[] @relation("Admins")
 
   friends  User[] @relation("UserFriends")
   friendOf User[] @relation("UserFriends")
 
   chatRoomId String?
   Message    Message[]
-  wins   Match[] @relation("winner")
-  losses Match[] @relation("loser")
+  wins       Match[]   @relation("winner")
+  losses     Match[]   @relation("loser")
 }
 
 model ChatRoom {
   id           String    @id @default(uuid())
   name         String
   image        String
-  password     String   @default("")
+  password     String    @default("")
   type         ChatType
-  owners       User[]    @relation("Owners")
+  owner        User      @relation("Owners", fields: [userId], references: [id])
+  admins       User[]    @relation("Admins")
   messages     Message[]
   participants User[]    @relation("Participants")
 
-  userId String?
+  userId String
 }
 
 model Message {
@@ -62,7 +64,6 @@ model Message {
   sender         User     @relation(fields: [userId], references: [id])
   userId         String
 }
-
 
 model Match {
   id             String   @id @default(uuid())

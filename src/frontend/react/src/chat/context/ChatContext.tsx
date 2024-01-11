@@ -63,7 +63,6 @@ function ChatProvider({ children }: ChatProviderProps) {
       .catch((error) => console.error("Fetch error:", error));
   }
 
-
   useEffect(() => {
     tk = document.cookie
     .split('; ')

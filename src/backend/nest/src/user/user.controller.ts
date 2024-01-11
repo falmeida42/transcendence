@@ -1,13 +1,12 @@
 import {
   Controller,
-  Delete,
   Get,
   Logger,
   Post,
   Body,
   Param,
   UseGuards,
-  Req
+  HttpStatus,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetMe } from 'src/decorators';
@@ -32,7 +31,7 @@ export class UserController {
       return await this.userService.getUsers();
     } catch (error) {
       this.logger.error(error);
-      return { error: error, message: 'Unable to get users' };
+      return { message: error, code: HttpStatus.BAD_REQUEST };
     }
   }
 
@@ -45,11 +44,9 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('findlogin/:login')
   async findByLogin(@Param('login') login: string) {
-
     return this.userService.getUserByLogin(login);
   }
 
-  
   @UseGuards(TwoFAGuard)
   @Get('auth')
   async getAuth(@GetMe() user: User) {
@@ -60,18 +57,6 @@ export class UserController {
   @Get('find/:id')
   async findById(@Param('id') id: string) {
     return this.userService.getUserById(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete('delete/:login')
-  async delete(@Param('login') login: string) {
-    const user = await this.prisma.user.findUnique({ where: { login } });
-
-    if (!user) {
-      return 'User not found';
-    }
-
-    return this.prisma.user.delete({ where: { login } });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -87,130 +72,117 @@ export class UserController {
       });
     } catch (error) {
       this.logger.error(error);
-      throw new Error(error.message);
+      return { message: error, code: HttpStatus.BAD_REQUEST };
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('friends')
-  async getFriends(@Req() req: any) {
-    
-    console.log("backend getting friends")
-    
-    const friends = this.userService.getFriends(String(req.user.id));
-    
-    console.log("friends receeeeived ", friends)
-    return friends
+  async getFriends(@GetMe('id') id: string) {
+    const friends = this.userService.getFriends(id);
+
+    return friends;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('chatRooms')
-  async getChatRooms(@Req() req: any) {
-    
-    console.log("backend getting ChatRooms")
-    
-    const ChatRooms = this.userService.getChatRooms(String(req.user.id));
-    
-    console.log("friends receeeeived ", ChatRooms)
-    return ChatRooms
+  async getChatRooms(@GetMe('id') id: string) {
+    const ChatRooms = this.userService.getChatRooms(id);
+
+    return ChatRooms;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('chatRoom/:id')
-  async getChatRoomById(@Req() req: any, @Param('id') id: string) {
-    
-    console.log("backend getting ChatRoom with id ", id)
-    
-    const ChatRoom = this.userService.getChatRoomById(id);
-    
-    console.log("chat room receeeeived ", ChatRoom)
-    return ChatRoom
+  async getChatRoomById(@Param('id') id: string) {
+    return this.userService.getChatRoomById(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('chatHistory/:id')
-  async getChatHistory(@Req() req: any, @Param('id') id: string) {
-    
-    const chatHistory = this.userService.getChatHistory(req.user.id, id);
-    
-    return chatHistory
+  async getChatHistory(@GetMe('id') userId: string, @Param('id') id: string) {
+    return this.userService.getChatHistory(userId, id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('add-friend/:friendName')
   async addFriend(
-    @Req() req: any,
+    @GetMe('id') id: string,
     @Param('friendName') friendName: string,
   ): Promise<string> {
     try {
-      const user = await this.userService.getUserById(String(req.user.id))
-            
+      const user = this.userService.getUserById(id);
+
       if (!user) {
         return 'User not found';
       }
-      const friend = await this.userService.getUserByLogin(friendName)
+      const friend = await this.userService.getUserByLogin(friendName);
 
-      await this.userService.insertFriend(String(req.user.id), friend.id)
+      if (!friend) {
+        return 'Friend not found';
+      }
 
-      return 'Friend added'
+      this.userService.insertFriend(id, friend.id);
+
+      return 'Friend added';
     } catch (error) {
-      console.error(error);
-      return 'Error to add a friend'   
+      this.logger.error(error);
+      return 'Error to add a friend';
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('add-room')
   async addRoom(
-    @Req() req: any,
-    @Body() body: any,
+    @GetMe('id') id: string,
+    @Body('roomdata') roomdata: any,
   ): Promise<any> {
-    console.log("adding room", JSON.stringify(body))
-      if (body.roomdata) {
-        body.roomdata.type = body.roomdata.type.toUpperCase()
-        console.log("Add room")
-        console.log(JSON.stringify(body))
-        await this.userService.createRoom(String(req.user.id), body.roomdata)
-      }
+    if (roomdata) {
+      roomdata.type = roomdata.type.toUpperCase();
+      await this.userService.createRoom(id, roomdata);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('update-room-privacy/:roomId')
   async updateRoomPrivacy(
-    @Req() req: any,
-    @Body() body: any,
+    @Body('type') type: any,
+    @Body('password') password: any,
     @Param('roomId') roomId: string,
   ) {
-      if (body) {
-        console.log("Updated room privacy")
-        console.log(JSON.stringify(body))
-        await this.userService.updateChatRoomPrivacy(roomId, body.type, body.password)
-      }
+    if (type && password) {
+      await this.userService.updateChatRoomPrivacy(roomId, type, password);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('joinable-rooms')
   async joinableRooms(@GetMe('id') id: string) {
-    // this.logger.debug("joinable-rooms req", JSON.stringify(req.user))
-    return await this.userService.getJoinableRooms(id)
+    try {
+      return await this.userService.getJoinableRooms(id);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: error, message: 'Could not get joinable rooms' };
+    }
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
-  @Req() req: any,
-  @Body() body: any
-){
-    return this.userService.joinRoom(body.username, body.roomId, body.password, body.roomType)
-};
+    @Body('username') username: string,
+    @Body('roomId') roomId: string,
+    @Body('password') password: string,
+    @Body('roomType') roomType: string,
+  ) {
+    return this.userService.joinRoom(username, roomId, password, roomType);
+  }
 
-@UseGuards(JwtAuthGuard)
-@Post('leave-room')
-async leaveRoom(
-  @Req() req: any,
-  @Body() body: any
-){
-    return this.userService.leaveRoom(body.username, body.roomId)
-};
-
+  @UseGuards(JwtAuthGuard)
+  @Post('leave-room')
+  async leaveRoom(
+    @GetMe('username') username: string,
+    @Body('roomId') roomId: string,
+  ) {
+    return this.userService.leaveRoom(username, roomId);
+  }
 }

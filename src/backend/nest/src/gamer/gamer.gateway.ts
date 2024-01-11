@@ -19,7 +19,7 @@ import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: { origin: 'http://localhost:5173', credentials: true }
+  cors: { origin: 'http://localhost:5173', credentials: true },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
