@@ -34,7 +34,6 @@ const RealPong = (props: props) => {
       document.removeEventListener("keyup", sendKeyEvent);
     };
   }, [status]);
-  console.log(match?.status);
 
   return (
     <div className="gamePage">

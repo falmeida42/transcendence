@@ -14,7 +14,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Match } from './utils/Match';
 import { Player } from './utils/Player';
 import Queue from './utils/Queue';
-import { state } from './utils/ReconnectedPlayer';
 import { Room } from './utils/Room';
 import { gameConfig } from './utils/gameConfig';
 
@@ -54,7 +53,7 @@ export class GamerGateway
     this.logger.log(`Client disconnected ${client.id}`);
     const player = this.players[client.id];
     if (player) {
-      console.log(`${client.id} desconectou`);
+      // console.log(`${client.id} desconectou`);
 
       const playerId = client.id;
       if (player.room && this.match[player.room]) {
@@ -66,19 +65,36 @@ export class GamerGateway
       }
       const timerId = setTimeout(() => {
         this.removePlayer(playerId);
-      }, 5000);
+      }, 10000);
       this.players[playerId].disconnectedId = timerId;
     }
   }
 
-  @SubscribeMessage('Reconnect')
-  handleReconnect(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() reconnectedPlayer: state,
-  ) {
-    this.logger.log(`${client.id} reconectou`);
-    this.logger.log(reconnectedPlayer);
-  }
+  // @SubscribeMessage('Reconnect')
+  // handleReconnect(
+  //   @ConnectedSocket() client: Socket,
+  //   @MessageBody() reconnectedPlayer: state,
+  // ) {
+  //   this.logger.log(`${client.id} reconectou`);
+  //   this.logger.log(reconnectedPlayer);
+  //   const oldSocketId = reconnectedPlayer.socketId;
+  //   const existingPlayer = this.players[oldSocketId];
+
+  //   if (existingPlayer) {
+  //     clearTimeout(existingPlayer.disconnectedId);
+  //     this.players[client.id] = {
+  //       ...existingPlayer,
+  //       disconnectedId: undefined,
+  //       socket: client.id,
+  //     };
+
+  //     delete this.players[oldSocketId];
+
+  //     this.rejoinRoom(client, oldSocketId);
+  //   } else {
+  //     this.logger.log('Player not found');
+  //   }
+  // }
 
   @SubscribeMessage('Login')
   handleLogin(
@@ -194,9 +210,30 @@ export class GamerGateway
     if (match.status === 'PLAY') match.status = 'PAUSE';
   }
 
+  // rejoinRoom(client: Socket, oldSocketId: string) {
+  //   const socketId = client.id;
+  //   const player = this.players[socketId];
+
+  //   if (!player || !player.room) return;
+
+  //   const roomId = player.room;
+  //   const room = this.rooms[roomId];
+
+  //   if (room.player1 === oldSocketId) {
+  //     room.player1 = socketId;
+  //   } else if (room.player2 === oldSocketId) {
+  //     room.player2 = socketId;
+  //   } else {
+  //     return;
+  //   }
+
+  //   client.join(roomId);
+  //   this.logger.log(`Client ${client.id} rejoined room ${roomId}`);
+  // }
+
   removePlayer(playerId: string) {
     this.leaveRoom(playerId);
-    // delete this.players[playerId];
+    delete this.players[playerId];
   }
 
   leaveRoom(socketId: string) {
@@ -211,7 +248,6 @@ export class GamerGateway
 
       const playerNumber = 'player' + (socketId === room.player1 ? 1 : 2);
       room[playerNumber] = undefined;
-      this.logger.log(playerNumber);
       if (match) {
         if (match.status !== 'END') {
           match.status = 'END';

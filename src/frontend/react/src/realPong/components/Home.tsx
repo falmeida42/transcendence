@@ -14,13 +14,6 @@ const Home = () => {
   const [page, setPage] = useState<number>(0);
 
   useEffect(() => {
-    console.log("page changer");
-    console.log({
-      isConnected,
-      username,
-      onQueue,
-      room,
-    });
     const changePage = () => {
       if (!isConnected) {
         setPage(0);

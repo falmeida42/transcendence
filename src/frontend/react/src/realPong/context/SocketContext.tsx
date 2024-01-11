@@ -75,6 +75,7 @@ const SocketProvider = (props: any) => {
       console.log("Conectado!");
       dispatch({ type: "CONNECTED", payload: true });
       if (localStorage.getItem("player")) {
+        console.log("Reconectando...");
         socket.emit(
           "Reconnect",
           JSON.parse(localStorage.getItem("player") || "")
@@ -88,7 +89,6 @@ const SocketProvider = (props: any) => {
 
     socket.on("RoomCreated", (room) => {
       dispatch({ type: "ROOM_CREATED", payload: room });
-      localStorage.setItem("player", JSON.stringify(state));
     });
 
     socket.on("MatchRefresh", (match) => {
@@ -97,24 +97,27 @@ const SocketProvider = (props: any) => {
 
     socket.on("QueueJoined", () => {
       dispatch({ type: "QUEUE_JOINED", payload: true });
-      localStorage.setItem("player", JSON.stringify(state));
     });
 
     socket.on("QueueLeft", () => {
       dispatch({ type: "QUEUE_JOINED", payload: false });
-      localStorage.setItem("player", JSON.stringify(state));
     });
 
     // TODO: Make the winner be displayed
     socket.on("GameOver", () => {
       dispatch({ type: "SET_WINNER", payload: undefined });
-      localStorage.setItem("player", JSON.stringify(state));
     });
 
     set_name = (name: string) => {
       if (!name.trim()) return;
       dispatch({ type: "NAME_SET", payload: name });
-      localStorage.setItem("player", JSON.stringify(state));
+      localStorage.setItem(
+        "player",
+        JSON.stringify({
+          username: name.trim(),
+          socketId: socket.id,
+        })
+      );
       socket.emit("Login", { name: name.trim() });
     };
 
