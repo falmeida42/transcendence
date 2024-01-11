@@ -43,6 +43,9 @@ export class UserService {
       where: { id: userId },
       include: { 
         receivedFriendRequests: {
+          where: {
+            type: "PENDING",
+          },
           include: { requestor: true },
         },
       },
@@ -142,6 +145,47 @@ export class UserService {
       return { message: 'Friend request created', friendRequest };
     } catch (error) {
       throw new Error('Error creating friend request');
+    }
+  }
+
+  async acceptFriendRequest(requesterId: string, requesteeId: string, id: string) {
+    try {
+      // Check if both users exist
+      const requestor = await this.prisma.user.findUnique({
+        where: { id: requesterId },
+      });
+  
+      const requestee = await this.prisma.user.findUnique({
+        where: { id: requesteeId },
+      });
+  
+      if (!requestor || !requestee) {
+        return { message: 'User not found' };
+      }
+ 
+      const friendRequest = await this.prisma.friendRequest.update({
+        where: {
+          id: id,
+        },
+        data: {
+          type: 'ACCEPTED',
+        },
+      });
+
+      await this.prisma.user.update({
+        where: {
+          id: requesteeId,
+        },
+        data: {
+          friends: {
+            connect: {id: requesterId}
+          }
+        }
+      });
+  
+      return { message: 'Friend request accepted', friendRequest };
+    } catch (error) {
+      throw new Error('Error accepting friend request');
     }
   }
   
