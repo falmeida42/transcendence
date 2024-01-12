@@ -13,7 +13,7 @@ interface props {
 
 const RealPong = (props: props) => {
   const { match } = useContext(SocketContext);
-  const { gameConfig, ball, player1, player2, status } = match!;
+  const { gameConfig, ball, player1, player2, status, message } = match!;
   // const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -121,7 +121,7 @@ const RealPong = (props: props) => {
         />
         <text
           x={(gameConfig.width / 2 - 20).toString()}
-          y="45"
+          y="55"
           style={{
             direction: "rtl",
             fill: "rgba(255, 255, 255, 0.7)",
@@ -132,7 +132,7 @@ const RealPong = (props: props) => {
         </text>
         <text
           x={(gameConfig.width / 2 + 20).toString()}
-          y="45"
+          y="55"
           style={{
             fill: "rgba(255, 255, 255, 0.7)",
             fontSize: "30px",
@@ -168,6 +168,13 @@ const RealPong = (props: props) => {
           />
         )}
       </SVG>
+      <br />
+      <br />
+      <br />
+      <br />
+      {message && (
+        <h1 style={{ fontSize: "30px", fontWeight: "bold" }}>{message}</h1>
+      )}
     </div>
   );
 };

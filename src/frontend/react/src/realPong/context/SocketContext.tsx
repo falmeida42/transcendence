@@ -17,6 +17,7 @@ type state = {
   match?: Match;
   onQueue: boolean;
   socketId?: string;
+  rooms?: Room[];
 };
 
 const initialState: state = {
@@ -36,6 +37,9 @@ const disconnect = () => {
   socket.off("RoomCreated");
   socket.off("MatchRefresh");
   socket.off("GameOver");
+  socket.off("QueueJoined");
+  socket.off("QueueLeft");
+  socket.off("RoomList");
   socket.disconnect();
 };
 
@@ -58,6 +62,8 @@ const SocketProvider = (props: any) => {
         return { ...state, match: action.payload, onQueue: false };
       case "QUEUE_JOINED":
         return { ...state, onQueue: action.payload };
+      case "ROOMS_UPDATE":
+        return { ...state, rooms: action.payload };
       case "SET_WINNER":
         return {
           ...state,
@@ -72,15 +78,7 @@ const SocketProvider = (props: any) => {
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("Conectado!");
       dispatch({ type: "CONNECTED", payload: true });
-      if (localStorage.getItem("player")) {
-        console.log("Reconectando...");
-        socket.emit(
-          "Reconnect",
-          JSON.parse(localStorage.getItem("player") || "")
-        );
-      }
     });
 
     socket.on("disconnect", () => {
@@ -108,16 +106,13 @@ const SocketProvider = (props: any) => {
       dispatch({ type: "SET_WINNER", payload: undefined });
     });
 
+    socket.on("RoomList", (rooms) => {
+      dispatch({ type: "ROOMS_UPDATE", payload: rooms });
+    });
+
     set_name = (name: string) => {
       if (!name.trim()) return;
       dispatch({ type: "NAME_SET", payload: name });
-      localStorage.setItem(
-        "player",
-        JSON.stringify({
-          username: name.trim(),
-          socketId: socket.id,
-        })
-      );
       socket.emit("Login", { name: name.trim() });
     };
 

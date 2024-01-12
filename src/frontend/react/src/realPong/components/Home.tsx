@@ -6,10 +6,12 @@ import {
   leaveQueue,
   set_name,
 } from "../context/SocketContext";
+import "../game.css";
 import RealPong from "./RealPong";
 
 const Home = () => {
-  const { isConnected, room, username, onQueue } = useContext(SocketContext);
+  const { isConnected, room, username, onQueue, rooms } =
+    useContext(SocketContext);
   const [name, setName] = useState<string>("");
   const [page, setPage] = useState<number>(0);
 
@@ -34,8 +36,7 @@ const Home = () => {
       setPage(5);
     };
     changePage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, room, username, onQueue]);
+  }, [isConnected, room, username, onQueue, rooms]);
 
   if (page === 0) {
     return (
@@ -81,17 +82,26 @@ const Home = () => {
     );
 
   if (page === 3) {
+    console.log(JSON.stringify(rooms));
     return (
-      <div>
-        <button onClick={() => createRoom(true)}>Play against AI</button>
-        <button
-          onClick={() => {
-            joinQueue();
-            console.log("entrei");
-          }}
-        >
-          Play a random
-        </button>
+      <div className="home">
+        <div className="rooms-list">
+          <ul>
+            {rooms?.length === 0 && (
+              <li className="room-item">No rooms available</li>
+            )}
+            {rooms &&
+              rooms.map((room) => (
+                <li key={room.id} className="room-item">
+                  {room.name}
+                </li>
+              ))}
+          </ul>
+        </div>
+        <div className="game-buttons">
+          <button onClick={() => createRoom(true)}>Play against AI</button>
+          <button onClick={() => joinQueue()}>Play a random</button>
+        </div>
       </div>
     );
   }

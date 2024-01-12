@@ -1,0 +1,21 @@
+.home {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+}
+
+.rooms-list {
+  height: 300px;
+  width: 300px;
+  margin-right: 300px;
+  overflow-y: scroll;
+}
+
+.room-item {
+  list-style-type: none;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+}
