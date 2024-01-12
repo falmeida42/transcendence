@@ -52,8 +52,8 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
       .catch((error) => console.error("Fetch error:", error));
     }, []);
 
-    console.log(users);
-    console.log("is visible: ", isVisible)
+    // console.log(users);
+    // console.log("is visible: ", isVisible)
 
     const toggleVisibility = (visibility: boolean) => {
         setIsVisibleWarning(visibility);
@@ -65,11 +65,13 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
     };
 
     const handleClickClose = () => {
+        setUserToAdd({id: "", username: "", userImage: ""})
         handleClose();
     };
 
     const handleClickYes = () => {
 
+        console.log("USER TO CREATE REQUEST TO:", userToAdd)
         if (userToAdd?.username === "")
         {
             setWarningText("This field is mandatory");
@@ -77,26 +79,36 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
             return;
         }
 
-        fetch(`http://localhost:3000/user/friend-request`, {
+        console.log("CREATE FRIEND REQUEST: DATA PASSED TO THE BACKEND", id, userToAdd.id);
+        fetch(`http://localhost:3000/user/create-friend-request`, {
                 method: "POST",
                 headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                requesterId : id,
-                requestedId : userToAdd.id
-                })
+                body: JSON.stringify(
+                    {
+                        requesterId : id,
+                        requesteeId : userToAdd.id
+                    }
+                )
             })
             .then(async (response) => {
-            if (!response.ok) {
+                if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.text();
-            return data ? JSON.parse(data) : null;
+                }
+                const data = await response.text();
+                return data ? JSON.parse(data) : null;
+            })
+            .then((data) => {
+                if (data) {
+                console.log("Request sent status: ", JSON.stringify(data));
+                } else {
+                console.log("No data received");
+                }
             })
             .catch((error) => console.error("Fetch error:", error));
-            handleClose()
+            handleClickClose()
     };
 
     return (

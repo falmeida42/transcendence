@@ -39,15 +39,11 @@ const Topbar = () => {
               <div className="icon_info">
                 <ul>
                   <li className="icons_list">
-                    <a href="#">
                       <i className="fa fa-power-off"></i>
-                    </a>
                   </li>
                   <li className="icons_list">
-                    <a href="#" onClick={handleClickNotif}>
-                      <i className="fa fa-bell"></i>
+                      <i onClick={handleClickNotif} className="fa fa-bell"></i>
                       {isVisibleNotif && <NotifList />}
-                    </a>
                   </li>
                   <li className="user_list">
                     <img

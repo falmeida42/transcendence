@@ -81,62 +81,64 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('not-friends')
   async getNotFriends(@GetMe('id') id: string) {
-      console.log("USER ID: ", id);  
+      this.logger.debug("USER ID: ", id);    
       return this.userService.getNotFriends(id);
   }
 
+  
+  // @UseGuards(JwtAuthGuard)
+  // @Post('friend-request')
+  // async addFriendRequest(@Req() req: any, @Body() body: any) {
+    //   try {
+  //     const result = await this.userService.addFriendRequest(body.requesterId, body.requesteeId);
+  //     return { statusCode: HttpStatus.CREATED, ...result };
+  //   } catch (error) {
+  //     return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error creating friend request', error };
+  //   }
+  // }
+  
   @UseGuards(JwtAuthGuard)
-  @Delete(':login')
-  async delete(@Param('login') login: string) {
-    const user = await this.prisma.user.findUnique({ where: { login } });
-
-    if (!user) {
-      return 'User not found';
-    }
-
-    return this.prisma.user.delete({ where: { login } });
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post(':username')
-  async changeUsername(
-    @GetMe() user: User,
-    @Param('username') username: string,
-  ) {
-    try {
-      this.prisma.user.update({
-        where: { id: user.id },
-        data: { username: username },
-      });
-    } catch (error) {
-      this.logger.error(error);
-      throw new Error(error.message);
-    }
-    //return this.userService.delete(login);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('friend-request')
+  @Post('create-friend-request')
   async addFriendRequest(@Req() req: any, @Body() body: any) {
+    this.logger.debug("AAAAA", body.requesteeId);
+    return await this.userService.addFriendRequest(body.requesterId, body.requesteeId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('accept-friend-request')
+  async acceptFriendRequest(@GetMe('id') id: string, @Body() body: any) {
+    this.logger.debug("ACCEPT FETCH BODY:");
     try {
-      const result = await this.userService.addFriendRequest(body.requesterId, body.requestedId);
+      const result = await this.userService.acceptFriendRequest(body.requesterId, id, body.requestId);
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
-      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error creating friend request', error };
+      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
     }
   }
-
+  
   @UseGuards(JwtAuthGuard)
   @Get('friend-requests')
   async getFriendRequests(@GetMe('id') id: string) {
-      console.log("USER ID: ", id);  
+     this.logger.debug("USER ID: ", id);  
       return this.userService.getFriendRequests(id);
   }
 
-  // @Post('add-friend')
-  // async addFriend(@Req() req: any, @Body() body: any) {
-
-  //   if (!body.friendlogin)
-  //   return this.userService.addFriend()
-  // }
+  
+    @UseGuards(JwtAuthGuard)
+    @Post(':username')
+    async changeUsername(
+      @GetMe() user: User,
+      @Param('username') username: string,
+    ) {
+      try {
+        this.prisma.user.update({
+          where: { id: user.id },
+          data: { username: username },
+        });
+      } catch (error) {
+        this.logger.error(error);
+        throw new Error(error.message);
+      }
+      //return this.userService.delete(login);
+    }
 }

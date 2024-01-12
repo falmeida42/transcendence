@@ -607,6 +607,11 @@ a:focus {
     list-style: none;
     margin: 0;
 }
+.icon_info ul li a {
+    color: #bebebe;
+    font-size: 18px;
+    font-weight: normal;
+}
 
 /* .icon_info ul li {
     float: left;
@@ -619,17 +624,12 @@ a:focus {
     margin: 15px 0 0 5px;
 } */
 
-.icon_info ul li .fa-question-circle {
+/* .icon_info ul li .fa-question-circle {
     font-size: 21px;
     position: relative;
     top: 1px;
 }
 
-.icon_info ul li a {
-    color: #bebebe;
-    font-size: 18px;
-    font-weight: normal;
-}
 
 .icon_info ul li a img {
     width: 35px;
@@ -675,7 +675,7 @@ a:focus {
     margin: 0;
     padding: 12px 0 12px 20px;
     height: auto;
-}
+} */
 
 .sidebar_toggle {
     border: none;

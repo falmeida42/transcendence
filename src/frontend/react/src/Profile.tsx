@@ -85,9 +85,9 @@ function Profile() {
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 
 	const handleClickAddFriend = () => {
-		console.log("Handle click add friend called")
+		//console.log("Handle click add friend called")
 		setIsVisibleAddFriend(!isVisibleAddFriend);
-		console.log(isVisibleAddFriend)
+		//console.log(isVisibleAddFriend)
 	};
 	const token = document.cookie
 		.split('; ')
