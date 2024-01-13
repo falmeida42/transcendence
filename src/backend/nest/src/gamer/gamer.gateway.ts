@@ -217,6 +217,27 @@ export class GamerGateway
     }
   }
 
+  @SubscribeMessage('JoinRoomSpec')
+  joinRoomSpec(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('roomName') roomName: string,
+  ) {
+    const player = this.players[client.id];
+    let room;
+    for (const key in this.rooms) {
+      if (this.rooms[key].name === roomName) {
+        room = this.rooms[key];
+        break;
+      }
+    }
+    if (!room) return;
+    client.join(roomName);
+    player.room = room.id;
+    room.spectators.push(client.id);
+    this.logger.log(`Client ${client.id} joined the room ${roomName}`);
+    client.emit('RoomJoined', room);
+  }
+
   removePlayer(playerId: string) {
     this.leaveRoom(playerId);
     delete this.players[playerId];
@@ -254,7 +275,7 @@ export class GamerGateway
 
       if (match.status === 'END') {
         delete this.rooms[roomId];
-        if (match) delete this.match[roomId];
+        delete this.match[roomId];
       }
       const rooms = [];
       const keys = Object.keys(this.rooms);
@@ -315,7 +336,17 @@ export class GamerGateway
     const match = this.match[roomId];
     if (!match) return;
     if (match.status === 'END') {
-      this.leaveRoom(roomId);
+      delete this.rooms[roomId];
+      delete this.match[roomId];
+      const rooms = [];
+      const keys = Object.keys(this.rooms);
+      for (let i = 0; i < keys.length; i++) {
+        if (this.rooms[keys[i]].player1 && this.rooms[keys[i]].player2) {
+          rooms.push(this.rooms[keys[i]]);
+        }
+      }
+      this.logger.log(rooms);
+      this.server.emit('RoomList', rooms);
       return;
     }
 

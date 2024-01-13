@@ -101,7 +101,6 @@ const SocketProvider = (props: any) => {
       dispatch({ type: "QUEUE_JOINED", payload: false });
     });
 
-    // TODO: Make the winner be displayed
     socket.on("GameOver", () => {
       dispatch({ type: "SET_WINNER", payload: undefined });
     });

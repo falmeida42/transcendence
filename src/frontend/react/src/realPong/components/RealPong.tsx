@@ -80,7 +80,8 @@ const RealPong = (props: props) => {
               y="0"
               width={gameConfig.width.toString()}
               height={gameConfig.height.toString()}
-              xlinkHref="https://cdnb.artstation.com/p/assets/images/images/060/251/939/large/kazu_arts-image4.jpg?1678154083"
+              // xlinkHref="https://cdnb.artstation.com/p/assets/images/images/060/251/939/large/kazu_arts-image4.jpg?1678154083"
+              xlinkHref="https://cdn.intra.42.fr/users/6e834c7689fb6ec761861181e5fc177c/maxthecorgi.png"
             ></image>
           </pattern>
         </defs>
@@ -168,6 +169,7 @@ const RealPong = (props: props) => {
           />
         )}
       </SVG>
+      <br />
       <br />
       <br />
       <br />
