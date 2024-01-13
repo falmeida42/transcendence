@@ -147,18 +147,6 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('update-room-privacy/:roomId')
-  async updateRoomPrivacy(
-    @Body('type') type: any,
-    @Body('password') password: any,
-    @Param('roomId') roomId: string,
-  ) {
-    if (type && password) {
-      await this.userService.updateChatRoomPrivacy(roomId, type, password);
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get('joinable-rooms')
   async joinableRooms(@GetMe('id') id: string) {
     try {
@@ -219,7 +207,7 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      this.logger.debug('getting channel participants');
+      // this.logger.debug('getting channel participants');
       const result = await this.userService.getChannelParticipants(chatId);
       return res.status(HttpStatus.OK).json({ result: result });
     } catch (error) {
@@ -230,16 +218,14 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('kick')
   async kickUser(
     @GetMe() user: User,
-    @Query('roomId') roomId: string,
-    @Query('participantId') kickedId: string,
+    @Body('roomId') roomId: string,
+    @Body('participantId') kickedId: string,
     @Res() res: Response,
   ) {
-    this.logger.debug('User: ', user);
-    this.logger.debug('Room: ', roomId);
-    this.logger.debug('Kicking: ', kickedId);
     try {
       if (await this.userService.isOwner(user.id, roomId)) {
         await this.userService.kickUser(kickedId, roomId);
@@ -258,7 +244,20 @@ export class UserController {
       }
     } catch (error) {
       this.logger.error(error);
-      res.status(error.code).json({ message: error.message }).send();
+      res.status(error.status).json({ message: error.message }).send();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('update-room-privacy/:roomId')
+  async updateRoomPrivacy(
+    @Body('type') type: any,
+    @Body('password') password: any,
+    @Param('roomId') roomId: string,
+  ) {
+    this.logger.debug('Entering update-room-privacy');
+    if (type && password) {
+      await this.userService.updateChatRoomPrivacy(roomId, type, password);
     }
   }
 }
