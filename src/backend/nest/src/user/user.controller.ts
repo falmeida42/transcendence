@@ -219,6 +219,20 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('can-kick')
+  async canKick(
+    @GetMe() user: User,
+    @Query('roomId') roomId: string,
+    @Res() res: Response,
+  ) {
+    const room = await this.userService.kickableUsers(user, roomId);
+    if (!room) {
+      return;
+    }
+    return res.status(HttpStatus.OK).json({ result: room });
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('kick')
   async kickUser(
     @GetMe() user: User,
@@ -226,6 +240,9 @@ export class UserController {
     @Body('participantId') kickedId: string,
     @Res() res: Response,
   ) {
+    this.logger.debug('User: ', user);
+    this.logger.debug('Room: ', roomId);
+    this.logger.debug('Kicking: ', kickedId);
     try {
       if (await this.userService.isOwner(user.id, roomId)) {
         await this.userService.kickUser(kickedId, roomId);

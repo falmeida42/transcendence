@@ -452,4 +452,34 @@ export class UserService {
       },
     });
   }
+
+  async kickableUsers(user: User, roomId: string) {
+    if (await this.isOwner(user.id, roomId)) {
+      return this.prisma.chatRoom.findMany({
+        where: { id: roomId },
+        include: {
+          participants: {
+            where: { NOT: { id: user.id } },
+          },
+          admins: {
+            where: { NOT: { id: user.id } },
+          },
+          owner: false,
+        },
+      });
+    } else if (await this.isAdmin(user.id, roomId)) {
+      return this.prisma.chatRoom.findMany({
+        where: { id: roomId },
+        include: {
+          participants: {
+            where: { NOT: { id: user.id } },
+          },
+          admins: false,
+          owner: false,
+        },
+      });
+    } else {
+      return null;
+    }
+  }
 }
