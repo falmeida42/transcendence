@@ -9,12 +9,12 @@ export class UserService {
   private readonly logger = new Logger('UserService');
 
   async getUsers() {
-    return this.prisma.user.findMany();
+    return await this.prisma.user.findMany();
   }
 
   async getUserById(userId: string): Promise<UserDto | null> {
     try {
-      return this.prisma.user.findUnique({ where: { id: userId } });
+      return await this.prisma.user.findUnique({ where: { id: userId } });
     } catch (error) {
       this.logger.error(error);
       throw new Error(`Failed to return user with id ${userId}`);
@@ -22,7 +22,14 @@ export class UserService {
   }
 
   async getUserByLogin(userLogin: string): Promise<UserDto | null> {
-    return this.prisma.user.findUnique({ where: { login: userLogin } });
+    return await this.prisma.user.findUnique({ where: { login: userLogin } });
+  }
+
+  async updateUserById(userId: string, userData: Partial<UserDto>): Promise<UserDto | null> {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: userData,
+    });
   }
 
   async getAll(): Promise<UserDto[] | null> {
@@ -34,8 +41,14 @@ export class UserService {
       where: { id: userId }, // Assuming id is a numeric type
       include: { friends: true },
     });
-  
     return user?.friends || null;
+  }
+
+  async create(user: UserDto) {
+    return await this.prisma.user.create({
+      data: user,
+    });
+    //return user?.friends || null;
   }
 
   async getFriendRequests(userId: string) {
@@ -205,7 +218,7 @@ export class UserService {
   }
 
   async set2FAOn(id: string) {
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id: id },
       data: { twoFactorAuthEnabled: true },
     });

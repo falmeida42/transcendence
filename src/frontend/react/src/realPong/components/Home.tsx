@@ -7,10 +7,12 @@ import {
   set_name,
 } from "../context/SocketContext";
 import RealPong from "./RealPong";
+import { useApi } from "../../apiStore";
 
 const Home = () => {
   const { isConnected, room, username, onQueue, match, winner } =
     useContext(SocketContext);
+  const {id} = useApi();
   const [name, setName] = useState<string>("");
   const [page, setPage] = useState<number>(0);
 
@@ -68,7 +70,7 @@ const Home = () => {
             if (e.key === "Enter") set_name(name);
           }}
         />
-        <button onClick={() => set_name(name)}>Set Name</button>
+        <button onClick={() => set_name(id)}>Set Name</button>
       </div>
     );
   }

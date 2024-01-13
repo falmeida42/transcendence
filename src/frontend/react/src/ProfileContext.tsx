@@ -87,7 +87,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
 
   }, []);
 
-  console.log("YOUR FRIENDS:", userFriends);
+  // console.log("YOUR FRIENDS:", userFriends);
 
   const contextValue: ProfileContextProps = {
     userFriends: userFriends,

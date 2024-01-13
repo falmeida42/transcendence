@@ -37,7 +37,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
-        console.log("YOUR NON_FRIENDS ", data)
+        // console.log("YOUR NON_FRIENDS ", data)
         return data ? JSON.parse(data) : null;
       })
       .then((data) => {

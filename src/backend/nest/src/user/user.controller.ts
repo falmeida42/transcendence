@@ -6,15 +6,15 @@ import {
   Body,
   HttpStatus,
   Param,
-  UseGuards,
   Post,
-  Req
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { GetMe } from 'src/decorators';
-import { JwtAuthGuard } from '../auth/guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
+import { GetMe } from 'src/decorators';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtAuthGuard } from '../auth/guard';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -43,17 +43,25 @@ export class UserController {
     return user;
   }
 
-    @UseGuards(TwoFAGuard)
-    @Get('auth')
-    async getAuth(@GetMe() user: User) {
-      return (await this.findById(String(user.id))).twoFactorAuthEnabled;
-    }
+  @UseGuards(JwtAuthGuard)
+  @Post('me')
+  async updateMe(@GetMe() user: User, @Body() userData: any) {
+    const updatedUser = await this.userService.updateUserById(String(user.id), userData);
+    return updatedUser;
+  }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('find/:id')
-    async findById(@Param('id') id: string) {
-        return this.userService.getUserById(id);
-      }
+  @UseGuards(TwoFAGuard)
+  @Get('auth')
+  async getAuth(@GetMe() user: User) {
+    return (await this.findById(String(user.id))).twoFactorAuthEnabled;
+    
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('find/:id')
+  async findById(@Param('id') id: string) {
+      return this.userService.getUserById(id);
+    }
 
 
 
@@ -129,4 +137,59 @@ export class UserController {
       }
       //return this.userService.delete(login);
     }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/matches/:id')
+  async getMatches(@Param('id') id: string) {
+    try {
+      this.logger.debug(id);
+      let matches = [];
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wins: true,
+          losses: true,
+        },
+      });
+      // const wins = await this.prisma.match.findMany({
+      //   where: {
+      //     userwinId: id,
+      //   },
+      // });
+      // const losses = await this.prisma.match.findMany({
+      //   where: {
+      //     userlosId: id,
+      //   },
+      // });
+      // matches = [...wins, ...losses];
+      // this.logger.debug();
+      matches = [...user.wins, ...user.losses].sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+      if (!matches) throw new Error('teste');
+      // const matches = user.
+      return matches;
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Get(':id')
+  // async findById(@Param('id') id: string) {
+  //   return this.userService.getUserById(id);
+  // }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':login')
+  async delete(@Param('login') login: string) {
+    const user = await this.prisma.user.findUnique({ where: { login } });
+
+    if (!user) {
+      return 'User not found';
+    }
+  }
+
 }

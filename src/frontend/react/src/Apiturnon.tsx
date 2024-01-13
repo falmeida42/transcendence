@@ -14,8 +14,6 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
   const {setauth, settwofa} = useApi();
 
   const handleSendClick = async () => {
-    // Move the logic from Useturnoff to handleSendClick
-    // Make sure not to call hooks here
     try {
       const newUserData = name;
       const token = document.cookie
@@ -25,7 +23,6 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
       if (token === undefined)
         return;
 
-      // console.log(token, 'turn on');
 
       const res = await fetch('http://localhost:3000/auth/2fa/turn-on', {
         method: 'POST',
@@ -35,11 +32,9 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
         },
         body: JSON.stringify({code: newUserData}),
       })
-      // console.log(res.status);
       if (!res.ok) {
         if (res.status === 401) {
         console.log('401');
-        // navigate('/Profile');
         setErr("WRONG!");
         const data = await res.json();
         console.log('401', JSON.stringify(data));
@@ -51,12 +46,9 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
       handleClose();
       setErr("DONE!")
       } catch {
-        // console.log('catch', JSON.stringify(error));
         navigate('/Profile');
         return;
       }
-
-      // return;
   };
 
   return (

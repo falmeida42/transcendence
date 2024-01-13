@@ -5,6 +5,8 @@ import "./Profile.css";
 import AddFriendPopup from './AddFriendPopUp';
 import { ProfileContext, updateUserFriends } from './ProfileContext';
 import TwoFaPopup from './TwoFAPopup';
+import getHookers from "./Hookers";
+import MatchHistory from "./MatchHistory";
 
 interface User {
 	id: string,
@@ -13,43 +15,58 @@ interface User {
 }
 
 function Profile() {
+  const {
+    id,
+    user,
+    first_name,
+    last_name,
+    login,
+    email,
+    image,
+    twofa,
+    setUsername,
+    setImage,
+  } = useApi();
+  const {isLoading, serverError, apiData} = getHookers(`/user/matches/${id}`)
 
-	const { user, first_name, last_name, login, email, image, twofa, setUsername, setImage } = useApi();
+  // console.log(isLoading);
 
 	/////////////// Username update /////////////////
-
+	
 	const [isEditing, setIsEditing] = useState(false);
-	const [textValue, setTextValue] = useState(login);
-	const [name, setName] = useState("");
+	const [textValue, setTextValue] = useState<string | undefined>(user);
 
 	const handleEditClick = () => {
 		setIsEditing(true);
 	};
-
+	
 	const handleSubmitClick = () => {
-		setIsEditing(false);
-		setUsername(textValue);
-		updateFunction();
+    if (textValue)
+    {
+      setIsEditing(false);
+      setUsername(textValue);
+      useUpdateUserData({username: textValue, image: image})
+    }
 	};
-
+	
 	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setTextValue(event.target.value);
 	};
-
+	
 
 	/////////////// Image update /////////////////
-
-
+	
+	
 	const [isEditingImage, setIsEditingImage] = useState(false);
-	const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
-
-	const handleEditClickImage = () => {
+  	const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
+	  
+	  const handleEditClickImage = () => {
 		setIsEditingImage(true);
 	};
-
+	
 	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files && event.target.files[0];
-
+		
 		if (file) {
 			const reader = new FileReader();
 			reader.onload = (e) => {
@@ -58,18 +75,14 @@ function Profile() {
 			reader.readAsDataURL(file);
 		}
 	};
-
-	const { updateFunction } = useUpdateUserData({
-		updateFunction: () => ({
-			username: textValue,
-			image: selectedImage,
-		}),
-	});
-
+	
 	const handleSubmitClickImage = () => {
-		setIsEditingImage(false);
-		setImage(selectedImage);
-		updateFunction();
+    if (selectedImage)
+    {
+      setIsEditingImage(false);
+      setImage(selectedImage);
+      useUpdateUserData({username: user, image: selectedImage})
+    }
 	};
 
 	const { userFriends } = useContext(ProfileContext) ?? {};
@@ -113,7 +126,7 @@ function Profile() {
 									<div className="profile_img">
 										<img
 											style={{ maxHeight: 300 }}
-											src={selectedImage || 'placeholder.jpg'}
+											src={!isEditingImage && !selectedImage ? image : selectedImage}
 											alt="Selected"
 											className=" rounded-circle"
 										/>
@@ -148,7 +161,8 @@ function Profile() {
 										type="text"
 										id="textField"
 										className="form-control"
-										value={textValue}
+                    maxLength={12}
+										value={!isEditing && !textValue ? user : textValue}
 										readOnly={!isEditing}
 										onChange={handleTextChange}
 										style={{ maxHeight: "25px", maxWidth: "200px" }}
@@ -205,28 +219,7 @@ function Profile() {
 						</div>
 					</nav>
 					<div className="tab-content" id="nav-tabContent">
-						<div className="tab-pane fade show active" id="recent_activity" role="tabpanel" aria-labelledby="nav-home-tab">
-							<div className="msg_list_main">
-								<ul className="msg_list">
-									<li>
-										<span><img src="images/layout_img/msg2.png" className="img-responsive" alt="#"></img></span>
-										<span>
-											<span className="name_user">Win against Taison Jack</span>
-											<span className="msg_user">11-4</span>
-											<span className="time_ago">12 min ago</span>
-										</span>
-									</li>
-									<li>
-										<span><img src="images/layout_img/msg3.png" className="img-responsive" alt="#"></img></span>
-										<span>
-											<span className="name_user">Loss against Mike John</span>
-											<span className="msg_user">1-7</span>
-											<span className="time_ago">12 min ago</span>
-										</span>
-									</li>
-								</ul>
-							</div>
-						</div>
+          {/* <MatchHistory id={id}/> */}
 						<div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-home-tab">
 							<div className="msg_list_main">
 								<ul className="msg_list">

@@ -5,7 +5,8 @@ import NotifList from "./NotifList.tsx";
 
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
-  const { login, image } = useApi();
+  const { user, image } = useApi();
+  console.log("USER TOPBAR:", user);
   const [isVisibleNotif, setIsVisibleNotif] = useState(false);
 
   const handleClickNotif = () => {
@@ -54,8 +55,8 @@ const Topbar = () => {
                     />
                   </li>
                   <li className="user_list">
-                    <a href="#Profile">
-                      <span className="name_user">{login}</span>
+                    <a href="/Profile">
+                      <span className="name_user">{user}</span>
                     </a>
                   </li>
                 </ul>

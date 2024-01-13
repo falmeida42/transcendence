@@ -11,8 +11,6 @@ const Usetwofa = ({ handleClose }: UsetwofaProps) => {
   const { settwofa } = useApi();
 
   const handleSendClick = async () => {
-    // Move the logic from Usetwofa to handleSendClick
-    // Make sure not to call hooks here
     try {
       const token = document.cookie
         .split('; ')
@@ -21,19 +19,23 @@ const Usetwofa = ({ handleClose }: UsetwofaProps) => {
       if (token === undefined)
         return;
 
-      // console.log(token, 'turn on');
 
-      await fetch('http://localhost:3000/auth/2fa/turn-off', {
+      const response = await fetch('http://localhost:3000/auth/2fa/turn-off', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       })
+      if (!response.ok){
+        if (response.status === 401) {
+          navigate('/login');
+        }
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
-    // setauth(true);
     settwofa(false);
     //navigate('/Profile');
     handleClose();
