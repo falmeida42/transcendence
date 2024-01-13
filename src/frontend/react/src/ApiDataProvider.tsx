@@ -38,6 +38,14 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
             "Content-Type": "application/json",
           },
         });
+
+        const friends = await fetch("http://localhost:3000/user/friends", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!response.ok) {
           if (response.status === 401) {
             // Redirect to the login page
@@ -47,6 +55,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         }
 
         const data = await response.json();
+        const dataFriends = await friends.json();
         // console.log(data);
         setInfo(
           data.id,
@@ -56,7 +65,8 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
           data.login,
           data.email,
           data.image,
-          data.twoFactorAuthEnabled
+          data.twoFactorAuthEnabled,
+          dataFriends
         );
       } catch (error) {
         console.error(error);

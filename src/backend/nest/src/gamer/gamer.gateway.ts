@@ -19,10 +19,7 @@ import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: {
-    origin: ['http://localhost:5173'],
-    credentials: true,
-  },
+  cors: { origin: 'http://localhost:5173', credentials: true },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -94,7 +91,6 @@ export class GamerGateway
       againstAi ? 'vs AI' : ''
     }`;
     client.join(roomId);
-    this.logger.log(`Room ${roomId}`);
 
     this.rooms[client.id] = {
       id: client.id,
@@ -220,22 +216,16 @@ export class GamerGateway
   @SubscribeMessage('JoinRoomSpec')
   joinRoomSpec(
     @ConnectedSocket() client: Socket,
-    @MessageBody('roomName') roomName: string,
+    @MessageBody('roomId') roomId: string,
   ) {
     const player = this.players[client.id];
-    let room;
-    for (const key in this.rooms) {
-      if (this.rooms[key].name === roomName) {
-        room = this.rooms[key];
-        break;
-      }
-    }
+    const room = this.rooms[roomId];
     if (!room) return;
-    client.join(roomName);
+    client.join(room.name);
     player.room = room.id;
     room.spectators.push(client.id);
-    this.logger.log(`Client ${client.id} joined the room ${roomName}`);
-    client.emit('RoomJoined', room);
+    this.logger.log(`Client ${client.id} joined the room ${room.name}`);
+    client.emit('RoomCreated', room);
   }
 
   removePlayer(playerId: string) {

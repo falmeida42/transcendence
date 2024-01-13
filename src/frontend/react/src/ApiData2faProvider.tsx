@@ -48,7 +48,7 @@ const ApiData2faProvider: React.FC<ApiData2faProviderProps> = (props) => {
 
         const data = await UpResponse.json();
         console.log(data);
-        setInfo("", "", "", "", "", "", "", data);
+        setInfo("", "", "", "", "", "", "", data, "");
       } catch (error) {
         console.error(error);
       }

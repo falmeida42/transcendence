@@ -3,6 +3,7 @@ import {
   SocketContext,
   createRoom,
   joinQueue,
+  joinRoomSpec,
   leaveQueue,
   set_name,
 } from "../context/SocketContext";
@@ -92,7 +93,14 @@ const Home = () => {
             )}
             {rooms &&
               rooms.map((room) => (
-                <li key={room.id} className="room-item">
+                <li
+                  key={room.id}
+                  className="room-item"
+                  onClick={() => {
+                    console.log(room.id);
+                    joinRoomSpec(room.id);
+                  }}
+                >
                   {room.name}
                 </li>
               ))}

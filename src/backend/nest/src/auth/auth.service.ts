@@ -46,7 +46,6 @@ export class AuthService {
           twoFactorAuthEnabled: false,
         },
       });
-      // this.logger.debug('New user: ', newUser);
 
       if (newUser) {
         const accessToken = await this.signAccessToken(Number(newUser.id));
@@ -92,24 +91,20 @@ export class AuthService {
   }
 
   async is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
-    // this.logger.debug(twoFactorAuthenticationCode, user);
-
     if (!user.twoFactorAuthSecret) {
       throw new ForbiddenException('2FA secret is not set');
     }
-    // this.logger.debug(twoFactorAuthenticationCode, user.twoFactorAuthSecret);
     const res = await authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,
     });
-    // this.logger.debug('res',res)
     return res;
   }
 
   async is2FAActive(id: string) {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
-        where: { id: id },
+        where: { id },
       });
       return user.twoFactorAuthEnabled;
     } catch (error) {

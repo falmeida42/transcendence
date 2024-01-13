@@ -151,12 +151,17 @@ const pauseGame = () => {
   socket.emit("PauseMatch");
 };
 
+const joinRoomSpec = (roomName: string) => {
+  socket.emit("JoinRoomSpec", { roomName });
+};
+
 export {
   SocketContext,
   SocketProvider,
   createRoom,
   gameLoaded,
   joinQueue,
+  joinRoomSpec,
   leaveQueue,
   pauseGame,
   sendKey,

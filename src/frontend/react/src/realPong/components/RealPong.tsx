@@ -169,11 +169,6 @@ const RealPong = (props: props) => {
           />
         )}
       </SVG>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
       {message && (
         <h1 style={{ fontSize: "30px", fontWeight: "bold" }}>{message}</h1>
       )}

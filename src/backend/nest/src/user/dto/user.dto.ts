@@ -33,4 +33,8 @@ export class UserDto {
 
   @IsBoolean()
   twoFactorAuthEnabled: boolean;
+
+  @IsString()
+  @IsOptional()
+  chatRoomId: string;
 }

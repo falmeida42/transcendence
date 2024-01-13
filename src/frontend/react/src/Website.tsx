@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import "./App.css";
 import Bars from "./Bars.tsx";
-import Chat from "./Chat.tsx";
 import Profile from "./Profile.tsx";
 import { useHashStore } from "./hashStore.tsx";
 // import { useApi } from "./apiStore.tsx";
 import { Route, Switch } from "wouter";
 import ApiDataProvider from "./ApiDataProvider.tsx";
+import Chat from "./chat/Chat.tsx";
 import Home from "./realPong/components/Home.tsx";
 import { SocketProvider } from "./realPong/context/SocketContext.tsx";
 
