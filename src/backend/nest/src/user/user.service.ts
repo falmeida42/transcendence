@@ -148,42 +148,45 @@ export class UserService {
     }
   }
 
-  async acceptFriendRequest(requesterId: string, requesteeId: string, id: string) {
+  async handleFriendRequest(requesterId: string, requesteeId: string, id: string, type: string) {
     try {
-      // // Check if both users exist
-      // const requestor = await this.prisma.user.findUnique({
-      //   where: { id: requesterId },
-      // });
-  
-      // const requestee = await this.prisma.user.findUnique({
-      //   where: { id: requesteeId },
-      // });
-  
-      // if (!requestor || !requestee) {
-      //   return { message: 'User not found' };
-      // }
- 
-      const friendRequest = await this.prisma.friendRequest.update({
-        where: {
-          id: id,
-        },
-        data: {
-          type: 'ACCEPTED',
-        },
-      });
-
-      await this.prisma.user.update({
-        where: {
-          id: requesteeId,
-        },
-        data: {
-          friends: {
-            connect: { id: requesterId }
+      if (type === "ACCEPTED")
+      {
+        const friendRequest = await this.prisma.friendRequest.update({
+          where: {
+            id: id,
           },
-        },
-      });
+          data: {
+            type: 'ACCEPTED',
+          },
+        });
   
-      return { message: 'Friend request accepted', friendRequest };
+        await this.prisma.user.update({
+          where: {
+            id: requesteeId,
+          },
+          data: {
+            friends: {
+              connect: { id: requesterId }
+            },
+          },
+        });
+        return { message: 'Friend request accepted', friendRequest };
+      }
+      else
+      {
+        const friendRequest = await this.prisma.friendRequest.update({
+          where: {
+            id: id,
+          },
+          data: {
+            type: 'CANCELED',
+          },
+        });
+  
+        return { message: 'Friend request denied', friendRequest };
+      }
+  
     } catch (error) {
       throw new Error('Error accepting friend request');
     }

@@ -1,21 +1,15 @@
 import { useState, useEffect } from "react";
 import { updateUserFriends } from './ProfileContext';
-import Notif from "./Notif";
 
-interface NotifListProps {
-    
-}
-
-interface FriendRequest {
-    id: string;
-    requestor_id: string;
-    requestor_username: string;
+interface NotifProps {
     requestor_image: string;
+    requestor_username: string;
+    requestor_id: string;
+    id: string;
 }
 
-const NotifList: React.FC<NotifListProps> = () => {
-
-const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+const Notif: React.FC<NotifProps> = (props) => {
+    const[isVisible, setIsVisible] = useState(true);
 
 const token = document.cookie
     .split('; ')
@@ -25,36 +19,7 @@ if (token === undefined)
     return;
 console.log(token);
 
-useEffect(() => {
 
-    fetch(`http://localhost:3000/user/friend-requests`, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
-    })
-        .then(async (response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.json();
-            return data as FriendRequest[]; 
-        })
-        .then((data) => {
-            console.log("FR Return: ", data);
-            const mappedRequests = data.map((request: any) => ({
-                id: request.id,
-                requestor_id: request.requestor.id,
-                requestor_username: request.requestor.login,
-                requestor_image: request.requestor.image
-            }));
-
-            setFriendRequests([...mappedRequests]);
-        })
-        .catch((error) => console.error("Fetch error:", error));
-
-}, []);
 
 const acceptRequest = (requestor_id: string, id: string) =>
 {
@@ -87,6 +52,7 @@ const acceptRequest = (requestor_id: string, id: string) =>
             .then( updateUserFriends )
             .catch((error) => console.error("Fetch error:", error));
         };
+        setIsVisible(!isVisible);
 }
 
 const rejectRequest = (requestor_id: string, id: string) =>
@@ -120,20 +86,21 @@ const rejectRequest = (requestor_id: string, id: string) =>
             .then( updateUserFriends )
             .catch((error) => console.error("Fetch error:", error));
         };
+        setIsVisible(!isVisible);
 }
 
 
 return (
-    <div className="request-container">
-        <ul className="request-list">
-            {
-                friendRequests.map((request: FriendRequest) => (
-                    <Notif requestor_id={request.requestor_id} requestor_image={request.requestor_image} 
-                    requestor_username={request.requestor_username} id={request.id}></Notif>
-                ))
+        <div>
+            { isVisible &&
+            <li className="request-item">
+                <img src={props.requestor_image} className="mr-2" alt="#"></img>
+                <p className="mr-2">Friend request from <strong>{props.requestor_username}</strong></p>
+                <i onClick={() => acceptRequest(props.requestor_id, props.id)} className="fa fa-check mr-1"></i>
+                <i onClick={() => rejectRequest(props.requestor_id, props.id)} className="fa fa-times"></i>
+            </li>
             }
-        </ul>
-    </div>
+        </div>
 )}
 
-export default NotifList;
+export default Notif;

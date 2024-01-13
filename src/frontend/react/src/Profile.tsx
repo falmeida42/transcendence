@@ -1,12 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import { useApi } from './apiStore';
 import useUpdateUserData from './UpdateUserData';
-import Usetwofa from './Apiturnon';
-import Qrcode from './Qrcode';
-import Apiturnoff from './Apiturnoff';
 import "./Profile.css";
 import AddFriendPopup from './AddFriendPopUp';
 import { ProfileContext, updateUserFriends } from './ProfileContext';
+import TwoFaPopup from './TwoFAPopup';
 
 interface User {
 	id: string,
@@ -30,10 +28,8 @@ function Profile() {
 
 	const handleSubmitClick = () => {
 		setIsEditing(false);
-		// You can add logic here to handle the submission of changes
 		setUsername(textValue);
 		updateFunction();
-		// console.log('Submitted changes:', textValue);
 	};
 
 	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,72 +61,40 @@ function Profile() {
 
 	const { updateFunction } = useUpdateUserData({
 		updateFunction: () => ({
-			username: textValue, // Assuming you want to update the username with the current textValue
+			username: textValue,
 			image: selectedImage,
 		}),
 	});
 
 	const handleSubmitClickImage = () => {
 		setIsEditingImage(false);
-		// You can add logic here to handle the submission of the new image
 		setImage(selectedImage);
 		updateFunction();
-		// console.log('Submitted new image:', selectedImage);
-	};
-
-	const handleClickCode = () => {
-		Usetwofa({ code: name });
 	};
 
 	const { userFriends } = useContext(ProfileContext) ?? {};
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
+	const [isVisible2FA, setIsVisible2FA] = useState(false);
 
 	const handleClickAddFriend = () => {
-		//console.log("Handle click add friend called")
 		setIsVisibleAddFriend(!isVisibleAddFriend);
-		//console.log(isVisibleAddFriend)
 	};
+
+	const handleClick2FA = () => {
+		setIsVisible2FA(!isVisible2FA);
+	};
+
 	const token = document.cookie
 		.split('; ')
 		.find((row) => row.startsWith('token='))
 		?.split('=')[1];
 	if (token === undefined)
 		return;
-	
-	// useEffect(() => {
-	// 	// const urlParams = new URLSearchParams(window.location.search);
-
-
-	// 	fetch(`http://localhost:3000/user/friends`, {
-	// 		method: "GET",
-	// 		headers: {
-	// 			Authorization: `Bearer ${token}`,
-	// 			"Content-Type": "application/json",
-	// 		},
-	// 	})
-	// 		.then(async (response) => {
-	// 			if (!response.ok) {
-	// 				throw new Error(`HTTP error! Status: ${response.status}`);
-	// 			}
-	// 			const data = await response.text();
-	// 			return data ? JSON.parse(data) : null;
-	// 		})
-	// 		.then((data) => {
-	// 			const mappedFriends = data.map((friend: any) => ({
-	// 				id: friend.id,
-	// 				username: friend.login,
-	// 				userImage: friend.image,
-	// 			}));
-
-	// 			setFriends([...mappedFriends]);
-	// 		})
-	// 		.catch((error) => console.error("Fetch error:", error));
-
-	// }, []);
 
 	return (
 		<div className="container-fluid profile_container">
 			<AddFriendPopup isVisible={isVisibleAddFriend} handleClose={handleClickAddFriend} token={token}/>
+			<TwoFaPopup isVisible={isVisible2FA} handleClose={handleClick2FA} token={token}/>				
 				<div className="profile_contant flex-item">
 					<div className="form-group">
 						<div className="input-group d-flex flex-column">
@@ -211,8 +175,8 @@ function Profile() {
 
                 			<p className='mb-4'><i className="fa fa-envelope-o"></i> : {email}</p>
             		
-					<button className="btn btn-lg btn-secondary mr-2" onClick={handleClickAddFriend}>
-						Enable 2FA
+					<button className="btn btn-lg btn-secondary mr-2" onClick={handleClick2FA}>
+						Manage 2FA
 					</button>
 					<button className="btn btn-lg btn-secondary mr-2" onClick={handleClickAddFriend}>
 						Add Friend
@@ -233,23 +197,6 @@ function Profile() {
 
 			</div>
 
-			{/* <div className="full inner_elements margin_top_30">
-				<div className="tab_style2">
-					{twofa === false && <Qrcode />}
-					<div className="user_progress_bar">
-						{twofa === true && <Apiturnoff />}
-						<h2>
-							<span className="skill">Match results (wins | losses)<span className="info_valume"></span></span>
-							<div className="progress skill-bar">
-								<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style={{ width: '75%' }}> <h5 style={{ textAlign: 'right', color: 'white', paddingRight: '4%', marginLeft: '-20px' }}>12</h5>
-								</div>
-								<h5 style={{ lineHeight: "30px", paddingLeft: '3%', marginRight: '-39px' }}>3</h5 >
-							</div>
-						</h2>
-					</div>
-
-					</div>
-				</div> */}
 				<div className="tabbar">
 					<nav>
 						<div className="nav nav-tabs" id="nav-tab" role="tablist">

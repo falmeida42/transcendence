@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "./apiStore";
 import "./Profile.css"
+import { updateUserFriends } from "./ProfileContext";
 
 interface AddFriendPopupProps {
     isVisible: boolean;
@@ -50,10 +51,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
         setUsers([...mappedUsers])
       })
       .catch((error) => console.error("Fetch error:", error));
-    }, []);
-
-    // console.log(users);
-    // console.log("is visible: ", isVisible)
+    }, [updateUserFriends]);
 
     const toggleVisibility = (visibility: boolean) => {
         setIsVisibleWarning(visibility);

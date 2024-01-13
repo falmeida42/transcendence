@@ -84,18 +84,6 @@ export class UserController {
       this.logger.debug("USER ID: ", id);    
       return this.userService.getNotFriends(id);
   }
-
-  
-  // @UseGuards(JwtAuthGuard)
-  // @Post('friend-request')
-  // async addFriendRequest(@Req() req: any, @Body() body: any) {
-    //   try {
-  //     const result = await this.userService.addFriendRequest(body.requesterId, body.requesteeId);
-  //     return { statusCode: HttpStatus.CREATED, ...result };
-  //   } catch (error) {
-  //     return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error creating friend request', error };
-  //   }
-  // }
   
   @UseGuards(JwtAuthGuard)
   @Post('create-friend-request')
@@ -105,11 +93,11 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('accept-friend-request')
-  async acceptFriendRequest(@GetMe('id') id: string, @Body() body: any) {
+  @Post('handle-friend-request')
+  async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
     this.logger.debug("ACCEPT FETCH BODY:");
     try {
-      const result = await this.userService.acceptFriendRequest(body.requesterId, id, body.requestId);
+      const result = await this.userService.handleFriendRequest(body.requesterId, id, body.requestId, body.type);
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
       return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };

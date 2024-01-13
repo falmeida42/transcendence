@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useApi } from './apiStore';
 import { navigate } from 'wouter/use-location';
+import "./Profile.css"
 
 interface UseturnoffProps {
   code: string;
+  handleClose: () => void;
 }
 
-const Useturnoff = ({ code }: UseturnoffProps) => {
+const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
   const [name, setName] = useState(code);
   const [err, setErr] = useState("SEND");
   const {setauth, settwofa} = useApi();
@@ -45,7 +47,8 @@ const Useturnoff = ({ code }: UseturnoffProps) => {
       }
       setauth(true);
       settwofa(true);
-      navigate('/');
+      // navigate('/Profile');
+      handleClose();
       setErr("DONE!")
       } catch {
         // console.log('catch', JSON.stringify(error));
@@ -61,6 +64,7 @@ const Useturnoff = ({ code }: UseturnoffProps) => {
       <input
         type="string"
         name="name"
+        className='password-input popup-input'
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => {
@@ -69,7 +73,9 @@ const Useturnoff = ({ code }: UseturnoffProps) => {
           }
         }}
       />
-      <button onClick={handleSendClick}>{err}</button>
+      <div className="modal-footer">
+        <button className="btn btn-secondary" onClick={handleSendClick}>{err}</button>
+      </div>
     </div>
   );
 };

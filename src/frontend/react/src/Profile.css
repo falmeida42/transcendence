@@ -139,3 +139,32 @@
     overflow-x: visible;
     
   }
+
+  .icons_list {
+    i {
+      cursor: pointer;
+    }
+  }
+
+  .password-input {
+    border-radius: 3px;
+    border: none;
+    padding: 14px;
+    color: black;
+    background: #F2F5F8;
+    width: 100%;
+    font-size: 14px;
+  }
+
+  
+  #twofa {
+    top: 20%;
+
+    .modal-footer {
+      border-top: 0px;
+    }
+    
+    p {
+      margin-bottom: 0;
+    }
+  }
