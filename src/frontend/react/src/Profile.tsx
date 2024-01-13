@@ -7,6 +7,7 @@ import { ProfileContext, updateUserFriends } from './ProfileContext';
 import TwoFaPopup from './TwoFAPopup';
 import getHookers from "./Hookers";
 import MatchHistory from "./MatchHistory";
+import BlockPopup from './BlockPopUp';
 
 interface User {
 	id: string,
@@ -89,6 +90,7 @@ function Profile() {
 	const { userFriends } = useContext(ProfileContext) ?? {};
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 	const [isVisible2FA, setIsVisible2FA] = useState(false);
+  const [isVisibleBlock, setIsVisibleBlock] = useState(false);
   
 	const handleClickAddFriend = () => {
     setIsVisibleAddFriend(!isVisibleAddFriend);
@@ -96,6 +98,10 @@ function Profile() {
   
 	const handleClick2FA = () => {
     setIsVisible2FA(!isVisible2FA);
+	};
+
+  const handleClickBlock = () => {
+    setIsVisibleBlock(!isVisibleBlock);
 	};
   
 	const token = document.cookie
@@ -110,7 +116,8 @@ function Profile() {
   return (
     <div className="container-fluid profile_container">
 			<AddFriendPopup isVisible={isVisibleAddFriend} handleClose={handleClickAddFriend} token={token}/>
-			<TwoFaPopup isVisible={isVisible2FA} handleClose={handleClick2FA} token={token}/>				
+			<TwoFaPopup isVisible={isVisible2FA} handleClose={handleClick2FA} token={token}/>
+      <BlockPopup isVisible={isVisibleBlock} handleClose={handleClickBlock} token={token}/>					
 				<div className="profile_contant flex-item">
 					<div className="form-group">
 						<div className="input-group d-flex flex-column">
@@ -192,11 +199,14 @@ function Profile() {
 
                 			<p className='mb-4'><i className="fa fa-envelope-o"></i> : {email}</p>
             		
-					<button className="btn btn-lg btn-secondary mr-2" onClick={handleClick2FA}>
+					<button className="btn btn-lg btn-secondary mr-2 mb-1" onClick={handleClick2FA}>
 						Manage 2FA
 					</button>
-					<button className="btn btn-lg btn-secondary mr-2" onClick={handleClickAddFriend}>
+					<button className="btn btn-lg btn-secondary mr-2 mb-1" onClick={handleClickAddFriend}>
 						Add Friend
+					</button>
+					<button className="btn btn-lg btn-secondary mr-2 mb-1" onClick={handleClickBlock}>
+						Block User
 					</button>
 
 
