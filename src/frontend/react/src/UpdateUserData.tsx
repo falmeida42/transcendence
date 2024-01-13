@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
 interface UseUpdateUserDataProps {
   username: string | undefined;
@@ -14,9 +14,10 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
     return;
   }
 
-  console.log("AAAAAAAAA-----", props.username, props.image);
-
-        fetch('http://localhost:3000/user/me', {
+  useEffect(() => {
+    const updateData = async () => {
+      try {
+        await fetch('http://localhost:3000/user/me', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -27,7 +28,13 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
             image: props.image,
           }),
         });
-
+        
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    updateData();
+  })
 };
 
 export default useUpdateUserData;

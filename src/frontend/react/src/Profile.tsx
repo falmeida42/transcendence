@@ -45,7 +45,7 @@ function Profile() {
     {
       setIsEditing(false);
       setUsername(textValue);
-      useUpdateUserData({username: textValue, image: image})
+      //useUpdateUserData({username: textValue, image: image})
     }
 	};
 	
@@ -81,7 +81,7 @@ function Profile() {
     {
       setIsEditingImage(false);
       setImage(selectedImage);
-      useUpdateUserData({username: user, image: selectedImage})
+      //useUpdateUserData({username: user, image: selectedImage})
     }
 	};
 
@@ -104,6 +104,8 @@ function Profile() {
 	if (token === undefined)
 		return;
 
+
+  useUpdateUserData({ username: textValue, image: selectedImage });
 	return (
 		<div className="container-fluid profile_container">
 			<AddFriendPopup isVisible={isVisibleAddFriend} handleClose={handleClickAddFriend} token={token}/>

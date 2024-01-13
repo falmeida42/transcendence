@@ -6,7 +6,6 @@ import NotifList from "./NotifList.tsx";
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
   const { user, image } = useApi();
-  console.log("USER TOPBAR:", user);
   const [isVisibleNotif, setIsVisibleNotif] = useState(false);
 
   const handleClickNotif = () => {
