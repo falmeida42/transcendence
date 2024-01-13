@@ -34,7 +34,7 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
       }
     };
     updateData();
-  })
+}, [props.username, props.image]);
 };
 
 export default useUpdateUserData;

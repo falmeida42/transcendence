@@ -26,9 +26,21 @@ export class UserService {
   }
 
   async updateUserById(userId: string, userData: Partial<UserDto>): Promise<UserDto | null> {
+  // Filter out the empty values from userData
+  const nonEmptyData: Record<string, any> = {};
+  Object.entries(userData).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      nonEmptyData[key] = value;
+    }
+  });
+
+  if (Object.keys(nonEmptyData).length === 0) {
+    // If there are no non-empty values, return null or handle accordingly
+    return null;
+  }
     return await this.prisma.user.update({
       where: { id: userId },
-      data: userData,
+      data: nonEmptyData,
     });
   }
 
@@ -112,39 +124,39 @@ export class UserService {
 
   async addFriendRequest(requesterId: string, requesteeId: string): Promise<{ message: string; friendRequest?: any }> {
     try {
-      // // Check if both users exist
-      // const requestor = await this.prisma.user.findUnique({
-      //   where: { id: requesterId },
-      // });
+      // Check if both users exist
+      const requestor = await this.prisma.user.findUnique({
+        where: { id: requesterId },
+      });
   
-      // const requestee = await this.prisma.user.findUnique({
-      //   where: { id: requesteeId },
-      // });
+      const requestee = await this.prisma.user.findUnique({
+        where: { id: requesteeId },
+      });
   
-      // if (!requestor || !requestee) {
-      //   return { message: 'User not found' };
-      // }
+      if (!requestor || !requestee) {
+        return { message: 'User not found' };
+      }
   
 
-      // const friends = await this.getFriends(requesterId);
+      const friends = await this.getFriends(requesterId);
 
-      // // Check if the requestee is already a friend
-      // if (friends.some((friend) => friend.id === requesteeId)) {
-      //  return { message: 'Requestee is already a friend' };
-      // }
+      // Check if the requestee is already a friend
+      if (friends.some((friend) => friend.id === requesteeId)) {
+       return { message: 'Requestee is already a friend' };
+      }
 
-      // // Check if a friend request already exists
-      // const existingFriendRequest = await this.prisma.friendRequest.findFirst({
-      //   where: {
-      //     requesterId,
-      //     requesteeId,
-      //     type: 'PENDING', // You might want to include the type in the check
-      //   },
-      // });
+      // Check if a friend request already exists
+      const existingFriendRequest = await this.prisma.friendRequest.findFirst({
+        where: {
+          requesterId,
+          requesteeId,
+          type: 'PENDING', // You might want to include the type in the check
+        },
+      });
   
-      // if (existingFriendRequest) {
-      //   return { message: 'Friend request already exists' };
-      // }
+      if (existingFriendRequest) {
+        return { message: 'Friend request already exists' };
+      }
   
       // Create the friend request
       const friendRequest = await this.prisma.friendRequest.create({

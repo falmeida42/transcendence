@@ -167,3 +167,7 @@ input {
   outline: none;
   flex: 1;
 }
+
+.special-button {
+  cursor: pointer;
+}

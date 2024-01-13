@@ -28,16 +28,16 @@ function Profile() {
     setImage,
   } = useApi();
   const {isLoading, serverError, apiData} = getHookers(`/user/matches/${id}`)
-
+  
   // console.log(isLoading);
-
+  
 	/////////////// Username update /////////////////
 	
 	const [isEditing, setIsEditing] = useState(false);
 	const [textValue, setTextValue] = useState<string | undefined>(user);
-
+  
 	const handleEditClick = () => {
-		setIsEditing(true);
+    setIsEditing(true);
 	};
 	
 	const handleSubmitClick = () => {
@@ -50,27 +50,28 @@ function Profile() {
 	};
 	
 	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setTextValue(event.target.value);
+    setTextValue(event.target.value);
 	};
 	
-
+  
 	/////////////// Image update /////////////////
 	
 	
 	const [isEditingImage, setIsEditingImage] = useState(false);
   	const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
 	  
+
 	  const handleEditClickImage = () => {
-		setIsEditingImage(true);
-	};
+      setIsEditingImage(true);
+    };
 	
-	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files && event.target.files[0];
-		
-		if (file) {
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files && event.target.files[0];
+      
+      if (file) {
 			const reader = new FileReader();
 			reader.onload = (e) => {
-				setSelectedImage(e.target?.result as string);
+        setSelectedImage(e.target?.result as string);
 			};
 			reader.readAsDataURL(file);
 		}
@@ -84,30 +85,30 @@ function Profile() {
       //useUpdateUserData({username: user, image: selectedImage})
     }
 	};
-
+  
 	const { userFriends } = useContext(ProfileContext) ?? {};
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 	const [isVisible2FA, setIsVisible2FA] = useState(false);
-
+  
 	const handleClickAddFriend = () => {
-		setIsVisibleAddFriend(!isVisibleAddFriend);
+    setIsVisibleAddFriend(!isVisibleAddFriend);
 	};
-
+  
 	const handleClick2FA = () => {
-		setIsVisible2FA(!isVisible2FA);
+    setIsVisible2FA(!isVisible2FA);
 	};
-
+  
 	const token = document.cookie
-		.split('; ')
-		.find((row) => row.startsWith('token='))
-		?.split('=')[1];
+  .split('; ')
+  .find((row) => row.startsWith('token='))
+  ?.split('=')[1];
 	if (token === undefined)
-		return;
-
+  return;
 
   useUpdateUserData({ username: textValue, image: selectedImage });
-	return (
-		<div className="container-fluid profile_container">
+	
+  return (
+    <div className="container-fluid profile_container">
 			<AddFriendPopup isVisible={isVisibleAddFriend} handleClose={handleClickAddFriend} token={token}/>
 			<TwoFaPopup isVisible={isVisible2FA} handleClose={handleClick2FA} token={token}/>				
 				<div className="profile_contant flex-item">
