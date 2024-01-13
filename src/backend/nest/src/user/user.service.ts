@@ -1,4 +1,4 @@
-import { ChatType } from '@prisma/client';
+import { ChatRoom, ChatType, User } from '@prisma/client';
 import {
   ForbiddenException,
   Injectable,
@@ -132,7 +132,7 @@ export class UserService {
       include: {
         participants: true,
         admins: true,
-        owner: true
+        owner: true,
       },
     });
 
@@ -355,17 +355,16 @@ export class UserService {
   async addAdminToChat(login: string, chatId: string, userId: string) {
     // Check if the chat room and user exist
 
-    console.log("login: ", login)
     const requester = await this.prisma.user.findUnique({
-      where: {login : login}
-    })
+      where: { login: login },
+    });
 
     const chatRoom = await this.prisma.chatRoom.findUnique({
       where: { id: chatId },
       include: {
         admins: true,
-        owner: true
-      }
+        owner: true,
+      },
     });
 
     const user = await this.prisma.user.findUnique({
@@ -384,7 +383,9 @@ export class UserService {
     const isAdmin = chatRoom.admins.some((admin) => admin.id === userId);
 
     if (isAdmin) {
-      throw new ForbiddenException('User is already an admin in this chat room.');
+      throw new ForbiddenException(
+        'User is already an admin in this chat room.',
+      );
     }
 
     // Add the user as an admin
@@ -398,25 +399,57 @@ export class UserService {
     });
   }
 
-  // Inside UserService
+  async getChannelParticipants(channelId: string) {
+    const channel = await this.getChatRoomById(channelId);
 
-async getChannelParticipants(channelId: string) {
-  const channel = await this.getChatRoomById(channelId);
+    if (!channel) {
+      throw new NotFoundException('Could not get room');
+    }
 
-  if (!channel) {
-    throw new NotFoundException('Could not get room');
+    const participants = channel.participants.filter((participant) => {
+      // Assuming owner and admins are stored in separate arrays within the channel
+      const isAdmin = channel.admins.some(
+        (admin) => admin.id === participant.id,
+      );
+      const isOwner = channel.owner.id === participant.id;
+
+      // Include participants who are neither owner nor admin
+      return !isAdmin && !isOwner;
+    });
+
+    return participants;
   }
 
-  const participants = channel.participants.filter(participant => {
-    // Assuming owner and admins are stored in separate arrays within the channel
-    const isAdmin = channel.admins.some(admin => admin.id === participant.id);
-    const isOwner = channel.owner.id === participant.id;
+  async isAdmin(userId: string, roomId: string) {
+    const room = await this.getChatRoomById(roomId);
+    if (!room) {
+      throw new NotFoundException('No such room: ', roomId);
+    }
+    return room.admins.some((admin) => admin.id === userId);
+  }
 
-    // Include participants who are neither owner nor admin
-    return !isAdmin && !isOwner;
-  });
+  async isOwner(userId: string, roomId: string) {
+    const room = await this.getChatRoomById(roomId);
+    if (!room) {
+      throw new NotFoundException('No such room: ', roomId);
+    }
+    return room.owner.id === userId;
+  }
 
-  return participants;
-}
-
+  async kickUser(id: string, roomId: string) {
+    return await this.prisma.chatRoom.update({
+      where: { id: roomId },
+      data: {
+        participants: {
+          disconnect: { id },
+        },
+        admins: {
+          disconnect: { id },
+        },
+      },
+      include: {
+        participants: true,
+      },
+    });
+  }
 }
