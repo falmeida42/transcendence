@@ -96,8 +96,8 @@ return (
             <li className="request-item">
                 <img src={props.requestor_image} className="mr-2" alt="#"></img>
                 <p className="mr-2">Friend request from <strong>{props.requestor_username}</strong></p>
-                <i onClick={() => acceptRequest(props.requestor_id, props.id)} className="fa fa-check mr-1"></i>
-                <i onClick={() => rejectRequest(props.requestor_id, props.id)} className="fa fa-times"></i>
+                <i onClick={() => acceptRequest(props.requestor_id, props.id)} className="fa fa-check mr-2"></i>
+                <i onClick={() => rejectRequest(props.requestor_id, props.id)} className="fa fa-times mr-2"></i>
             </li>
             }
         </div>
