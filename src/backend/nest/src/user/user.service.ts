@@ -1,5 +1,6 @@
 import { ChatType } from '@prisma/client';
 import {
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -18,7 +19,7 @@ export class UserService {
     return this.prisma.user.findMany();
   }
 
-  async getUserById(userId: string): Promise<UserDto | null> {
+  async getUserById(userId: string) {
     try {
       return await this.prisma.user.findUnique({ where: { id: userId } });
     } catch (error) {
@@ -27,7 +28,7 @@ export class UserService {
     }
   }
 
-  async getUserByLogin(userLogin: string): Promise<UserDto | null> {
+  async getUserByLogin(userLogin: string) {
     return await this.prisma.user.findUnique({ where: { login: userLogin } });
   }
 
@@ -347,5 +348,51 @@ export class UserService {
       this.logger.error('Error adding message:', error.message);
       throw new NotImplementedException(error.message);
     }
+  }
+
+  async addAdminToChat(login: string, chatId: string, userId: string) {
+    // Check if the chat room and user exist
+
+    console.log("login: ", login)
+    const requester = await this.prisma.user.findUnique({
+      where: {login : login}
+    })
+
+    const chatRoom = await this.prisma.chatRoom.findUnique({
+      where: { id: chatId },
+      include: {
+        admins: true,
+        owner: true
+      }
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!chatRoom || !user || !requester) {
+      throw new NotFoundException('Chat room or user not found.');
+    }
+
+    if (requester.id != chatRoom.owner.id) {
+      throw new ForbiddenException('User is not the channel owner');
+    }
+
+    // Check if the user is already an admin
+    const isAdmin = chatRoom.admins.some((admin) => admin.id === userId);
+
+    if (isAdmin) {
+      throw new ForbiddenException('User is already an admin in this chat room.');
+    }
+
+    // Add the user as an admin
+    return await this.prisma.chatRoom.update({
+      where: { id: chatId },
+      data: {
+        admins: {
+          connect: { id: userId },
+        },
+      },
+    });
   }
 }

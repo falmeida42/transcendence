@@ -34,6 +34,8 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
     const handleClickYes = () => {
         if (userToInvite.login === "")
         {
+            // Set User as Admin
+            
             toggleVisibility(true);
             return;
         }

@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetMe } from 'src/decorators';
@@ -14,6 +15,7 @@ import { JwtAuthGuard } from '../auth/guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
 import { UserService } from './user.service';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -184,5 +186,23 @@ export class UserController {
     @Body('roomId') roomId: string,
   ) {
     return this.userService.leaveRoom(username, roomId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('add-admin')
+  async addAdmin(
+    @GetMe('login') login: string,
+    @Body('chatId') chatId: string,
+    @Body('userId') userId: string,
+    @Res() res: Response
+  ) {
+    try {
+      this.logger.debug("adding room", login)
+      await this.userService.addAdminToChat(login, chatId, userId);
+      return res.status(HttpStatus.OK).json({ message: 'User added as admin successfully' });
+    } catch (error) {
+      this.logger.debug("Error received from add admin",error);
+      return res.status(HttpStatus.FORBIDDEN).json({ message: error.message }).send();
+    }
   }
 }
