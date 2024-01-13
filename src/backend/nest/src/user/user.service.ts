@@ -131,6 +131,8 @@ export class UserService {
       where: { id: chatId },
       include: {
         participants: true,
+        admins: true,
+        owner: true
       },
     });
 
@@ -395,4 +397,26 @@ export class UserService {
       },
     });
   }
+
+  // Inside UserService
+
+async getChannelParticipants(channelId: string) {
+  const channel = await this.getChatRoomById(channelId);
+
+  if (!channel) {
+    throw new NotFoundException('Could not get room');
+  }
+
+  const participants = channel.participants.filter(participant => {
+    // Assuming owner and admins are stored in separate arrays within the channel
+    const isAdmin = channel.admins.some(admin => admin.id === participant.id);
+    const isOwner = channel.owner.id === participant.id;
+
+    // Include participants who are neither owner nor admin
+    return !isAdmin && !isOwner;
+  });
+
+  return participants;
+}
+
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { tk } from "../../context/ChatContext";
 import { useApi } from "../../../apiStore";
 
@@ -10,7 +10,7 @@ interface AdminPopupProps {
 
 const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
 
-    const [chatData, setChatData] = useState<Data>();
+    const [chatData, setChatData] = useState<Participant[]>([]);
     const [userToInvite, setUserToInvite] = useState<Participant>({id: "", login: "", image: "", chatRoomId: ""});
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const [warningText, setWarningText] = useState("This field is mandatory");
@@ -22,24 +22,47 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
         image: string;
         chatRoomId: string | null;
     }
-    
-    interface Data {
-        participants: Participant[]; 
-    }
+
 
     const handleClickClose = () => {
         props.handleClose();
     };
 
-    const handleClickYes = () => {
-        if (userToInvite.login === "")
-        {
-            // Set User as Admin
-            
+    const handleClickYes = async () => {
+        console.log("handle yes: ", userToInvite)
+        console.log("handle yes: ", props.channelId)
+        console.log("handle yes: ", userToInvite.id)
+        console.log("handle yes: ", userToInvite.login)
+        if (userToInvite.login === "") {
+           
+
             toggleVisibility(true);
             return;
         }
-        //send to backend
+
+         // Set User as Admin
+         fetch('http://localhost:3000/user/add-admin', {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${tk}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chatId: props.channelId,
+                userId: userToInvite.id,
+            }),
+        })
+        .then((data) => {
+            console.log("Admin added: ", JSON.stringify(data));
+            // Handle success, e.g., update component state
+            // You may also want to display a success message to the user
+        })
+        .catch((error) => {
+            console.error("Fetch error:", error);
+            // Handle error, e.g., display an error message to the user
+        });
+
+        // send to backend
         props.handleClose();
     };
 
@@ -52,12 +75,12 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
         toggleVisibility(false);
     };
 
-    fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
+    fetch(`http://localhost:3000/user/channelParticipants/${props.channelId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,
         "Content-Type": "application/json",
-      },
+      }
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -68,8 +91,14 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
       })
       .then((data) => {
         if (data) {
-          console.log("Room info received ", JSON.stringify(data));
-          setChatData(data);
+            const participants = data.result.map((participant : any) => ({
+                id: participant.id,
+                login: participant.login,
+                image: participant.image,
+                chatRoomId: participant.chatRoomId,
+              }));
+              
+          setChatData(participants);
         } else {
           console.log("No data received");
         }
@@ -93,7 +122,7 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
                             <p>Select a user to give administrator rights to:</p>
                             <ul className="popup-input">
                             {
-                                    chatData?.participants.map((data) => (
+                                    chatData.map((data) => (
                                         login !== data.login && (
                                             <li>
                                             <label>

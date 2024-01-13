@@ -197,11 +197,24 @@ export class UserController {
     @Res() res: Response
   ) {
     try {
-      this.logger.debug("adding room", login)
       await this.userService.addAdminToChat(login, chatId, userId);
       return res.status(HttpStatus.OK).json({ message: 'User added as admin successfully' });
     } catch (error) {
-      this.logger.debug("Error received from add admin",error);
+      return res.status(HttpStatus.FORBIDDEN).json({ message: error.message }).send();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('channelParticipants/:chatId')
+  async getChannelParticipants(
+    @Param('chatId') chatId: string,
+    @Res() res: Response
+  ) {
+    try {
+      this.logger.debug("getting channel participants")
+      const result = await this.userService.getChannelParticipants(chatId);
+      return res.status(HttpStatus.OK).json({ result: result });
+    } catch (error) {
       return res.status(HttpStatus.FORBIDDEN).json({ message: error.message }).send();
     }
   }
