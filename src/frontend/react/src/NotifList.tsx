@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { updateUserFriends } from './ProfileContext';
 
 interface NotifListProps {
     
@@ -84,6 +84,7 @@ const acceptRequest = (requestor_id: string, id: string) =>
             .then((data) => {
                 console.log("ACCEPT STATUS:", JSON.stringify(data))
             })
+            .then( updateUserFriends )
             .catch((error) => console.error("Fetch error:", error));
         };
 }

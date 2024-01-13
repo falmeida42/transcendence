@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useApi } from './apiStore';
 import useUpdateUserData from './UpdateUserData';
 import Usetwofa from './Apiturnon';
@@ -6,6 +6,7 @@ import Qrcode from './Qrcode';
 import Apiturnoff from './Apiturnoff';
 import "./Profile.css";
 import AddFriendPopup from './AddFriendPopUp';
+import { ProfileContext, updateUserFriends } from './ProfileContext';
 
 interface User {
 	id: string,
@@ -81,7 +82,7 @@ function Profile() {
 		Usetwofa({ code: name });
 	};
 
-	const [friends, setFriends] = useState<User[]>([])
+	const { userFriends } = useContext(ProfileContext) ?? {};
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 
 	const handleClickAddFriend = () => {
@@ -96,36 +97,36 @@ function Profile() {
 	if (token === undefined)
 		return;
 	
-	useEffect(() => {
-		// const urlParams = new URLSearchParams(window.location.search);
+	// useEffect(() => {
+	// 	// const urlParams = new URLSearchParams(window.location.search);
 
 
-		fetch(`http://localhost:3000/user/friends`, {
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${token}`,
-				"Content-Type": "application/json",
-			},
-		})
-			.then(async (response) => {
-				if (!response.ok) {
-					throw new Error(`HTTP error! Status: ${response.status}`);
-				}
-				const data = await response.text();
-				return data ? JSON.parse(data) : null;
-			})
-			.then((data) => {
-				const mappedFriends = data.map((friend: any) => ({
-					id: friend.id,
-					username: friend.login,
-					userImage: friend.image,
-				}));
+	// 	fetch(`http://localhost:3000/user/friends`, {
+	// 		method: "GET",
+	// 		headers: {
+	// 			Authorization: `Bearer ${token}`,
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 	})
+	// 		.then(async (response) => {
+	// 			if (!response.ok) {
+	// 				throw new Error(`HTTP error! Status: ${response.status}`);
+	// 			}
+	// 			const data = await response.text();
+	// 			return data ? JSON.parse(data) : null;
+	// 		})
+	// 		.then((data) => {
+	// 			const mappedFriends = data.map((friend: any) => ({
+	// 				id: friend.id,
+	// 				username: friend.login,
+	// 				userImage: friend.image,
+	// 			}));
 
-				setFriends([...mappedFriends]);
-			})
-			.catch((error) => console.error("Fetch error:", error));
+	// 			setFriends([...mappedFriends]);
+	// 		})
+	// 		.catch((error) => console.error("Fetch error:", error));
 
-	}, []);
+	// }, []);
 
 	return (
 		<div className="container-fluid profile_container">
@@ -283,7 +284,7 @@ function Profile() {
 							<div className="msg_list_main">
 								<ul className="msg_list">
 									{
-										friends.map((friend: User) => (
+										userFriends.map((friend: User) => (
 											<li>
 												<span><img src={friend.userImage} className="img-responsive" alt="#"></img></span>
 												<span>

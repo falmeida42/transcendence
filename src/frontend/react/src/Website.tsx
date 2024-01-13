@@ -12,6 +12,7 @@ import ApiData2faProvider from "./ApiData2faProvider.tsx";
 import { Route, Switch } from "wouter";
 import Home from "./realPong/components/Home.tsx";
 import { SocketProvider } from "./realPong/context/SocketContext.tsx";
+import { ProfileProvider } from "./ProfileContext.tsx";
 
 function Website() {
 	const { showHash } = useHashStore();
@@ -33,6 +34,7 @@ function Website() {
 	<div>
 		{/* <ApiData2faProvider/> */}
 		<ApiDataProvider/>
+		<ProfileProvider>
 		<Bars />
 			<Switch>
 				<Route path="/Game">
@@ -53,6 +55,7 @@ function Website() {
 				</div>
 				</Route>
 			</Switch>
+		</ProfileProvider>
 	</div>
 	);
 }
