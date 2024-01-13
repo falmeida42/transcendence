@@ -12,7 +12,8 @@ interface ap {
   qrcode: any;
   twofa: boolean;
   auth: boolean;
-  setInfo: (id: string,user: string, first_name: string, last_name: string, login: string, email: string, image: string, twofa: boolean) => void;
+  friends: any
+  setInfo: (id: string,user: string, first_name: string, last_name: string, login: string, email: string, image: string, twofa: boolean, friends: any) => void;
   setUsername: (user: string | undefined) => void;
   setImage: (newImage: string | undefined) => void;
   setqrcode: (newqr: any | undefined) => void;
@@ -32,7 +33,8 @@ export const useApi = create<ap>((set) => ({
   qrcode: '',
   twofa: false,
   auth: false,
-  setInfo: (Id, User, First_name, Last_name, Login, Email, Image, Twofa) =>
+  friends: [],
+  setInfo: (Id, User, First_name, Last_name, Login, Email, Image, Twofa, Friends) =>
     set(() => ({
       id: Id,
       user: User,
@@ -41,6 +43,7 @@ export const useApi = create<ap>((set) => ({
       login: Login,
       email: Email,
       image: Image,
+      friends: Friends,
       twofa: Twofa,
     })),
   setUsername: (newUser) =>
@@ -61,5 +64,6 @@ export const useApi = create<ap>((set) => ({
     yield this.login;
     yield this.email;
     yield this.image;
+    yield this.friends;
   },
 }));

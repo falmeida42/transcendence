@@ -10,19 +10,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ChatType {
+  DIRECT_MESSAGE
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}
+
 model User {
-  id         String  @id @default(uuid())
-  login      String  @unique
+  id         String     @id @default(uuid())
+  login      String     @unique
   email      String?
   image      String
   first_name String?
   last_name  String?
   username   String?
+  chatRooms  ChatRoom[] @relation("Participants")
   twoFactorAuthSecret  String?
   twoFactorAuthEnabled Boolean @default(false)
 
-  wins   Match[] @relation("winner")
-  losses Match[] @relation("loser")
+  ownerOf ChatRoom[] @relation("Owners")
+  adminOf ChatRoom[] @relation("Admins")
+
+  friends  User[] @relation("UserFriends")
+  friendOf User[] @relation("UserFriends")
+
+  chatRoomId String?
+  Message    Message[]
+  wins       Match[]   @relation("winner")
+  losses     Match[]   @relation("loser")
+}
+
+model ChatRoom {
+  id           String    @id @default(uuid())
+  name         String
+  image        String
+  password     String    @default("")
+  type         ChatType
+  owner        User      @relation("Owners", fields: [userId], references: [id])
+  admins       User[]    @relation("Admins")
+  messages     Message[]
+  participants User[]    @relation("Participants")
+
+  userId String
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  content        String
+  chat_id        String
+  chat_reference ChatRoom @relation(fields: [chat_id], references: [id])
+  sender_id      String
+  sender         User     @relation(fields: [userId], references: [id])
+  userId         String
 }
 
 model Match {

@@ -3,7 +3,6 @@ import Bars from './Bars.tsx';
 import { useHashStore } from "./hashStore.tsx";
 import { useEffect } from 'react';
 import Profile from "./Profile.tsx";
-import Chat from "./Chat.tsx";
 // import { useApi } from "./apiStore.tsx";
 import ApiDataProvider from "./ApiDataProvider.tsx";
 import { useApi } from "./apiStore.tsx";
@@ -12,6 +11,7 @@ import ApiData2faProvider from "./ApiData2faProvider.tsx";
 import { Route, Switch } from "wouter";
 import Home from "./realPong/components/Home.tsx";
 import { SocketProvider } from "./realPong/context/SocketContext.tsx";
+import Chat from "./chat/Chat.tsx";
 
 function Website() {
 	const { showHash } = useHashStore();

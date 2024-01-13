@@ -1,0 +1,404 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700);
+
+$green: #86BB71;
+$blue: #94C2ED;
+$orange: #E38968;
+$gray: #92959E;
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+.container_chat {
+  margin: 0 auto;
+  //background: #444753;
+  border-radius: 5px;
+  width: 100%;
+  height: 100%;
+  padding-left: 4%;
+  display: flex;
+	justify-content: center;
+	position: relative;
+	z-index: 0;
+}
+
+.sidebar {
+  max-width: 33vw;
+  min-height: 700px;
+  flex: 1;
+  float: left;
+  background: #444753;
+  
+  @media (max-width: 767px) {
+    max-width: 50vw;
+   // min-width: 33vw;
+  }
+
+  .search {
+    padding: 20px;
+
+    button {
+      background-color: #6A6C75;
+      border-color: #F2F5F8;
+    }
+  }
+  
+  
+  input {
+    border-radius: 3px;
+    border: none;
+    padding: 14px;
+    color: white;
+    background: #6A6C75;
+    width: 90%;
+    font-size: 14px;
+  }
+  
+  .chats {
+    padding: 20px;
+    overflow-y: scroll;
+    max-height: 700px;  
+    
+    .clearfix {
+      cursor: pointer;
+    }
+    
+    li {
+      padding-bottom: 20px;
+    }
+  }
+  
+  img {
+    float: left;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    padding: 7px;
+  }
+  
+  .about {
+    float: left;
+    margin-top: 8px;
+    padding-left: 2px;
+  }
+  
+  .status {
+    color: $gray;
+
+    i {
+      font-size: 15px;
+    }
+  }
+  
+  .popup-input {
+    color: black;
+    background: #F2F5F8;
+    overflow-y: scroll;
+    max-height: 175px;
+
+    li {
+      
+      label {
+        display: flex;
+        align-items: center;
+      }
+
+      input {
+        flex: 0;
+        width: 20px;
+        margin: 0 5px 0 10px;
+      }
+
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        padding: 7px;
+      }
+    }
+  }
+}
+
+.chat {
+  float:left;
+  background: #F2F5F8;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  max-width: 33vw;
+  flex: 1;
+  color: #434651;
+  // height: 700px;
+  
+  @media (max-width: 767px) {
+    max-width: 50vw;
+  }
+
+  .chat-header {
+    padding: 20px;
+    border-bottom: 2px solid white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    @media (max-width: 767px) {
+      flex-direction: column-reverse;
+      justify-content: space-between;
+    }
+
+    img {
+      float: right;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      padding: 7px;
+    }
+    
+    .chat-about {
+      float: left;
+      padding-left: 10px;
+      margin-top: 6px;
+      flex-grow: 1;
+    }
+    
+    .chat-with {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .chat-num-messages {
+      color: $gray;
+    }
+    
+    .fa-star {
+      float: right;
+      color: #D8DADF;
+      font-size: 20px;
+      margin-top: 12px;
+    }
+
+    i {
+      margin: 16px 9px 4px 0px;
+      left: 50%;
+      // float: right;
+      color: grey;
+    }
+  }
+  
+  .chat-history {
+    padding: 30px 30px 20px;
+    border-bottom: 2px solid white;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+
+    
+    .message-data {
+      margin-bottom: 15px;
+    }
+    
+    .message-data-time {
+      color: lighten($gray, 8%);
+      padding-left: 6px;
+    }
+    
+    .message {      
+      color: white;
+      padding: 18px 20px;
+      line-height: 26px;
+      font-size: 16px;
+      border-radius: 7px;
+      margin-bottom: 30px;
+      width: 90%;
+      position: relative;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      
+      &:after {
+        bottom: 100%;
+        left: 16px;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-bottom-color: $green;
+        border-width: 10px;
+        margin-left: -10px;
+      }
+    }
+    
+    .my-message {
+      background: $green;
+    }
+    
+    .other-message {
+      background: $blue;
+      
+      &:after {
+        border-bottom-color: $blue;
+        left: calc(100% - 16px);
+      }
+    }
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      padding: 7px;
+    }
+    
+  }
+  
+  .chat-message {
+    padding: 30px;
+    
+    textarea {
+      width: 90%;
+      border: none;
+      padding: 10px 20px;
+      font: 14px/22px "Lato", Arial, sans-serif;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      resize: none;
+      
+    }
+    
+    .fa-file-o, .fa-file-image-o {
+      font-size: 16px;
+      color: gray;
+      cursor: pointer;
+      
+    }
+    
+    button {
+      float: right;
+      color: $blue;
+      font-size: 16px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      background: #F2F5F8;
+      margin-top: 16px;
+      
+      &:hover {
+        color: darken($blue, 7%);
+      }
+    }
+  }
+}
+
+.online, .offline, .me {
+    margin-right: 3px;
+    font-size: 10px;
+  }
+  
+.online {
+  color: $green;
+}
+  
+.offline {
+  color: $orange;
+}
+
+.me {
+  color: $blue;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.float-right {
+  float: right;
+}
+
+.clearfix:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.modal {
+  display: block;
+  top: 40%;
+  left: 4%;
+
+  .modal-dialog {
+    max-width: 300px;
+  }
+}
+
+.container {
+  width: 100%;
+}
+
+.hover-label {
+  //font-style: italic;
+  margin-bottom: -5px;
+}
+
+.password-input {
+  border-radius: 3px;
+  border: none;
+  padding: 14px;
+ // color: white;
+  background: #F2F5F8;
+  width: 90%;
+  font-size: 14px;
+}
+
+.popup-input {
+  color: black;
+  background: #F2F5F8;
+  padding: 4px 0px;
+  overflow-y: scroll;
+  max-height: 175px;
+
+  li {
+    
+    label {
+      display: flex;
+      align-items: center;
+    }
+
+    input {
+      flex: 0;
+      width: 20px;
+      margin: 0 5px 0 10px;
+    }
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      padding: 7px;
+    }
+  }
+}
+
+.modal-title {
+  color: #434651;
+}
+
+strong {
+  font-weight: bold;
+}

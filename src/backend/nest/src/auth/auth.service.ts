@@ -46,7 +46,6 @@ export class AuthService {
           twoFactorAuthEnabled: false,
         },
       });
-      // this.logger.debug('New user: ', newUser);
 
       if (newUser) {
         const accessToken = await this.signAccessToken(Number(newUser.id));
@@ -80,7 +79,11 @@ export class AuthService {
     if (!user) {
       throw new ForbiddenException('User is undefined');
     }
-    return authenticator.keyuri(user.id, 'transcendence', user.twoFactorAuthSecret);
+    return authenticator.keyuri(
+      user.id,
+      'transcendence',
+      user.twoFactorAuthSecret,
+    );
   }
 
   async generateQrCodeURL(otpAuthURL: string) {
@@ -88,17 +91,14 @@ export class AuthService {
   }
 
   async is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
-    // this.logger.debug(twoFactorAuthenticationCode, user);
 
     if (!user.twoFactorAuthSecret) {
       throw new ForbiddenException('2FA secret is not set');
     }
-    // this.logger.debug(twoFactorAuthenticationCode, user.twoFactorAuthSecret);
     const res = await authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthSecret,
     });
-    // this.logger.debug('res',res)
     return res;
   }
 

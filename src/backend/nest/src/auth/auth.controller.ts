@@ -40,17 +40,13 @@ export class AuthController {
     if (await this.authService.is2FAActive(String(dto.id))) {
       // Execute 2FA logic
       this.logger.debug('2FA IS ENABLED');
-      
+
       const user = await this.userService.getUserById(dto.id);
       if (!user) {
         throw new ForbiddenException('User not found');
       }
-      this.logger.debug('USER: ', user);
-
 
       const token = await this.authService.sign2FAToken(user.id);
-
-      // this.logger.debug('ACCESS TOKEN: ', token);
 
       res
         .cookie('token2fa', token, {
@@ -66,7 +62,6 @@ export class AuthController {
     // Execute login without 2FA
 
     const data = await this.authService.signup(dto);
-    // this.logger.debug('Token:', data.accessToken);
     res
       .cookie('token', data.accessToken, {
         expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
@@ -101,17 +96,17 @@ export class AuthController {
     // generate key uri
     const otpAuthURL = await this.authService.generate2FAKeyURI(user);
 
-    // this.logger.debug('secret: ', secret);
-    // this.logger.debug('otp url: ', otpAuthURL);
-
     // generate QR code
     return res.json(await this.authService.generateQrCodeURL(otpAuthURL));
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/turn-on')
-  async turn2FAOn(@GetMe() user: User, @Body('code') code: string, @Res() res : Response) {
-    // this.logger.debug(code);
+  async turn2FAOn(
+    @GetMe() user: User,
+    @Body('code') code: string,
+    @Res() res: Response,
+  ) {
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
       if (!user.twoFactorAuthSecret) {
         throw new ForbiddenException('2FA secret not set');
@@ -122,8 +117,6 @@ export class AuthController {
 
       if (isCodeValid === false) {
         return res.status(401).json({ error: 'Wrong 2FA code' });
-        // res.send(res);
-        // throw new ForbiddenException('Wrong 2FA code');
       }
 
       await this.userService.set2FAOn(user.id);
@@ -136,7 +129,6 @@ export class AuthController {
   @Post('2fa/turn-off')
   async turn2FAOff(@GetMe('id') id: string) {
     if ((await this.userService.is2FAEnabled(id)) === true) {
-      this.logger.debug('ass');
       try {
         await this.userService.set2FAOff(id);
       } catch (error) {
@@ -155,22 +147,19 @@ export class AuthController {
     @GetMe('id') id: string,
     @Body() body: any,
   ) {
-    // this.logger.debug('code: ', code);
-
     const user = await this.userService.getUserById(id);
 
     if (!user) {
       throw new ForbiddenException('No such id ', user.id);
     }
-    
+
     const isCodeValid = await this.authService.is2FACodeValid(body.code, user);
-    
+
     if (!isCodeValid) {
-      // this.logger.debug('code: ', JSON.stringify(body));
       res
         // .status(401)
-        .redirect(`${process.env.FRONTEND_URL}/2fa`)
-        return;
+        .redirect(`${process.env.FRONTEND_URL}/2fa`);
+      return;
       throw new ForbiddenException('Wrong 2FA code');
     }
     const tokenPerm = await this.authService.signAccessToken(Number(user.id));

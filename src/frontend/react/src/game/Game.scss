@@ -1,0 +1,15 @@
+.container {
+	display: flex;
+	justify-content: center;
+	position: relative;
+	z-index: 0;
+	.score {
+		color: white;
+		font-family: sans-serif;
+		position: absolute;
+		top: 24px;
+		width: 60%;
+		display: flex;
+		justify-content: space-around;
+	}
+}

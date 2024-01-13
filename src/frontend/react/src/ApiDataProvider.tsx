@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect } from "react";
-import { useApi } from "./apiStore";
+import React, { useEffect, ReactNode } from 'react';
+import { useApi } from './apiStore';
 
 interface ApiDataProviderProps {
   children?: ReactNode;
@@ -35,8 +35,16 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         const response = await fetch('http://localhost:3000/user/me', {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const friends = await fetch('http://localhost:3000/user/friends', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         });
         if (!response.ok){
@@ -48,8 +56,9 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         }
 
         const data = await response.json();
+        const dataFriends = await friends.json();
         // console.log(data);
-        setInfo(data.id, data.user, data.first_name, data.last_name, data.login, data.email, data.image, data.twoFactorAuthEnabled);
+        setInfo(data.id, data.user, data.first_name, data.last_name, data.login, data.email, data.image, data.twoFactorAuthEnabled, dataFriends);
       } catch (error) {
         console.error(error);
       }

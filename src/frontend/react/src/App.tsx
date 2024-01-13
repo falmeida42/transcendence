@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./App.css";
 import Website from "./Website.tsx";
 import { useApi } from "./apiStore.tsx";
-import { Link, Route, Switch, useLocation } from 'wouter';
+import { Route, Switch } from 'wouter';
 import { navigate } from "wouter/use-location";
 import AuthApi from "./ApiAuth.tsx";
-import React from "react";
 import ApiData2faProvider from "./ApiData2faProvider.tsx";
-import ApiDataProvider from "./ApiDataProvider.tsx";
 
 
 function App() {
