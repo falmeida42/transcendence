@@ -83,7 +83,6 @@ const Home = () => {
     );
 
   if (page === 3) {
-    console.log(JSON.stringify(rooms));
     return (
       <div className="home">
         <div className="rooms-list">
@@ -97,7 +96,7 @@ const Home = () => {
                   key={room.id}
                   className="room-item"
                   onClick={() => {
-                    console.log(room.id);
+                    console.log(room.name);
                     joinRoomSpec(room.id);
                   }}
                 >

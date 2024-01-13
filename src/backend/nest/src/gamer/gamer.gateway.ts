@@ -226,6 +226,7 @@ export class GamerGateway
     room.spectators.push(client.id);
     this.logger.log(`Client ${client.id} joined the room ${room.name}`);
     client.emit('RoomCreated', room);
+    this.refreshGame(roomId);
   }
 
   removePlayer(playerId: string) {
