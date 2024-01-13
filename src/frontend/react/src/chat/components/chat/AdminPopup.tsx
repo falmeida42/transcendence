@@ -117,8 +117,8 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
                         <span>&times;</span>
                         </button>
                     </div>
-                    <div>
-                        <div className="modal-body">
+                    { chatData.length !== 0 && <div>
+                         <div className="modal-body">
                             <p>Select a user to give administrator rights to:</p>
                             <ul className="popup-input">
                             {
@@ -146,7 +146,10 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
                             <button type="button" className="btn btn-clear" onClick={handleClickYes}>Submit</button>
                             <button type="button" className="btn btn-secondary" onClick={handleClickClose}>Cancel</button>
                         </div>
-                    </div>                   
+                    </div>}
+                    { chatData.length === 0 && 
+                        <p style={{color: "red", padding: "25px"}}>You don't have participants to promote</p>}
+                                  
                     </div>
                 </div>
                 </div>
