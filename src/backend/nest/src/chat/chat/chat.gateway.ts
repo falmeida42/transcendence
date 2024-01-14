@@ -7,6 +7,7 @@ import {
   OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
@@ -90,6 +91,17 @@ export class ChatGateway
     this.io.emit('getUsersConnected', this.users);
   }
 
+  @SubscribeMessage('joinAllRooms')
+  async joinAllRooms(client: Socket, payload: any): Promise<void> {
+
+    const user = await this.userService.getChatRoomsByLogin(payload.username);
+    if (user) {
+      user.chatRooms.forEach((room) => {
+        client.join(room.id);
+      });
+    }
+  }
+
   @SubscribeMessage('messageToServer')
   async handleMessage(client: Socket, payload: any) {
     const user = await this.userService.getUserByLogin(payload.sender);
@@ -128,7 +140,7 @@ export class ChatGateway
   }
 
   @SubscribeMessage('AddChannel')
-  addChannel(client: Socket) {
+  addChannel(client: Socket, @MessageBody('id') id: string) {
     this.io.emit('UpdateRooms');
   }
 }

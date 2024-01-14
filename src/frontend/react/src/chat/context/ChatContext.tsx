@@ -25,7 +25,7 @@ let updateChatRooms: () => void;
 let socketInstance: Socket<DefaultEventsMap, DefaultEventsMap>;
 
 
-let test: () => void;
+let test: (id: string) => void;
 
 function ChatProvider({ children }: ChatProviderProps) {
 
@@ -171,6 +171,7 @@ function ChatProvider({ children }: ChatProviderProps) {
 
     test = () => {
       socketInstance.emit("AddChannel")
+      socketInstance.emit("joinAllRooms" , { username: login })
     }
 
   }, []);

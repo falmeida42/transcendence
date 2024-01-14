@@ -18,6 +18,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
     const [modal, setModal] = useState(1);
     const {friends, login} = useApi();
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
+    const [id] = useState(crypto.randomUUID().toString())
 
     const toggleVisibility = (visibility: boolean) => {
         setIsVisibleWarning(visibility);
@@ -138,7 +139,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                 },
                 body: JSON.stringify({
                     roomdata: {
-                        id: crypto.randomUUID().toString(),
+                        id: id,
                         name: inputName,
                         image: inputImage,
                         type: inputPrivacy,
@@ -148,7 +149,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                 })
                 })
                 .then(() =>
-                    test()
+                    test(id)
                     // updateChatRooms
                 )
                 .catch((error) => console.error("Fetch error:", error));
