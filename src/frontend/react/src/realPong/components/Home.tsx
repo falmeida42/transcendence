@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
+import { useApi } from "../../apiStore";
 import {
   SocketContext,
   createRoom,
   joinQueue,
-  joinRoomSpec,
   leaveQueue,
   set_name,
 } from "../context/SocketContext";
@@ -13,8 +13,8 @@ import RealPong from "./RealPong";
 const Home = () => {
   const { isConnected, room, username, onQueue, rooms } =
     useContext(SocketContext);
-  const [name, setName] = useState<string>("");
   const [page, setPage] = useState<number>(0);
+  const { login } = useApi();
 
   useEffect(() => {
     const changePage = () => {
@@ -23,7 +23,8 @@ const Home = () => {
         return;
       }
       if (!username) {
-        setPage(1);
+        set_name(login);
+        setPage(2);
         return;
       }
       if (onQueue) {
@@ -37,7 +38,7 @@ const Home = () => {
       setPage(5);
     };
     changePage();
-  }, [isConnected, room, username, onQueue, rooms]);
+  }, [isConnected, room, username, onQueue, rooms, login]);
 
   if (page === 0) {
     return (
@@ -47,21 +48,21 @@ const Home = () => {
     );
   }
 
-  if (page === 1) {
-    return (
-      <div>
-        <input
-          type="text"
-          name="name"
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") set_name(name);
-          }}
-        />
-        <button onClick={() => set_name(name)}>Set Name</button>
-      </div>
-    );
-  }
+  // if (page === 1) {
+  //   return (
+  //     <div>
+  //       <input
+  //         type="text"
+  //         name="name"
+  //         onChange={(e) => setName(e.target.value)}
+  //         onKeyDown={(e) => {
+  //           if (e.key === "Enter") set_name(name);
+  //         }}
+  //       />
+  //       <button onClick={() => set_name(name)}>Set Name</button>
+  //     </div>
+  //   );
+  // }
 
   if (page === 2)
     return (
@@ -85,26 +86,6 @@ const Home = () => {
   if (page === 3) {
     return (
       <div className="home">
-        <div className="rooms-list">
-          <ul>
-            {rooms?.length === 0 && (
-              <li className="room-item">No rooms available</li>
-            )}
-            {rooms &&
-              rooms.map((room) => (
-                <li
-                  key={room.id}
-                  className="room-item"
-                  onClick={() => {
-                    console.log(room.name);
-                    joinRoomSpec(room.id);
-                  }}
-                >
-                  {room.name}
-                </li>
-              ))}
-          </ul>
-        </div>
         <div className="game-buttons">
           <button onClick={() => createRoom(true)}>Play against AI</button>
           <button onClick={() => joinQueue()}>Play a random</button>

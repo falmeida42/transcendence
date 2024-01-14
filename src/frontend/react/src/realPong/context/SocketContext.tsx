@@ -151,8 +151,8 @@ const pauseGame = () => {
   socket.emit("PauseMatch");
 };
 
-const joinRoomSpec = (roomName: string) => {
-  socket.emit("JoinRoomSpec", { roomName });
+const joinRoomSpec = (roomId: string) => {
+  socket.emit("JoinRoomSpec", { roomId });
 };
 
 export {

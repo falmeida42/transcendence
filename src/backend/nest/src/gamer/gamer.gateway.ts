@@ -213,22 +213,6 @@ export class GamerGateway
     }
   }
 
-  @SubscribeMessage('JoinRoomSpec')
-  joinRoomSpec(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('roomId') roomId: string,
-  ) {
-    const player = this.players[client.id];
-    const room = this.rooms[roomId];
-    if (!room) return;
-    client.join(room.name);
-    player.room = room.id;
-    room.spectators.push(client.id);
-    this.logger.log(`Client ${client.id} joined the room ${room.name}`);
-    client.emit('RoomCreated', room);
-    this.refreshGame(roomId);
-  }
-
   removePlayer(playerId: string) {
     this.leaveRoom(playerId);
     delete this.players[playerId];
@@ -355,7 +339,9 @@ export class GamerGateway
     }, 1000 / 30);
   }
 
-  refreshGame(roomId: string) {
+  refreshGame(roomId: string, temp?: string) {
+    if (temp) this.logger.debug(temp + roomId);
+    else this.logger.debug(temp + roomId);
     const match = this.match[roomId];
     this.server.to(roomId).emit('MatchRefresh', match);
   }
