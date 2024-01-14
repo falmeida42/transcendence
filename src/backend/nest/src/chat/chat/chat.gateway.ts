@@ -59,16 +59,12 @@ export class ChatGateway
       (user) => user.username === payload.username,
     );
 
-
     const user = await this.userService.getChatRoomsByLogin(payload.username);
     if (user) {
-
       user.chatRooms.forEach((room) => {
         client.join(room.id);
       });
     }
-
-    
 
     if (existingUserIndex !== -1) {
       // User with the same username already exists, update the data
@@ -91,7 +87,6 @@ export class ChatGateway
 
   @SubscribeMessage('joinAllRooms')
   async joinAllRooms(client: Socket, payload: any): Promise<void> {
-
     const user = await this.userService.getChatRoomsByLogin(payload.username);
     if (user) {
       user.chatRooms.forEach((room) => {

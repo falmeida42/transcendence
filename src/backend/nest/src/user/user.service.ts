@@ -406,11 +406,10 @@ export class UserService {
     const channel = await this.getChatRoomById(channelId);
 
     if (!channel) {
-      throw new NotFoundException('Could not get room');
+      throw new NotFoundException('Could not get room: ', channelId);
     }
 
     const participants = channel.participants.filter((participant) => {
-      // Assuming owner and admins are stored in separate arrays within the channel
       const isAdmin = channel.admins.some(
         (admin) => admin.id === participant.id,
       );
@@ -419,7 +418,6 @@ export class UserService {
       // Include participants who are neither owner nor admin
       return !isAdmin && !isOwner;
     });
-
     return participants;
   }
 
@@ -458,7 +456,7 @@ export class UserService {
 
   async kickableUsers(user: User, roomId: string) {
     if (await this.isOwner(user.id, roomId)) {
-      return this.prisma.chatRoom.findMany({
+      const room = await this.prisma.chatRoom.findUnique({
         where: { id: roomId },
         include: {
           participants: {
@@ -470,19 +468,9 @@ export class UserService {
           owner: false,
         },
       });
+      return room.participants;
     } else if (await this.isAdmin(user.id, roomId)) {
-      return this.prisma.chatRoom.findMany({
-        where: { id: roomId },
-        include: {
-          participants: {
-            where: { NOT: { id: user.id } },
-          },
-          admins: false,
-          owner: false,
-        },
-      });
-    } else {
-      return null;
+      return await this.getChannelParticipants(roomId);
     }
   }
 }
