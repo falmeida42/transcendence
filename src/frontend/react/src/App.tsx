@@ -1,67 +1,64 @@
 import { useEffect } from "react";
-import "./App.css";
-import Website from "./Website.tsx";
-import { useApi } from "./apiStore.tsx";
-import { Route, Switch } from 'wouter';
+import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-location";
 import AuthApi from "./ApiAuth.tsx";
 import ApiData2faProvider from "./ApiData2faProvider.tsx";
-
+import "./App.css";
+import Website from "./Website.tsx";
+import { useApi } from "./apiStore.tsx";
 
 function App() {
-  const {auth} = useApi();
+  const { auth } = useApi();
   // const location = useLocation();
 
   const token = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
 
   const token2fa = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token2fa='))
-    ?.split('=')[1];
+    .split("; ")
+    .find((row) => row.startsWith("token2fa="))
+    ?.split("=")[1];
 
   useEffect(() => {
     if (token && token2fa) {
-
       // document.cookie = `${'token'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
-      document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
-      navigate('/');
+      document.cookie = `${"token2fa"}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
+      navigate("/");
     } else if (token2fa) {
-      <ApiData2faProvider/>
-      navigate('/2fa');
+      <ApiData2faProvider />;
+      navigate("/2fa");
     } else if (token) {
       // document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
-		// <ApiDataProvider/>
-    navigate('/');
+      // <ApiDataProvider/>
+      navigate("/");
     } else {
-      navigate('/login');
+      navigate("/login");
     }
-
   }, [token, token2fa, navigate]);
-    const handleButtonClick = () => {
-      window.location.href = "http://localhost:3000/auth/login";
-    };
+  const handleButtonClick = () => {
+    window.location.href = "http://localhost:3000/auth/login";
+  };
 
   return (
-      <Switch>
-        <Route path="/login">
-          <div className="background-image">
-            <div className="centered-container">
-              <div className="special-button" onClick={handleButtonClick}>
-                LOGIN
-              </div>
+    <Switch>
+      <Route path="/login">
+        <div className="background-image">
+          <div className="centered-container">
+            <div className="special-button" onClick={handleButtonClick}>
+              LOGIN
             </div>
           </div>
-        </Route>
-        <Route path="/2fa">
-          <AuthApi code="" />
-        </Route>
-        <Route>
-         <Website />
-        </Route>
-      </Switch>
+        </div>
+      </Route>
+      <Route path="/2fa">
+        <AuthApi code="" />
+      </Route>
+      <Route>
+        <Website />
+      </Route>
+    </Switch>
   );
 }
 

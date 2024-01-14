@@ -1,20 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
-  Logger,
-  Post,
-  Body,
-  Param,
-  UseGuards,
   HttpStatus,
+  Logger,
+  Param,
+  Post,
+  UseGuards,
   Res,
-  Query,
+  Query
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { GetMe } from 'src/decorators';
-import { JwtAuthGuard } from '../auth/guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
+import { GetMe } from 'src/decorators';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtAuthGuard } from '../auth/guard';
+import * as bcrypt from '../utils';
 import { UserService } from './user.service';
 import { Response } from 'express';
 

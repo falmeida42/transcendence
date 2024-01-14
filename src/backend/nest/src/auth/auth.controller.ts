@@ -1,24 +1,23 @@
 import {
   Body,
   Controller,
-  Get,
-  UseGuards,
-  Res,
-  Post,
-  Logger,
   ForbiddenException,
+  Get,
   HttpStatus,
-  Param,
+  Logger,
+  Post,
   Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { User } from '@prisma/client';
+import { Response } from 'express';
+import { GetMe } from 'src/decorators';
 import { FTGuard, JwtAuthGuard } from '../auth/guard';
 import { UserService } from '../user/user.service';
-import { GetMe } from 'src/decorators';
-import { User } from '@prisma/client';
-import { TwoFAGuard } from './guard/2FA.guard';
-import { Response } from 'express';
+import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
+import { TwoFAGuard } from './guard/2FA.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -64,7 +63,7 @@ export class AuthController {
     const data = await this.authService.signup(dto);
     res
       .cookie('token', data.accessToken, {
-        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + 14 * 60 * 1000),
         domain: 'localhost',
         path: '/',
         sameSite: 'none',

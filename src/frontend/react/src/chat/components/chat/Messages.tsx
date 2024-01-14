@@ -26,10 +26,9 @@ const Messages = (props: MessagesProps) => {
     if (elem) {
       elem.scrollTop = elem.scrollHeight;
     }
-  })
+  }, [channelMessagesSelected?.length])
   
 
-  console.log("Current messages:", JSON.stringify(channelMessagesSelected));
 
   return (
     <div className="chat-history" id="chat-history">
