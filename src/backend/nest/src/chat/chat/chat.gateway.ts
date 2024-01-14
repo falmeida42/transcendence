@@ -62,13 +62,11 @@ export class ChatGateway
 
     const user = await this.userService.getChatRoomsByLogin(payload.username);
 
-    if (!user) {
-      throw new HttpException('No such user ', HttpStatus.BAD_REQUEST);
+    if (user) {
+      user.chatRooms.forEach((room) => {
+        client.join(room.id);
+      });
     }
-
-    user.chatRooms.forEach((room) => {
-      client.join(room.id);
-    });
 
     if (existingUserIndex !== -1) {
       // User with the same username already exists, update the data
