@@ -39,7 +39,6 @@ const disconnect = () => {
   socket.off("GameOver");
   socket.off("QueueJoined");
   socket.off("QueueLeft");
-  socket.off("RoomList");
   socket.disconnect();
 };
 
@@ -62,8 +61,6 @@ const SocketProvider = (props: any) => {
         return { ...state, match: action.payload, onQueue: false };
       case "QUEUE_JOINED":
         return { ...state, onQueue: action.payload };
-      case "ROOMS_UPDATE":
-        return { ...state, rooms: action.payload };
       case "SET_WINNER":
         return {
           ...state,
@@ -103,10 +100,6 @@ const SocketProvider = (props: any) => {
 
     socket.on("GameOver", () => {
       dispatch({ type: "SET_WINNER", payload: undefined });
-    });
-
-    socket.on("RoomList", (rooms) => {
-      dispatch({ type: "ROOMS_UPDATE", payload: rooms });
     });
 
     set_name = (name: string) => {
