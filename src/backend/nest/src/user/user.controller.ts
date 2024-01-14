@@ -1,20 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
-  Logger,
-  Post,
-  Body,
-  Param,
-  UseGuards,
   HttpStatus,
+  Logger,
+  Param,
+  Post,
+  UseGuards,
   Res,
-  Query,
+  Query
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { GetMe } from 'src/decorators';
-import { JwtAuthGuard } from '../auth/guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
+import { GetMe } from 'src/decorators';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtAuthGuard } from '../auth/guard';
+import * as bcrypt from '../utils';
 import { UserService } from './user.service';
 import { Response } from 'express';
 
@@ -147,6 +148,23 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('update-room-privacy/:roomId')
+  async updateRoomPrivacy(
+    @Body('type') type: any,
+    @Body('password') password: any,
+    @Param('roomId') roomId: string,
+  ) {
+    if (type && password) {
+      const hashedPassword = await bcrypt.hashPassword(password);
+      await this.userService.updateChatRoomPrivacy(
+        roomId,
+        type,
+        hashedPassword,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('joinable-rooms')
   async joinableRooms(@GetMe('id') id: string) {
     try {
@@ -265,16 +283,4 @@ export class UserController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('update-room-privacy/:roomId')
-  async updateRoomPrivacy(
-    @Body('type') type: any,
-    @Body('password') password: any,
-    @Param('roomId') roomId: string,
-  ) {
-    this.logger.debug('Entering update-room-privacy');
-    if (type && password) {
-      await this.userService.updateChatRoomPrivacy(roomId, type, password);
-    }
-  }
 }

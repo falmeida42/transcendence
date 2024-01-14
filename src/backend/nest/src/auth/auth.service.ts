@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { authenticator } from 'otplib';
 import { User } from '@prisma/client';
+import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 
 @Injectable()
@@ -91,7 +91,6 @@ export class AuthService {
   }
 
   async is2FACodeValid(twoFactorAuthenticationCode: string, user: User) {
-
     if (!user.twoFactorAuthSecret) {
       throw new ForbiddenException('2FA secret is not set');
     }
@@ -104,10 +103,9 @@ export class AuthService {
 
   async is2FAActive(id: string) {
     try {
-      const user = await this.prisma.user.findUnique({ where: { id: id } });
-      if (!user) {
-        throw new ForbiddenException('User is not in database. id: ', id);
-      }
+      const user = await this.prisma.user.findUniqueOrThrow({
+        where: { id },
+      });
       return user.twoFactorAuthEnabled;
     } catch (error) {
       console.error(error);

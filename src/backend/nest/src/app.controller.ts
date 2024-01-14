@@ -8,7 +8,6 @@ export class AppController {
     private readonly appService: AppService,
     private readonly authServce: AuthService,
   ) {}
-
   @Get()
   async getHome() {
     return { Res: 'Success' };

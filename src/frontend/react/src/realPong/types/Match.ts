@@ -32,4 +32,5 @@ export interface Match {
   score1: number;
   score2: number;
   status: "START" | "PLAY" | "PAUSE" | "END";
+  message?: string;
 }

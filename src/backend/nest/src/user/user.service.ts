@@ -1,4 +1,3 @@
-import { ChatRoom, ChatType, User } from '@prisma/client';
 import {
   ForbiddenException,
   Injectable,
@@ -6,7 +5,9 @@ import {
   NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
+import { ChatType, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from '../utils';
 import { UserDto } from './dto';
 
 @Injectable()
@@ -201,6 +202,7 @@ export class UserService {
   }
 
   async createRoom(userId: string, roomData: any) {
+    const hashedPassword = await bcrypt.hashPassword(roomData.password);
     return await this.prisma.chatRoom.create({
       data: {
         id: roomData.id,
@@ -208,7 +210,7 @@ export class UserService {
         userId: userId,
         image: roomData.image,
         type: roomData.type,
-        password: roomData.password,
+        password: hashedPassword,
         participants: {
           connect: roomData.participants.map((login: string) => ({
             login: login,
@@ -265,7 +267,8 @@ export class UserService {
         where: { id: roomId },
       });
 
-      if (roomType === 'PROTECTED' && room.password !== password) {
+      const passToComp = await bcrypt.validatePassword(password, room.password);
+      if (roomType === 'PROTECTED' && passToComp === false) {
         return {
           success: false,
           message: 'Incorrect password for the chat room',
