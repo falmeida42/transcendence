@@ -13,12 +13,10 @@ interface props {
 
 const RealPong = (props: props) => {
   const { match } = useContext(SocketContext);
-  const { gameConfig, ball, player1, player2, status } = match!;
+  const { gameConfig, ball, player1, player2, status, message } = match!;
   // const [page, setPage] = useState(0);
 
   useEffect(() => {
-    console.log("RealPong.tsx: useEffect");
-
     const sendKeyEvent = (e: KeyboardEvent) => {
       const { key, type } = e;
       if (e.repeat) return;
@@ -37,8 +35,6 @@ const RealPong = (props: props) => {
     };
   }, [status]);
 
-  // if (page === 0) {
-  // console.log(`Page: ${page}`);
   return (
     <div className="gamePage">
       {status === "START" && (
@@ -84,7 +80,7 @@ const RealPong = (props: props) => {
               y="0"
               width={gameConfig.width.toString()}
               height={gameConfig.height.toString()}
-              xlinkHref="https://cdnb.artstation.com/p/assets/images/images/060/251/939/large/kazu_arts-image4.jpg?1678154083"
+              xlinkHref="https://cdn.intra.42.fr/users/6e834c7689fb6ec761861181e5fc177c/maxthecorgi.png"
             ></image>
           </pattern>
         </defs>
@@ -125,7 +121,7 @@ const RealPong = (props: props) => {
         />
         <text
           x={(gameConfig.width / 2 - 20).toString()}
-          y="45"
+          y="55"
           style={{
             direction: "rtl",
             fill: "rgba(255, 255, 255, 0.7)",
@@ -134,10 +130,9 @@ const RealPong = (props: props) => {
         >
           {match?.score1 + " " + match?.player1.name}
         </text>
-
         <text
           x={(gameConfig.width / 2 + 20).toString()}
-          y="45"
+          y="55"
           style={{
             fill: "rgba(255, 255, 255, 0.7)",
             fontSize: "30px",
@@ -145,7 +140,6 @@ const RealPong = (props: props) => {
         >
           {match?.score2 + " " + match?.player2.name}
         </text>
-
         {ball && (
           <Circle
             cx={ball.x.toString()}
@@ -154,7 +148,6 @@ const RealPong = (props: props) => {
             style={{ fill: "#61ff22" }}
           />
         )}
-
         {player1 && (
           <Rect
             x={player1.x.toString()}
@@ -164,7 +157,7 @@ const RealPong = (props: props) => {
             style={{ fill: "#fff" }}
           />
         )}
-
+        user,
         {player2 && (
           <Rect
             x={player2.x.toString()}
@@ -175,6 +168,18 @@ const RealPong = (props: props) => {
           />
         )}
       </SVG>
+      {message && (
+        <h1
+          style={{
+            fontSize: "30px",
+            fontWeight: "bold",
+            color: "#FFF",
+            backgroundColor: "rgba(0,0,0,0.7)",
+          }}
+        >
+          {message}
+        </h1>
+      )}
     </div>
   );
 };

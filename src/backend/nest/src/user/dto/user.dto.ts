@@ -36,5 +36,5 @@ export class UserDto {
 
   @IsString()
   @IsOptional()
-  chatRoomId: string;  
+  chatRoomId: string;
 }

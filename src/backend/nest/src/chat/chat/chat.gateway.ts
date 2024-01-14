@@ -1,15 +1,15 @@
 // chat.gateway.ts
 
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  OnGatewayInit,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { UserStatus } from './User';
 
@@ -34,9 +34,7 @@ export class ChatGateway
     this.logger.log('WebSocket Gateway initialized');
   }
 
-  handleConnection(client: Socket): void {
-    this.logger.log(`Client connected ${client.id}`);
-  }
+  handleConnection(client: Socket): void {}
 
   handleDisconnect(client: Socket): void {
     this.logger.log(`Client disconnected ${client.id}`);

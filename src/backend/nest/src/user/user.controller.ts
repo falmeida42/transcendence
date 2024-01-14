@@ -1,18 +1,19 @@
 import {
+  Body,
   Controller,
   Get,
-  Logger,
-  Post,
-  Body,
-  Param,
-  UseGuards,
   HttpStatus,
+  Logger,
+  Param,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { GetMe } from 'src/decorators';
-import { JwtAuthGuard } from '../auth/guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
+import { GetMe } from 'src/decorators';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtAuthGuard } from '../auth/guard';
+import * as bcrypt from '../utils';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -151,7 +152,12 @@ export class UserController {
     @Param('roomId') roomId: string,
   ) {
     if (type && password) {
-      await this.userService.updateChatRoomPrivacy(roomId, type, password);
+      const hashedPassword = await bcrypt.hashPassword(password);
+      await this.userService.updateChatRoomPrivacy(
+        roomId,
+        type,
+        hashedPassword,
+      );
     }
   }
 

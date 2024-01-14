@@ -15,8 +15,9 @@ type state = {
   username?: string;
   room?: Room;
   match?: Match;
-  winner?: string;
   onQueue: boolean;
+  socketId?: string;
+  rooms?: Room[];
 };
 
 const initialState: state = {
@@ -25,7 +26,7 @@ const initialState: state = {
   match: undefined,
   username: "",
   onQueue: false,
-  winner: undefined,
+  socketId: "",
 };
 
 const socket = io("http://localhost:3000/gamer", { autoConnect: false });
@@ -36,6 +37,9 @@ const disconnect = () => {
   socket.off("RoomCreated");
   socket.off("MatchRefresh");
   socket.off("GameOver");
+  socket.off("QueueJoined");
+  socket.off("QueueLeft");
+  socket.off("RoomList");
   socket.disconnect();
 };
 
@@ -47,7 +51,7 @@ const SocketProvider = (props: any) => {
   const reducer = (state: state, action: action): state => {
     switch (action.type) {
       case "CONNECTED":
-        return { ...state, isConnected: action.payload };
+        return { ...state, isConnected: action.payload, socketId: socket.id };
       case "DISCONNECTED":
         return { ...state, isConnected: action.payload };
       case "NAME_SET":
@@ -58,11 +62,12 @@ const SocketProvider = (props: any) => {
         return { ...state, match: action.payload, onQueue: false };
       case "QUEUE_JOINED":
         return { ...state, onQueue: action.payload };
+      case "ROOMS_UPDATE":
+        return { ...state, rooms: action.payload };
       case "SET_WINNER":
         return {
           ...state,
-          winner: action.payload,
-          match: undefined,
+          match: action.payload,
         };
       default:
         return state;
@@ -73,12 +78,10 @@ const SocketProvider = (props: any) => {
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("Conectado!");
       dispatch({ type: "CONNECTED", payload: true });
     });
 
     socket.on("disconnect", () => {
-      console.log("Desconectado!");
       dispatch({ type: "DISCONNECTED", payload: false });
     });
 
@@ -87,7 +90,6 @@ const SocketProvider = (props: any) => {
     });
 
     socket.on("MatchRefresh", (match) => {
-      // console.log("MatchRefresh", match.ball);
       dispatch({ type: "MATCH_REFRESH", payload: match });
     });
 
@@ -99,9 +101,12 @@ const SocketProvider = (props: any) => {
       dispatch({ type: "QUEUE_JOINED", payload: false });
     });
 
-    // TODO: Make the winner be displayed
-    socket.on("GameOver", (winner) => {
-      dispatch({ type: "SET_WINNER", payload: winner });
+    socket.on("GameOver", () => {
+      dispatch({ type: "SET_WINNER", payload: undefined });
+    });
+
+    socket.on("RoomList", (rooms) => {
+      dispatch({ type: "ROOMS_UPDATE", payload: rooms });
     });
 
     set_name = (name: string) => {
@@ -146,12 +151,17 @@ const pauseGame = () => {
   socket.emit("PauseMatch");
 };
 
+const joinRoomSpec = (roomId: string) => {
+  socket.emit("JoinRoomSpec", { roomId });
+};
+
 export {
   SocketContext,
   SocketProvider,
   createRoom,
   gameLoaded,
   joinQueue,
+  joinRoomSpec,
   leaveQueue,
   pauseGame,
   sendKey,

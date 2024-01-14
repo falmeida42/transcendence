@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { useApi } from "../../apiStore";
 import {
   SocketContext,
   createRoom,
@@ -6,29 +7,24 @@ import {
   leaveQueue,
   set_name,
 } from "../context/SocketContext";
+import "../game.css";
 import RealPong from "./RealPong";
 
 const Home = () => {
-  const { isConnected, room, username, onQueue, match, winner } =
+  const { isConnected, room, username, onQueue, rooms } =
     useContext(SocketContext);
-  const [name, setName] = useState<string>("");
   const [page, setPage] = useState<number>(0);
+  const { login } = useApi();
 
   useEffect(() => {
-    console.log("page changer");
-    console.log({
-      isConnected,
-      username,
-      onQueue,
-      room,
-    });
     const changePage = () => {
       if (!isConnected) {
         setPage(0);
         return;
       }
       if (!username) {
-        setPage(1);
+        set_name(login);
+        setPage(2);
         return;
       }
       if (onQueue) {
@@ -39,15 +35,10 @@ const Home = () => {
         setPage(3);
         return;
       }
-      if (!match && winner) {
-        setPage(4);
-        return;
-      }
-      setPage(4);
+      setPage(5);
     };
     changePage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, room, username, onQueue, !!match, !!winner]);
+  }, [isConnected, room, username, onQueue, rooms, login]);
 
   if (page === 0) {
     return (
@@ -57,21 +48,21 @@ const Home = () => {
     );
   }
 
-  if (page === 1) {
-    return (
-      <div>
-        <input
-          type="text"
-          name="name"
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") set_name(name);
-          }}
-        />
-        <button onClick={() => set_name(name)}>Set Name</button>
-      </div>
-    );
-  }
+  // if (page === 1) {
+  //   return (
+  //     <div>
+  //       <input
+  //         type="text"
+  //         name="name"
+  //         onChange={(e) => setName(e.target.value)}
+  //         onKeyDown={(e) => {
+  //           if (e.key === "Enter") set_name(name);
+  //         }}
+  //       />
+  //       <button onClick={() => set_name(name)}>Set Name</button>
+  //     </div>
+  //   );
+  // }
 
   if (page === 2)
     return (
@@ -94,15 +85,16 @@ const Home = () => {
 
   if (page === 3) {
     return (
-      <div>
-        <button onClick={() => createRoom(true)}>Play against AI</button>
-        <button onClick={() => joinQueue()}>Play a random</button>
-        <button disabled>Play with a friend</button>
+      <div className="home">
+        <div className="game-buttons">
+          <button onClick={() => createRoom(true)}>Play against AI</button>
+          <button onClick={() => joinQueue()}>Play a random</button>
+        </div>
       </div>
     );
   }
 
-  if (page === 4) return <RealPong setPage={setPage} />;
+  if (page === 5) return <RealPong setPage={setPage} />;
 };
 
 export default Home;
