@@ -2,6 +2,7 @@ import { createContext, ReactNode, useState, useEffect, useRef } from "react";
 
 interface ProfileContextProps {
   userFriends: any,
+  blockableUsers: any
 }
 
 interface ProfileProviderProps {
@@ -17,10 +18,12 @@ interface User {
 const ProfileContext = createContext<ProfileContextProps | undefined>(undefined);
 
 let updateUserFriends: () => void;
+let updateBlockableUsers: () => void;
 
 function ProfileProvider({ children }: ProfileProviderProps) {
     
     const [userFriends, setUserFriends] = useState<User[]>([])
+    const [blockableUsers, setBlockableUsers] = useState<User[]>([])
     
     const tk = document.cookie
     .split('; ')
@@ -58,6 +61,35 @@ function ProfileProvider({ children }: ProfileProviderProps) {
 
   }
 
+  updateBlockableUsers = () => {
+
+    fetch(`http://localhost:3000/user/blockable-users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then(async (response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+    })
+    .then((data) => {
+        const mappedBlockableUsers = data.map((friend: any) => ({
+            id: friend.id,
+            username: friend.login,
+            userImage: friend.image,
+        }));
+        
+        setBlockableUsers([...mappedBlockableUsers]);
+    })
+    .catch((error) => console.error("Fetch error:", error));
+
+  }
+
   useEffect(() => {
 
     fetch(`http://localhost:3000/user/friends`, {
@@ -85,12 +117,37 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     })
     .catch((error) => console.error("Fetch error:", error));
 
+    fetch(`http://localhost:3000/user/blockable-users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then(async (response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+    })
+    .then((data) => {
+        const mappedBlockableUsers = data.map((friend: any) => ({
+            id: friend.id,
+            username: friend.login,
+            userImage: friend.image,
+        }));
+        
+        setBlockableUsers([...mappedBlockableUsers]);
+    })
+    .catch((error) => console.error("Fetch error:", error));
+
   }, []);
 
-  // console.log("YOUR FRIENDS:", userFriends);
 
   const contextValue: ProfileContextProps = {
     userFriends: userFriends,
+    blockableUsers: blockableUsers
   };
 
   return (
@@ -100,4 +157,4 @@ function ProfileProvider({ children }: ProfileProviderProps) {
   );
 }
 
-export { ProfileContext, ProfileProvider, updateUserFriends };
+export { ProfileContext, ProfileProvider, updateUserFriends, updateBlockableUsers };

@@ -216,6 +216,50 @@ export class UserService {
       throw new Error('Error accepting friend request');
     }
   }
+
+  async blockUser(id: string, blockedId: string) {
+    try {
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        id: blockedId,
+      },
+    });
+
+    if (!existingUser) {
+      return { message: 'User with blockedId not found:', blockedId };
+    }
+
+    const isAlreadyBlocked = await this.prisma.user.findFirst({
+      where: {
+        id: blockedId,
+        blockedBy: {
+          some: {
+            id: id,
+          },
+        },
+      },
+    });
+
+    if (isAlreadyBlocked) {
+      return { message: 'User is already blocked:', blockedId };
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: blockedId,
+      },
+      data: {
+        blockedBy: {
+          connect: { id: id },
+        },
+      },
+    });
+   
+    } catch (error) {
+      throw new Error('Error blocking user');
+    }
+  }
   
   async set2FASecret(id: string, secret: string) {
     try {
@@ -251,5 +295,29 @@ export class UserService {
       throw new ForbiddenException('User does not exist');
     }
     return user.twoFactorAuthEnabled;
-  }  
+  }
+
+  async getBlockableUsers(id: string) {
+    try {
+      const users = await this.prisma.user.findMany({
+        where: {
+          id: {
+            not: id,
+          },
+          blockedBy: {
+            none: {
+              id: id,
+            },
+          },
+        },
+      });
+  
+      return users;
+    } catch (error) {
+      throw new Error('Error fetching users');
+    }
+  }
+
+  
 }
+

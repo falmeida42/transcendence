@@ -94,6 +94,12 @@ export class UserController {
   }
   
   @UseGuards(JwtAuthGuard)
+  @Get('blockable-users')
+  async getBlockableUsers(@GetMe('id') id: string) { 
+      return this.userService.getBlockableUsers(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('create-friend-request')
   async addFriendRequest(@Req() req: any, @Body() body: any) {
     this.logger.debug("AAAAA", body.requesteeId);
@@ -106,6 +112,18 @@ export class UserController {
     this.logger.debug("ACCEPT FETCH BODY:");
     try {
       const result = await this.userService.handleFriendRequest(body.requesterId, id, body.requestId, body.type);
+      return { statusCode: HttpStatus.CREATED, ...result };
+    } catch (error) {
+      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('block-user')
+  async blockUser(@GetMe('id') id: string, @Body() body: any) {
+    this.logger.debug("ACCEPT FETCH BODY:");
+    try {
+      const result = await this.userService.blockUser(id, body.blockedId);
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
       return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };

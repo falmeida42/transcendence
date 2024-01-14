@@ -31,6 +31,9 @@ model User {
   friends  User[] @relation("UserFriends")
   friendOf User[] @relation("UserFriends")
 
+  blockedUsers User[] @relation("BlockedUsers")
+  blockedBy User[] @relation("BlockedUsers")
+
   sentFriendRequests		FriendRequest[] @relation("FriendsRequestor")
 	receivedFriendRequests	FriendRequest[] @relation("FriendsRequestee")
 

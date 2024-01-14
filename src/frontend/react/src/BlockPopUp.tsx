@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useApi } from "./apiStore";
 import "./Profile.css"
-import { updateUserFriends } from "./ProfileContext";
+import { ProfileContext, updateBlockableUsers, updateUserFriends } from "./ProfileContext";
 
 interface BlockPopupProps {
     isVisible: boolean;
@@ -23,34 +23,34 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const { id } = useApi();
+    const { blockableUsers } = useContext(ProfileContext) ?? {};
  
-    useEffect(() => {
-    fetch(`http://localhost:3000/user/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.text();
-        return data ? JSON.parse(data) : null;
-      })
-      .then((data) => {
-        const filteredUsers = data.filter((user: any) => user.id !== id);
-        const mappedUsers = filteredUsers.map((user : any) => ({
-            id: user.id,
-            username: user.login,
-            userImage: user.image
-        }));
+    // useEffect(() => {
+    // fetch(`http://localhost:3000/user/blockable-users`, {
+    //   method: "GET",
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //     "Content-Type": "application/json",
+    //   },
+    // })
+    //   .then(async (response) => {
+    //     if (!response.ok) {
+    //       throw new Error(`HTTP error! Status: ${response.status}`);
+    //     }
+    //     const data = await response.text();
+    //     return data ? JSON.parse(data) : null;
+    //   })
+    //   .then((data) => {
+    //     const mappedUsers = data.map((user : any) => ({
+    //         id: user.id,
+    //         username: user.login,
+    //         userImage: user.image
+    //     }));
 
-        setUsers([...mappedUsers])
-      })
-      .catch((error) => console.error("Fetch error:", error));
-    }, [updateUserFriends]);
+    //     setUsers([...mappedUsers])
+    //   })
+    //   .catch((error) => console.error("Fetch error:", error));
+    // }, [updateUserFriends]);
 
     const toggleVisibility = (visibility: boolean) => {
         setIsVisibleWarning(visibility);
@@ -77,7 +77,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
         }
 
         console.log("BLOCK REQUEST: DATA PASSED TO THE BACKEND", id, userToBlock.id);
-        fetch(`http://localhost:3000/user/create-friend-request`, {
+        fetch(`http://localhost:3000/user/block-user`, {
                 method: "POST",
                 headers: {
                 Authorization: `Bearer ${token}`,
@@ -85,8 +85,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
                 },
                 body: JSON.stringify(
                     {
-                        requesterId : id,
-                        requesteeId : userToBlock.id
+                        blockedId : userToBlock.id
                     }
                 )
             })
@@ -99,11 +98,12 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
             })
             .then((data) => {
                 if (data) {
-                console.log("Request sent status: ", JSON.stringify(data));
+                console.log("Block status: ", JSON.stringify(data));
                 } else {
                 console.log("No data received");
                 }
             })
+            .then(updateBlockableUsers)
             .catch((error) => console.error("Fetch error:", error));
             handleClickClose()
     };
@@ -126,7 +126,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
                             <ul
                             className="popup-input"
                             >
-                               {users.map((user) => (
+                               {blockableUsers.map((user) => (
                                 <li key={user.id}>
                                     <label>
                                     <input 

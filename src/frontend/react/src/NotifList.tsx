@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { updateUserFriends } from './ProfileContext';
 import Notif from "./Notif";
 
 interface NotifListProps {
@@ -55,73 +54,6 @@ useEffect(() => {
         .catch((error) => console.error("Fetch error:", error));
 
 }, []);
-
-const acceptRequest = (requestor_id: string, id: string) =>
-{
-    if (requestor_id !== "" && id !== "")
-    {
-      fetch('http://localhost:3000/user/handle-friend-request', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(
-                {
-                    requesterId: requestor_id,
-                    requestId: id,
-                    type: "ACCEPTED"
-                }
-              ),
-            })
-            .then(async (response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.text();
-            return data ? JSON.parse(data) : null;
-            })
-            .then((data) => {
-                console.log("ACCEPTED:", JSON.stringify(data))
-            })
-            .then( updateUserFriends )
-            .catch((error) => console.error("Fetch error:", error));
-        };
-}
-
-const rejectRequest = (requestor_id: string, id: string) =>
-{
-    if (requestor_id !== "" && id !== "")
-    {
-      fetch('http://localhost:3000/user/handle-friend-request', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(
-                {
-                    requesterId: requestor_id,
-                    requestId: id,
-                    type: "CANCELED"
-                }
-              ),
-            })
-            .then(async (response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.text();
-            return data ? JSON.parse(data) : null;
-            })
-            .then((data) => {
-                console.log("CANCELED:", JSON.stringify(data))
-            })
-            .then( updateUserFriends )
-            .catch((error) => console.error("Fetch error:", error));
-        };
-}
-
 
 return (
     <div className="request-container">
