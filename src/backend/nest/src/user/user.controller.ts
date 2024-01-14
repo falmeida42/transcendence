@@ -8,7 +8,7 @@ import {
   Post,
   UseGuards,
   Res,
-  Query
+  Query,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
@@ -258,6 +258,37 @@ export class UserController {
           return res.status(HttpStatus.FORBIDDEN).send();
         }
         await this.userService.kickUser(kickedId, roomId);
+        return res.status(HttpStatus.OK).send();
+      } else {
+        return res.status(HttpStatus.FORBIDDEN).send();
+      }
+    } catch (error) {
+      this.logger.error(error);
+      res.status(error.status).json({ message: error.message }).send();
+    }
+  }
+
+  // SAME CODE AS ABOVE
+  @UseGuards(JwtAuthGuard)
+  @Post('ban-user')
+  async banUser(
+    @GetMe() user: User,
+    @Body('roomId') roomId: string,
+    @Body('participantId') participantId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      if (await this.userService.isOwner(user.id, roomId)) {
+        await this.userService.banUser(participantId, roomId);
+        return res.status(HttpStatus.OK).send();
+      } else if (await this.userService.isAdmin(user.id, roomId)) {
+        if (
+          (await this.userService.isOwner(participantId, roomId)) ||
+          (await this.userService.isAdmin(participantId, roomId))
+        ) {
+          return res.status(HttpStatus.FORBIDDEN).send();
+        }
+        await this.userService.banUser(participantId, roomId);
         return res.status(HttpStatus.OK).send();
       } else {
         return res.status(HttpStatus.FORBIDDEN).send();

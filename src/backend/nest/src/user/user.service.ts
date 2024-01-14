@@ -454,6 +454,35 @@ export class UserService {
     });
   }
 
+  async banUser(id: string, roomId: string) {
+    await this.prisma.chatRoom.update({
+      where: { id: roomId },
+      data: {
+        participants: {
+          disconnect: { id },
+        },
+        admins: {
+          disconnect: { id },
+        },
+        bannedUsers: {
+          connect: { id },
+        },
+      },
+      include: {
+        participants: true,
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        bannedFrom: {
+          connect: { id },
+        },
+      },
+    });
+  }
+
   async kickableUsers(user: User, roomId: string) {
     if (await this.isOwner(user.id, roomId)) {
       const room = await this.prisma.chatRoom.findUnique({
