@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./App.css";
 import Website from "./Website.tsx";
 import { useApi } from "./apiStore.tsx";
-import { Link, Redirect, Route, Switch, useLocation } from 'wouter';
+import { Redirect, Route, Switch, useLocation } from 'wouter';
 import { navigate } from "wouter/use-location";
 import AuthApi from "./ApiAuth.tsx";
-import React from "react";
 import ApiData2faProvider from "./ApiData2faProvider.tsx";
-import ApiDataProvider from "./ApiDataProvider.tsx";
 
 
 function App() {
@@ -15,14 +13,14 @@ function App() {
   const [location] = useLocation();
 
   const token = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
 
   const token2fa = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token2fa='))
-    ?.split('=')[1];
+    .split("; ")
+    .find((row) => row.startsWith("token2fa="))
+    ?.split("=")[1];
 
   useEffect(() => {
     if (token && token2fa) {
@@ -38,7 +36,6 @@ function App() {
     }} else {
       navigate('/login');
     }
-
   }, [token, token2fa, navigate]);
   const handleButtonClick = () => {
     window.location.href = "http://localhost:3000/auth/login";

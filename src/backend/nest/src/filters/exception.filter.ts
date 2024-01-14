@@ -14,7 +14,6 @@ export class FTAuthExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest();
 
     if (exception.getStatus() === HttpStatus.UNAUTHORIZED) {
-      // Handle 403 Forbidden error
       response.redirect(`${process.env.FRONTEND_URL}`); // Redirect to a custom error page
     } else {
       // For other errors, fall back to the default behavior

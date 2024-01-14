@@ -7,8 +7,8 @@ interface ApiDataProviderProps {
 }
 
 const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
-  const { auth, setInfo, twofa, user, login, image, qrcode, email, first_name, last_name, id} = useApi();
-  
+  const { auth, setInfo } = useApi();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -31,8 +31,16 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
           }
           return;
         }
+        const friends = await fetch("http://localhost:3000/user/friends", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         const data = await response.json();
+        const dataFriends = await friends.json();
         setInfo(
           data.id,
           data.username,
@@ -41,7 +49,8 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
           data.login,
           data.email,
           data.image,
-          data.twoFactorAuthEnabled
+          data.twoFactorAuthEnabled,
+          dataFriends
         );
       } catch (error) {
         console.error(error);
@@ -49,7 +58,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
     };
 
     fetchData();
-  }, [auth, setInfo, twofa, user, login, image, qrcode, email, first_name, last_name, id]);
+  }, [auth, setInfo]);
 
   return <>{props.children}</>;
 };

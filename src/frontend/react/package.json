@@ -12,6 +12,7 @@
   "dependencies": {
     "@nestjs/websockets": "^10.3.0",
     "@types/socket.io-client": "^3.0.0",
+    "@types/uuid": "^9.0.7",
     "axios": "^1.6.5",
     "jquery": "^3.7.1",
     "react": "^18.2.0",
@@ -33,6 +34,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "prettier": "3.1.0",
+    "sass": "^1.69.7",
     "typescript": "^5.2.2",
     "vite": "^5.0.0"
   }

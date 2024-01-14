@@ -20,8 +20,8 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
         await fetch('http://localhost:3000/user/me', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             username: props.username,

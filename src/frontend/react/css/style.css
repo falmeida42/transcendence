@@ -1059,12 +1059,12 @@ a[data-toggle="collapse"] {
 }
 
 #content {
-    width: 100%;
-    /* min-height: 100vh; */
-    transition: ease all 0.3s;
-    position: relative;
-    /* padding: 60px 25px 25px 305px; */
-    background: #ffffff;
+  width: 100%;
+  /* min-height: 100vh; */
+  transition: ease all 0.3s;
+  position: relative;
+  /* padding: 60px 25px 25px 305px; */
+  /* background: #ffffff; */
 }
 
 .page_title {
@@ -2000,7 +2000,7 @@ td ul.list-inline li {
   position: relative;
   padding: 1em 2em;
   border: 0;
-  background-color: rgba(33, 33, 33, 0);;
+  background-color: rgba(33, 33, 33, 0);
   font-family: "Roboto", Arial, "Segoe UI", sans-serif;
   font-size: 18px;
   font-weight: 500;
@@ -2066,7 +2066,7 @@ body {
 }
 
 .background-image {
-  background-image: url('https://media.istockphoto.com/id/1329920974/photo/blue-watercolor-background-grunge-vignette.webp?b=1&s=170667a&w=0&k=20&c=bb-ho5LRuTJcrhtKAjqRg_2-iuzUptuXRkBf-D3YFZA='); /* Replace with the path to your background image */
+  background-image: url("https://media.istockphoto.com/id/1329920974/photo/blue-watercolor-background-grunge-vignette.webp?b=1&s=170667a&w=0&k=20&c=bb-ho5LRuTJcrhtKAjqRg_2-iuzUptuXRkBf-D3YFZA="); /* Replace with the path to your background image */
   background-size: cover;
   background-position: center;
   height: 100vh;

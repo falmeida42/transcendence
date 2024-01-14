@@ -19,7 +19,7 @@ import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: true,
+  cors: { origin: 'http://localhost:5173', credentials: true },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -50,16 +50,18 @@ export class GamerGateway
     this.logger.log(`Client disconnected ${client.id}`);
     const player = this.players[client.id];
     if (player) {
-      console.log(`${player.name} desconectou`);
+      // console.log(`${client.id} desconectou`);
 
       const playerId = client.id;
-      const timerId = setTimeout(() => {
-        this.removePlayer(playerId);
-      }, 5000);
-      this.players[playerId].disconnectedId = timerId;
+      if (player.room && this.match[player.room]) {
+        this.match[player.room].status = 'PAUSE';
+        if (this.match[player.room].player1)
+          this.match[player.room].player1.ready = false;
+        if (this.match[player.room].player2)
+          this.match[player.room].player2.ready = false;
+      }
+      this.removePlayer(playerId);
     }
-
-    delete this.players[client.id];
   }
 
   @SubscribeMessage('Login')
@@ -69,7 +71,15 @@ export class GamerGateway
   ) {
     this.logger.log(`Client ${client.id} logged in as ${name}`);
     this.players[client.id].name = name;
-    this.logger.log(this.players);
+    const rooms = [];
+    const keys = Object.keys(this.rooms);
+    for (let i = 0; i < keys.length; i++) {
+      if (this.rooms[keys[i]].player1 && this.rooms[keys[i]].player2) {
+        rooms.push(this.rooms[keys[i]]);
+      }
+    }
+    this.logger.log(rooms);
+    client.emit('RoomList', rooms);
   }
 
   @SubscribeMessage('CreateRoom')
@@ -77,14 +87,18 @@ export class GamerGateway
     @ConnectedSocket() client: Socket,
     @MessageBody('againstAi') againstAi: boolean,
   ) {
-    client.join(client.id);
-    this.logger.log(`Client ${client.id} created a room against AI`);
+    const roomId = `${this.players[client.id].name} ${
+      againstAi ? 'vs AI' : ''
+    }`;
+    client.join(roomId);
 
     this.rooms[client.id] = {
       id: client.id,
+      name: roomId,
       player1: this.players[client.id].socket,
       player2: 'AI',
       againstAi,
+      spectators: [],
     };
     this.players[client.id].room = client.id;
     this.match[this.players[client.id].room] = this.createMatch(
@@ -94,6 +108,15 @@ export class GamerGateway
     if (againstAi) this.runGame(this.players[client.id].room, againstAi);
 
     client.emit('RoomCreated', this.rooms[client.id]);
+    const rooms = [];
+    const keys = Object.keys(this.rooms);
+    for (let i = 0; i < keys.length; i++) {
+      if (this.rooms[keys[i]].player1 && this.rooms[keys[i]].player2) {
+        rooms.push(this.rooms[keys[i]]);
+      }
+    }
+    this.logger.log(rooms);
+    this.server.emit('RoomList', rooms);
   }
 
   @SubscribeMessage('GameLoaded')
@@ -108,16 +131,23 @@ export class GamerGateway
 
     const match = this.match[roomId];
     if (!match) return;
-    if (room.player1 === player.socket) match.player1.ready = true;
-    else match.player2.ready = true;
+    if (room.player1 === player.socket) {
+      match.player1.ready = true;
+      match.message = 'Player 1 ready;  Waiting for player 2...';
+    } else {
+      match.player2.ready = true;
+      match.message = 'Player 2 ready;  Waiting for player 1...';
+    }
     if (room.againstAi) {
       match.status = 'PLAY';
+      match.message = 'Game started';
     } else {
       if (
         match.player1.ready &&
         match.player2.ready &&
         match.status !== 'PLAY'
       ) {
+        match.message = 'Game started';
         match.status = 'PLAY';
       }
     }
@@ -137,8 +167,6 @@ export class GamerGateway
     const match = this.match[roomId];
 
     const direction = type === 'keyup' ? 'STOP' : key;
-    if (playerNumber === 'player2')
-      this.logger.debug(`player ${JSON.stringify(player)}`);
     match[playerNumber].direction = direction;
   }
 
@@ -171,10 +199,18 @@ export class GamerGateway
     const player = this.players[socketId];
     const roomId = player.room;
     const match = this.match[roomId];
-    match.player1.ready = false;
-    match.player2.ready = false;
+    if (match.status !== 'END') {
+      match.player1.ready = false;
+      match.player2.ready = false;
+    }
 
-    if (match.status === 'PLAY') match.status = 'PAUSE';
+    if (match.status === 'PLAY') {
+      match.status = 'PAUSE';
+      match.message =
+        client.id === match.player1.id
+          ? `${match.player1.name} paused the game`
+          : `${match.player2.name} paused the game`;
+    }
   }
 
   removePlayer(playerId: string) {
@@ -184,7 +220,7 @@ export class GamerGateway
 
   leaveRoom(socketId: string) {
     const player = this.players[socketId];
-    const roomId = player && player.room;
+    const roomId = player.room;
     const room = this.rooms[roomId];
 
     if (room) {
@@ -194,17 +230,37 @@ export class GamerGateway
 
       const playerNumber = 'player' + (socketId === room.player1 ? 1 : 2);
       room[playerNumber] = undefined;
-
       if (match) {
-        match[playerNumber] = undefined;
-
-        if (match.status !== 'END') match.status = 'END';
+        if (match.status !== 'END') {
+          match.status = 'END';
+          if (playerNumber === 'player2') {
+            match.score1 = 5;
+            match.score2 = 0;
+          } else {
+            match.score1 = 0;
+            match.score2 = 5;
+          }
+        }
+        match.message =
+          socketId === match.player1.id
+            ? `${match.player1.name} left`
+            : `${match.player2.name} left`;
+        this.refreshGame(roomId);
       }
 
-      if (!room.player1 && !room.player2) {
+      if (match.status === 'END') {
         delete this.rooms[roomId];
-        if (match) delete this.match[roomId];
+        delete this.match[roomId];
       }
+      const rooms = [];
+      const keys = Object.keys(this.rooms);
+      for (let i = 0; i < keys.length; i++) {
+        if (this.rooms[keys[i]].player1 && this.rooms[keys[i]].player2) {
+          rooms.push(this.rooms[keys[i]]);
+        }
+      }
+      this.logger.log(rooms);
+      this.server.emit('RoomList', rooms);
     }
   }
 
@@ -245,6 +301,7 @@ export class GamerGateway
       score1: 0,
       score2: 0,
       status: 'START',
+      message: 'Waiting players to be ready...',
     };
     this.match[this.players[player1Id].room] = match;
     return match;
@@ -252,7 +309,21 @@ export class GamerGateway
 
   runGame(roomId: string, againstAi: boolean) {
     const match = this.match[roomId];
-    if (!match || match.status === 'END') return;
+    if (!match) return;
+    if (match.status === 'END') {
+      delete this.rooms[roomId];
+      delete this.match[roomId];
+      const rooms = [];
+      const keys = Object.keys(this.rooms);
+      for (let i = 0; i < keys.length; i++) {
+        if (this.rooms[keys[i]].player1 && this.rooms[keys[i]].player2) {
+          rooms.push(this.rooms[keys[i]]);
+        }
+      }
+      this.logger.log(rooms);
+      this.server.emit('RoomList', rooms);
+      return;
+    }
 
     if (match.status === 'PLAY') {
       this.moveBall(match);
@@ -268,7 +339,9 @@ export class GamerGateway
     }, 1000 / 30);
   }
 
-  refreshGame(roomId: string) {
+  refreshGame(roomId: string, temp?: string) {
+    if (temp) this.logger.debug(temp + roomId);
+    else this.logger.debug(temp + roomId);
     const match = this.match[roomId];
     this.server.to(roomId).emit('MatchRefresh', match);
   }
@@ -398,20 +471,25 @@ export class GamerGateway
       match.score2 === match.gameConfig.maxScore
     ) {
       this.logger.log('Game Over');
+      match.message =
+        match.score1 === match.gameConfig.maxScore
+          ? `Game Over  ${match.player1.name} wins`
+          : `Game Over  ${match.player2.name} wins`;
       match.status = 'END';
       await this.saveMatchOnDatabase(match);
-      this.server.to(roomId).emit('GameOver', match);
+      this.server.to(roomId).emit('GameOver');
     }
   }
 
   async saveMatchOnDatabase(match: Match) {
     try {
+      this.logger.log(`${match.player1.name} vs ${match.player2.name}`);
       const user1Id = await this.prisma.user.findUniqueOrThrow({
         where: {
           login: match.player1.name,
         },
       });
-      const user2Id = await this.prisma.user.findFirstOrThrow({
+      const user2Id = await this.prisma.user.findUniqueOrThrow({
         where: {
           login: match.player2.name,
         },
@@ -431,8 +509,8 @@ export class GamerGateway
         },
       });
       this.logger.log(matchCreated);
-    } catch (e) {
-      this.logger.log(e);
+    } catch (error) {
+      this.logger.log(error);
     }
   }
 
@@ -449,19 +527,23 @@ export class GamerGateway
   }
 
   createRoomFromQueue(socket1: Socket, socket2: Socket) {
-    const roomId = socket1.id + socket1.id;
     const player1 = this.players[socket1.id];
     const player2 = this.players[socket2.id];
+    const roomId = player1.name + ' vs ' + player2.name;
 
+    player1.onQueue = false;
+    player2.onQueue = false;
     this.logger.log(`${player1.name} vs ${player2.name} in room }`);
     socket1.join(roomId);
     socket2.join(roomId);
 
     this.rooms[roomId] = {
       id: roomId,
+      name: roomId,
       player1: socket1.id,
       player2: socket2.id,
       againstAi: false,
+      spectators: [],
     };
 
     player1.room = roomId;
@@ -473,5 +555,14 @@ export class GamerGateway
     socket2.emit('RoomCreated', this.rooms[roomId]);
     this.runGame(roomId, false);
     this.logger.log(`Room ${roomId} created`);
+    const rooms = [];
+    const keys = Object.keys(this.rooms);
+    for (let i = 0; i < keys.length; i++) {
+      if (this.rooms[keys[i]].player1 && this.rooms[keys[i]].player2) {
+        rooms.push(this.rooms[keys[i]]);
+      }
+    }
+    this.logger.log(rooms);
+    this.server.emit('RoomList', rooms);
   }
 }

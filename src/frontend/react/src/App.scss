@@ -1,0 +1,12 @@
+
+body {
+	overflow: hidden;
+	margin: 0;
+}
+
+.app {
+    display: flex;
+    height: 100vh;
+    border: 1px solid red;
+    flex-direction: column;
+}
