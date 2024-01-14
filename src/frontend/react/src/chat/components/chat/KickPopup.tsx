@@ -24,7 +24,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
     }
     
     interface Data {
-        participants: Participant[]; 
+        participants: Participant[];
     }
 
     const handleClickClose = () => {
@@ -37,6 +37,23 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
             toggleVisibility(true);
             return;
         }
+        fetch(`http://localhost:3000/user/kick`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${tk}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+                {
+                    roomId: props.channelId,
+                    participantId: userToInvite.id,
+                }
+            )
+        })
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.error('Error: ', error));
+
         //send to backend
         props.handleClose();
     };
@@ -95,8 +112,8 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
                                         login !== data.login && (
                                             <li>
                                             <label>
-                                            <input 
-                                            type="radio" 
+                                            <input
+                                            type="radio"
                                             value="public"
                                             name="group"
                                             onChange={() => handleRadioChange(data)}
@@ -115,7 +132,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
                             <button type="button" className="btn btn-clear" onClick={handleClickYes}>Submit</button>
                             <button type="button" className="btn btn-secondary" onClick={handleClickClose}>Cancel</button>
                         </div>
-                    </div>                   
+                    </div>
                     </div>
                 </div>
                 </div>

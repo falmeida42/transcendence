@@ -10,6 +10,7 @@ import BanPopup from "./BanPopup"
 import LockPopup from "./LockPopup"
 import AdminPopup from "./AdminPopup"
 import { tk } from "../../context/ChatContext"
+import test from "node:test"
 
 export const toggleChatVisibility = () => {
     const element = (document.getElementById("chat") as HTMLDivElement);
@@ -118,13 +119,13 @@ const ChatContent = (props: ChatContentProps) => {
             <div className="chat-header clearfix">
                 <div className="chat-about">
                     <div className="chat-with">Chat with {props.selectedChatData.name}</div>
-                    <i onClick={handleClickLeave} onMouseEnter={() => handleMouseEnter("leave chatroom")} onMouseLeave={handleMouseLeave} className="fa fa-sign-out fa-lg clickable" ></i>
-                    <i onClick={handleClickMatch} onMouseEnter={() => handleMouseEnter("invite user to match")} onMouseLeave={handleMouseLeave} className="fa fa-gamepad fa-lg clickable" ></i>
-                    <i onClick={handleClickKick} onMouseEnter={() => handleMouseEnter("kick user")} onMouseLeave={handleMouseLeave} className="fa fa-user-times fa-lg clickable" ></i>
-                    <i onClick={handleClickMute} onMouseEnter={() => handleMouseEnter("mute user")} onMouseLeave={handleMouseLeave} className="fa fa-microphone-slash fa-lg clickable" ></i>
-                    <i onClick={handleClickBan} onMouseEnter={() => handleMouseEnter("ban user")} onMouseLeave={handleMouseLeave} className="fa fa-ban fa-lg clickable" ></i>
-                    <i onClick={handleClickLock} onMouseEnter={() => handleMouseEnter("set password")} onMouseLeave={handleMouseLeave} className="fa fa-lock fa-lg clickable" ></i>
-                    <i onClick={handleClickAdmin} onMouseEnter={() => handleMouseEnter("appoint admin")} onMouseLeave={handleMouseLeave} className="fa fa-support fa-lg clickable" ></i>
+                    <i onClick={handleClickLeave} onMouseEnter={() => handleMouseEnter("leave chatroom")} onMouseLeave={ () => handleMouseLeave()} className="fa fa-sign-out fa-lg clickable" ></i>
+                    <i onClick={handleClickMatch} onMouseEnter={() => handleMouseEnter("invite user to match")} onMouseLeave={ () => handleMouseLeave()} className="fa fa-gamepad fa-lg clickable" ></i>
+                    <i onClick={handleClickKick} onMouseEnter={() => handleMouseEnter("kick user")} onMouseLeave={ () => handleMouseLeave()} className="fa fa-user-times fa-lg clickable" ></i>
+                    <i onClick={handleClickMute} onMouseEnter={() => handleMouseEnter("mute user")} onMouseLeave={ () => handleMouseLeave()} className="fa fa-microphone-slash fa-lg clickable" ></i>
+                    <i onClick={handleClickBan} onMouseEnter={() => handleMouseEnter("ban user")} onMouseLeave={ () => handleMouseLeave()} className="fa fa-ban fa-lg clickable" ></i>
+                    <i onClick={handleClickLock} onMouseEnter={() => handleMouseEnter("set password")} onMouseLeave={ () => handleMouseLeave()} className="fa fa-lock fa-lg clickable" ></i>
+                    <i onClick={handleClickAdmin} onMouseEnter={() => handleMouseEnter("appoint admin")} onMouseLeave={ () => handleMouseLeave()} className="fa fa-support fa-lg clickable" ></i>
                     {isHovered !== "" && <div className="hover-label">{isHovered}</div>}
                 </div>
                 <img src={props.selectedChatData.image} 

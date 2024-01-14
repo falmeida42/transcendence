@@ -18,11 +18,14 @@ interface ChatProviderProps {
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
-export var tk: string | undefined;
+export let tk: string | undefined;
 
 let updateChatRooms: () => void;
 
 let socketInstance: Socket<DefaultEventsMap, DefaultEventsMap>;
+
+
+let test: (id: string) => void;
 
 function ChatProvider({ children }: ChatProviderProps) {
 
@@ -34,10 +37,9 @@ function ChatProvider({ children }: ChatProviderProps) {
 
   const { login } = useApi()
 
-  console.log("channel selected", channelSelected)
-
   updateChatRooms = () => {
-
+    console.log("entrei")
+    
     fetch(`http://localhost:3000/user/chatRooms`, {
       method: "GET",
       headers: {
@@ -54,51 +56,17 @@ function ChatProvider({ children }: ChatProviderProps) {
       })
       .then((data) => {
         if (data) {
-          console.log("Rooms received ", JSON.stringify(data));
           setChatRooms(data);
         } else {
-          console.log("No data received");
+          console.log("No data received teste");
         }
       })
       .catch((error) => console.error("Fetch error:", error));
   }
 
   useEffect(() => {
-    tk = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
-    if (tk === undefined)
-      return;
-
-    console.log("Frontend: token", tk);
-
-    socketInstance = io("http://localhost:3000/chat", {
-      withCredentials: true,
-    }).connect();
-
-    console.log("socketInstance", socketInstance)
-
-    socketInstance.on("connect", () => {
-      console.log("Client connected!!!!!!!!!!!!!!!!!  ", login, "   ", socketInstance.id);
-
-
-      socketInstance.emit("userConnected", { username: login, socketId: socketInstance.id });
-    });
-
-    socketInstance.on('getUsersConnected', (data) => {
-
-      console.log("Users connected ", data)
-
-      setUsersOnline(data)
-    });
-
-
-    setSocket(socketInstance);
 
     if (channelSelected) {
-      console.log("this is the channel selected: ", channelSelected)
-
       fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
         method: "GET",
         headers: {
@@ -115,22 +83,15 @@ function ChatProvider({ children }: ChatProviderProps) {
       })
       .then((data) => {
         if (data) {
-          console.log("Daaaata received ", data);
-          
           setChannelMessages((prevChannelMessages) => ({
             ...prevChannelMessages,
-            [channelSelected]: data.map((message) => ({
+            [channelSelected]: data.map((message: any) => ({
               id: message.id,
               username: message.sender.login,
               userImage: message.sender.image,
               message: message.content,
             })),
           }));
-          
-          console.log("This is the channelMessages: ", channelMessages)
-          console.log("This is the current channel message: ", channelMessages[channelSelected])
-          
-          
         } else {
           console.log("No data received");
         }
@@ -139,36 +100,36 @@ function ChatProvider({ children }: ChatProviderProps) {
       .catch((error) => console.error("Fetch error:", error));
     }
 
-    fetch(`http://localhost:3000/user/chatRooms`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${tk}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.text();
-        return data ? JSON.parse(data) : null;
-      })
-      .then((data) => {
-        if (data) {
-          console.log("Rooms received ", JSON.stringify(data));
-          setChatRooms(data);
-        } else {
-          console.log("No data received");
-        }
-      })
-      .catch((error) => console.error("Fetch error:", error));
-
-
-
-
+    updateChatRooms()
   }, [channelSelected]);
 
+
   useEffect(() => {
+    tk = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    ?.split('=')[1];
+    if (tk === undefined)
+      return;
+
+    socketInstance = io("http://localhost:3000/chat", {
+      withCredentials: true,
+    }).connect();
+
+    socketInstance.on("connect", () => {
+      socketInstance.emit("userConnected", { username: login, socketId: socketInstance.id });
+    });
+
+    socketInstance.on('getUsersConnected', (data) => {
+      setUsersOnline(data)
+    });
+
+    socketInstance.on("UpdateRooms", () => {
+      updateChatRooms()
+      socketInstance.emit("joinAllRooms" , { username: login })
+    })
+
+    setSocket(socketInstance);
 
     socketInstance.on("messageToClient", (payload) => {
       console.log("MESSAGE TO CLIENT: ", JSON.stringify(payload));
@@ -180,8 +141,8 @@ function ChatProvider({ children }: ChatProviderProps) {
         const newChannelMessages = { ...prevChannelMessages} ;
 
         newChannelMessages[channelId] = newChannelMessages[channelId] || []
-        console.log("newChannelMessages before: ", newChannelMessages)
-        console.log("newChannelMessages before: ", channelId)
+        // console.log("newChannelMessages before: ", newChannelMessages)
+        // console.log("newChannelMessages before: ", channelId)
 
         // Criar uma cópia do array de mensagens do canal específico
         const updatedMessages = [
@@ -193,21 +154,26 @@ function ChatProvider({ children }: ChatProviderProps) {
             userImage: payload.senderImage,
           },
         ];
-        console.log("newChannelMessages during: ", newChannelMessages)
+        // console.log("newChannelMessages during: ", newChannelMessages)
 
 
         // Atualizar apenas o array de mensagens do canal específico
         newChannelMessages[channelId] = updatedMessages;
       
-        console.log("newChannelMessages after: ", newChannelMessages)
+        // console.log("newChannelMessages after: ", newChannelMessages)
 
 
 
-        console.log("channel messages during construction: ", updatedMessages);
+        // console.log("channel messages during construction: ", updatedMessages);
 
         return newChannelMessages;
       });
     });
+
+    test = () => {
+      socketInstance.emit("AddChannel")
+      socketInstance.emit("joinAllRooms" , { username: login })
+    }
 
   }, []);
 
@@ -228,4 +194,4 @@ function ChatProvider({ children }: ChatProviderProps) {
   );
 }
 
-export { ChatContext, ChatProvider, updateChatRooms };
+export { ChatContext, ChatProvider, updateChatRooms, test };
