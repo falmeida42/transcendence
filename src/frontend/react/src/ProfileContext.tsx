@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useState, useEffect, useRef } from "react";
+import { navigate } from "wouter/use-location";
 
 interface ProfileContextProps {
   userFriends: any,
@@ -29,8 +30,6 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     .split('; ')
     .find((row) => row.startsWith('token='))
     ?.split('=')[1];
-    if (tk === undefined)
-      return;
   
   updateUserFriends = () => {
 
@@ -43,6 +42,9 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     })
     .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate('/login');
+          }
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -72,6 +74,9 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     })
     .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate('/login');
+          }
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -101,6 +106,9 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     })
     .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate('/login');
+          }
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -126,6 +134,9 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     })
     .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate('/login');
+          }
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();

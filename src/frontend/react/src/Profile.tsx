@@ -207,7 +207,7 @@ function Profile() {
 					<button className="btn btn-lg btn-secondary mr-2 mb-1" onClick={handleClickBlock}>
 						Block User
 					</button>
-						<ScoreBar/>
+						<ScoreBar id={id}/>
 					</div>
 
 			</div>

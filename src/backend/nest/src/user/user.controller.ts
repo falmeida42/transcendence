@@ -32,7 +32,7 @@ export class UserController {
     try {
       return await this.userService.getUsers();
     } catch (error) {
-      this.logger.error(error);
+      // this.logger.error(error);
       return { error: error, message: 'Unable to get users' };
     }
   }
@@ -89,7 +89,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('not-friends')
   async getNotFriends(@GetMe('id') id: string) {
-      this.logger.debug("USER ID: ", id);    
+      // this.logger.debug("USER ID: ", id);    
       return this.userService.getNotFriends(id);
   }
   
@@ -102,14 +102,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('create-friend-request')
   async addFriendRequest(@Req() req: any, @Body() body: any) {
-    this.logger.debug("AAAAA", body.requesteeId);
+    // this.logger.debug("AAAAA", body.requesteeId);
     return await this.userService.addFriendRequest(body.requesterId, body.requesteeId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('handle-friend-request')
   async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
-    this.logger.debug("ACCEPT FETCH BODY:");
+    // this.logger.debug("ACCEPT FETCH BODY:");
     try {
       const result = await this.userService.handleFriendRequest(body.requesterId, id, body.requestId, body.type);
       return { statusCode: HttpStatus.CREATED, ...result };
@@ -121,7 +121,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('block-user')
   async blockUser(@GetMe('id') id: string, @Body() body: any) {
-    this.logger.debug("ACCEPT FETCH BODY:");
+    // this.logger.debug("ACCEPT FETCH BODY:");
     try {
       const result = await this.userService.blockUser(id, body.blockedId);
       return { statusCode: HttpStatus.CREATED, ...result };
@@ -133,7 +133,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('friend-requests')
   async getFriendRequests(@GetMe('id') id: string) {
-     this.logger.debug("USER ID: ", id);  
+    //  this.logger.debug("USER ID: ", id);  
       return this.userService.getFriendRequests(id);
   }
 
@@ -211,7 +211,7 @@ export class UserController {
       const winsCount = user.wins.length;
       const lossesCount = user.losses.length;
       
-      this.logger.debug(winsCount, lossesCount);
+      // this.logger.debug(winsCount, lossesCount);
       return {winsCount, lossesCount};
     } catch (e) {
       this.logger.error(e.message);

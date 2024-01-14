@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { useApi } from "./apiStore";
 
-const ScoreBar = () => {
+interface props {
+    id: string;
+  }
+
+const ScoreBar = ({ id }: props) => {
     
     const[wins, setWin] = useState<number>(0);
     const[loses, setLoses] = useState<number>(0);
-    const { id } = useApi();
 
     const token = document.cookie
     .split("; ")
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
-    if (token === undefined) return;
+    if (token === undefined || id == undefined) return;
 
     const getScore = async () => {
         fetch(`http://localhost:3000/user/matches-wins/${id}`, {
@@ -37,7 +40,7 @@ const ScoreBar = () => {
 
     useEffect(() => {
         getScore();
-    }, [])
+    }, [id])
 
     const percentage = (wins / (wins + loses)) * 100;
 

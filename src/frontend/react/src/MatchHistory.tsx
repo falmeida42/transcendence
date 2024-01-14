@@ -16,16 +16,20 @@ interface Match {
   createdAt: Date
 }
 
-const MatchHistory = () => {
+interface props {
+  id: string;
+}
+
+const MatchHistory = ({ id }: props) => {
 
   const[matchHistory, setMatchHistory] = useState<Match[]>([])
-  const { id } = useApi()
+
   
   const token = document.cookie
     .split("; ")
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
-  if (token === undefined) return;
+  if (token === undefined || id === undefined) return;
 
   const getMatchHistory = async () => {
     fetch(`http://localhost:3000/user/matches/${id}`, {
@@ -59,7 +63,7 @@ const MatchHistory = () => {
 
   useEffect(() => {
     getMatchHistory();
-  },[])
+  },[id])
 
   return (
     <div
