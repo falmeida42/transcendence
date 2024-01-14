@@ -276,7 +276,12 @@ export class UserController {
     @Param('roomId') roomId: string,
   ) {
     if (type && password) {
-      await this.userService.updateChatRoomPrivacy(roomId, type, password);
+      const hashedPassword = await bcrypt.hashPassword(password);
+      await this.userService.updateChatRoomPrivacy(
+        roomId,
+        type,
+        hashedPassword,
+      );
     }
   }
 }
