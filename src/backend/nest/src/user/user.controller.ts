@@ -165,7 +165,11 @@ export class UserController {
     @Body('roomId') roomId: string,
     @Body('password') password: string,
     @Body('roomType') roomType: string,
+    @Res() res: Response,
   ) {
+    if (await this.userService.isBanned(username, roomId)) {
+      return res.status(HttpStatus.FORBIDDEN).send();
+    }
     return this.userService.joinRoom(username, roomId, password, roomType);
   }
 
@@ -291,7 +295,10 @@ export class UserController {
         await this.userService.banUser(participantId, roomId);
         return res.status(HttpStatus.OK).send();
       } else {
-        return res.status(HttpStatus.FORBIDDEN).send();
+        return res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: 'User is banned' })
+          .send();
       }
     } catch (error) {
       this.logger.error(error);

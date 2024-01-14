@@ -502,4 +502,15 @@ export class UserService {
       return await this.getChannelParticipants(roomId);
     }
   }
+
+  async isBanned(username: string, roomId: string) {
+    return this.prisma.chatRoom
+      .findUnique({
+        where: { id: roomId },
+      })
+      .bannedUsers({
+        where: { username },
+      })
+      .then((bannedUsers) => bannedUsers.length > 0);
+  }
 }
