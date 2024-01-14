@@ -126,6 +126,7 @@ function ChatProvider({ children }: ChatProviderProps) {
 
     socketInstance.on("UpdateRooms", () => {
       updateChatRooms()
+      socketInstance.emit("joinAllRooms" , { username: login })
     })
 
     setSocket(socketInstance);
