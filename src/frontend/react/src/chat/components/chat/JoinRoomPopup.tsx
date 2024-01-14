@@ -99,6 +99,11 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({ isVisible, handleClose })
             })
             .then(async (response) => {
                 if (!response.ok) {
+                    if (response.status == 403) {
+                        setWarningText("You were banned from this channel");
+                        toggleVisibility(true);
+                        return;
+                    }
                 throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.text();
@@ -121,7 +126,8 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({ isVisible, handleClose })
             .then(
                 updateChatRooms
             )
-            .catch((error) => console.error("Fetch error:", error));
+            .catch((error) => {console.error("Error:", error)}
+            );
 
     };
 

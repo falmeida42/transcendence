@@ -9,6 +9,7 @@ import {
   UseGuards,
   Res,
   Query,
+  ForbiddenException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
@@ -165,10 +166,10 @@ export class UserController {
     @Body('roomId') roomId: string,
     @Body('password') password: string,
     @Body('roomType') roomType: string,
-    @Res() res: Response,
+    // @Res() res: Response,
   ) {
     if (await this.userService.isBanned(username, roomId)) {
-      return res.status(HttpStatus.FORBIDDEN).send();
+      throw new ForbiddenException('Banned');
     }
     return this.userService.joinRoom(username, roomId, password, roomType);
   }
