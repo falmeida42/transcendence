@@ -26,7 +26,8 @@ const Messages = (props: MessagesProps) => {
     if (elem) {
       elem.scrollTop = elem.scrollHeight;
     }
-  })
+    console.log(`vou ficar doido ${JSON.stringify(channelMessagesSelected)}`)
+  }, [channelMessagesSelected?.length])
   
 
   console.log("Current messages:", JSON.stringify(channelMessagesSelected));

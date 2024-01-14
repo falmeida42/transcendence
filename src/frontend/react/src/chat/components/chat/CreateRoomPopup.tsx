@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
-import { tk, updateChatRooms } from "../../context/ChatContext";
+import { test, tk, updateChatRooms } from "../../context/ChatContext";
 
 interface CreateRoomPopupProps {
     isVisible: boolean;
@@ -147,23 +147,9 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                     }
                 })
                 })
-                .then(async (response) => {
-                    if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    const data = await response.text();
-                    return data ? JSON.parse(data) : null;
-                })
-                .then((data) => {
-                    if (data) {
-                    console.log("Rooms received ", JSON.stringify(data));
-
-                    } else {
-                    console.log("No data received");
-                    }
-                })
-                .then(
-                    updateChatRooms
+                .then(() =>
+                    test()
+                    // updateChatRooms
                 )
                 .catch((error) => console.error("Fetch error:", error));
 

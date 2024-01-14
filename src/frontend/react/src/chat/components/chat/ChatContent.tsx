@@ -10,6 +10,7 @@ import BanPopup from "./BanPopup"
 import LockPopup from "./LockPopup"
 import AdminPopup from "./AdminPopup"
 import { tk } from "../../context/ChatContext"
+import test from "node:test"
 
 export const toggleChatVisibility = () => {
     const element = (document.getElementById("chat") as HTMLDivElement);

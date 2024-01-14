@@ -126,4 +126,9 @@ export class ChatGateway
       });
     }
   }
+
+  @SubscribeMessage('AddChannel')
+  addChannel(client: Socket) {
+    this.io.emit('UpdateRooms');
+  }
 }
