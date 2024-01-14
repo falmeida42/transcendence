@@ -1,38 +1,65 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useApi } from "./apiStore";
 
-interface props {
-  id: string;
+interface User {
+  id: string,
+  image: string,
+  username: string
 }
 
-const MatchHistory = ({ id }: props) => {
-  useEffect(() => {
-    const callBitches = async () => {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="))
-        ?.split("=")[1];
-      if (token === undefined) return;
+interface Match {
+  id: string,
+  winner: User,
+  loser: User,
+  playerWinScore: number,
+  playerLosScore: number,
+  createdAt: Date
+}
 
-      const response = await fetch(
-        `http://localhost:3000/user/matches/${133015}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+const MatchHistory = () => {
+
+  const[matchHistory, setMatchHistory] = useState<Match[]>([])
+  const { id } = useApi()
+  
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
+  if (token === undefined) return;
+
+  const getMatchHistory = async () => {
+    fetch(`http://localhost:3000/user/matches/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then(async (response) => {
       if (!response.ok) {
-        return;
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
+      const data = await response.text();
+      return data ? JSON.parse(data) : null;
+      })
+    .then((data) => {
+      console.log("MATCH DATA:", data);
+      const mappedHistory = data.map((match: any) => ({
+        id: match.id,
+        winner: match.winner,
+        loser: match.loser,
+        playerWinScore: match.playerwinScore,
+        playerLosScore: match.playerlosScore,
+        createdAt: match.createdAt
+      }));
+      setMatchHistory([...mappedHistory]);
+  })
+  .catch((error) => console.error("Fetch error:", error));
+}
 
-      const data = await response.json();
-      console.log(JSON.stringify(data));
-    };
-
-    callBitches();
-  }, [id]);
+  useEffect(() => {
+    getMatchHistory();
+  },[])
 
   return (
     <div
@@ -43,34 +70,30 @@ const MatchHistory = ({ id }: props) => {
     >
       <div className="msg_list_main">
         <ul className="msg_list">
-          <li>
-            <span>
-              <img
-                src="images/layout_img/msg2.png"
-                className="img-responsive"
-                alt="#"
-              ></img>
-            </span>
-            <span>
-              <span className="name_user">Win against Taison Jack</span>
-              <span className="msg_user">11-4</span>
-              <span className="time_ago">12 min ago</span>
-            </span>
-          </li>
-          <li>
-            <span>
-              <img
-                src="images/layout_img/msg3.png"
-                className="img-responsive"
-                alt="#"
-              ></img>
-            </span>
-            <span>
-              <span className="name_user">Loss against Mike John</span>
-              <span className="msg_user">1-7</span>
-              <span className="time_ago">12 min ago</span>
-            </span>
-          </li>
+          {
+            matchHistory.map((match: Match) => (
+              <li key={match.id}>
+                <span>
+                  <img
+                    src={match.winner.image}
+                    className="img-responsive"
+                    alt="#"
+                  ></img>
+                </span>
+                <span>
+                  {match.winner.id === id ? (
+                    <span className="name_user">Win against {match.loser.username}</span>
+                  ) : <span className="name_user">Loss against {match.winner.username}</span>
+                  }
+                  <span className="msg_user">{match.playerWinScore}-{match.playerLosScore}</span>
+                  <span className="time_ago">
+                    {new Date(match.createdAt).toLocaleDateString()}{' '}
+                    {new Date(match.createdAt).toLocaleTimeString()}
+                  </span>
+                </span>  
+              </li>
+            ))
+          }
         </ul>
       </div>
     </div>

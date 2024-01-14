@@ -157,11 +157,47 @@ export class UserController {
     }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/matches/:id')
+  @Get('matches/:id')
   async getMatches(@Param('id') id: string) {
     try {
-      this.logger.debug(id);
+      // this.logger.debug(id);
       let matches = [];
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wins: {
+            include: {
+              winner: true,
+              loser: true,
+            }
+          },
+          losses: {
+            include: {
+              winner: true,
+              loser: true,
+            }
+          }
+        },
+      });
+      // this.logger.debug("FETCH RETURN", user);
+      matches = [...user.wins, ...user.losses].sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+
+      
+      if (!matches) throw new Error('teste');
+      return matches;
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('matches-wins/:id')
+  async getWins(@Param('id') id: string) {
+    try {
       const user = await this.prisma.user.findUnique({
         where: {
           id,
@@ -169,36 +205,19 @@ export class UserController {
         include: {
           wins: true,
           losses: true,
-        },
+        }
       });
-      // const wins = await this.prisma.match.findMany({
-      //   where: {
-      //     userwinId: id,
-      //   },
-      // });
-      // const losses = await this.prisma.match.findMany({
-      //   where: {
-      //     userlosId: id,
-      //   },
-      // });
-      // matches = [...wins, ...losses];
-      // this.logger.debug();
-      matches = [...user.wins, ...user.losses].sort(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-      );
-      if (!matches) throw new Error('teste');
-      // const matches = user.
-      return matches;
+      
+      const winsCount = user.wins.length;
+      const lossesCount = user.losses.length;
+      
+      this.logger.debug(winsCount, lossesCount);
+      return {winsCount, lossesCount};
     } catch (e) {
       this.logger.error(e.message);
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get(':id')
-  // async findById(@Param('id') id: string) {
-  //   return this.userService.getUserById(id);
-  // }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':login')

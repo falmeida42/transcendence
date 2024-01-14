@@ -168,3 +168,8 @@
       margin-bottom: 0;
     }
   }
+
+  .msg_list_main {
+    max-height: 200px;
+    overflow-y: scroll;
+  }

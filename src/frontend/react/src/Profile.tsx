@@ -8,6 +8,7 @@ import TwoFaPopup from './TwoFAPopup';
 import getHookers from "./Hookers";
 import MatchHistory from "./MatchHistory";
 import BlockPopup from './BlockPopUp';
+import ScoreBar from './ScoreBar';
 
 interface User {
 	id: string,
@@ -28,7 +29,7 @@ function Profile() {
     setUsername,
     setImage,
   } = useApi();
-  const {isLoading, serverError, apiData} = getHookers(`/user/matches/${id}`)
+//   const {isLoading, serverError, apiData} = getHookers(`/user/matches/${id}`)
   
   // console.log(isLoading);
   
@@ -46,7 +47,6 @@ function Profile() {
     {
       setIsEditing(false);
       setUsername(textValue);
-      //useUpdateUserData({username: textValue, image: image})
     }
 	};
 	
@@ -83,7 +83,6 @@ function Profile() {
     {
       setIsEditingImage(false);
       setImage(selectedImage);
-      //useUpdateUserData({username: user, image: selectedImage})
     }
 	};
   
@@ -208,18 +207,7 @@ function Profile() {
 					<button className="btn btn-lg btn-secondary mr-2 mb-1" onClick={handleClickBlock}>
 						Block User
 					</button>
-
-
-						<div className="user_progress_bar">
-							<h2>
-								<span className="skill">Match results (wins | losses)<span className="info_valume"></span></span>
-								<div className="progress skill-bar">
-									<div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style={{ width: '75%' }}> <h5 style={{ textAlign: 'right', color: 'white', paddingRight: '4%', marginLeft: '-20px' }}>12</h5>
-									</div>
-									<h5 style={{ lineHeight: "30px", paddingLeft: '3%', marginRight: '-39px' }}>3</h5 >
-								</div>
-							</h2>
-						</div>
+						<ScoreBar/>
 					</div>
 
 			</div>
@@ -232,7 +220,7 @@ function Profile() {
 						</div>
 					</nav>
 					<div className="tab-content" id="nav-tabContent">
-          {/* <MatchHistory id={id}/> */}
+          		<MatchHistory id={id}/>
 						<div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-home-tab">
 							<div className="msg_list_main">
 								<ul className="msg_list">

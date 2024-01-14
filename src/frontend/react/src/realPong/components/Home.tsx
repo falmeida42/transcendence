@@ -70,7 +70,7 @@ const Home = () => {
             if (e.key === "Enter") set_name(name);
           }}
         />
-        <button onClick={() => set_name(id)}>Set Name</button>
+        <button onClick={() => set_name(name)}>Set Name</button>
       </div>
     );
   }

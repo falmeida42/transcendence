@@ -15,43 +15,14 @@ interface BlockPopupProps {
 	userImage: string
 }
 
-
 const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }) => {
 
     const [userToBlock, setUserToBlock] = useState<User>({id: "", username: "", userImage: ""});
-    const [users, setUsers] = useState<User[]>([])
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const { id } = useApi();
     const { blockableUsers } = useContext(ProfileContext) ?? {};
  
-    // useEffect(() => {
-    // fetch(`http://localhost:3000/user/blockable-users`, {
-    //   method: "GET",
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //     "Content-Type": "application/json",
-    //   },
-    // })
-    //   .then(async (response) => {
-    //     if (!response.ok) {
-    //       throw new Error(`HTTP error! Status: ${response.status}`);
-    //     }
-    //     const data = await response.text();
-    //     return data ? JSON.parse(data) : null;
-    //   })
-    //   .then((data) => {
-    //     const mappedUsers = data.map((user : any) => ({
-    //         id: user.id,
-    //         username: user.login,
-    //         userImage: user.image
-    //     }));
-
-    //     setUsers([...mappedUsers])
-    //   })
-    //   .catch((error) => console.error("Fetch error:", error));
-    // }, [updateUserFriends]);
-
     const toggleVisibility = (visibility: boolean) => {
         setIsVisibleWarning(visibility);
     };
