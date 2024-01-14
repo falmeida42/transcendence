@@ -415,7 +415,6 @@ export class UserService {
       // Include participants who are neither owner nor admin
       return !isAdmin && !isOwner;
     });
-
     return participants;
   }
 
@@ -453,9 +452,8 @@ export class UserService {
   }
 
   async kickableUsers(user: User, roomId: string) {
-    let participants;
     if (await this.isOwner(user.id, roomId)) {
-      participants = await this.prisma.chatRoom.findMany({
+      const room = await this.prisma.chatRoom.findUnique({
         where: { id: roomId },
         include: {
           participants: {
@@ -467,9 +465,9 @@ export class UserService {
           owner: false,
         },
       });
+      return room.participants;
     } else if (await this.isAdmin(user.id, roomId)) {
-      participants = await this.getChannelParticipants(roomId);
+      return await this.getChannelParticipants(roomId);
     }
-    return participants;
   }
 }

@@ -14,7 +14,6 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
     const [userToInvite, setUserToInvite] = useState<Participant>({id: "", login: "", image: "", chatRoomId: "", username: ""});
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const [warningText, setWarningText] = useState("This field is mandatory");
-    const { login } = useApi();
     const [kickError, setKickError] = useState(false);
 
     interface Participant {
@@ -89,7 +88,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
         })
         .then((data) => {
           if (data) {
-            const mappedParticipants = data.result.map((participant: Participant) => ({
+            const mappedParticipants = data.map((participant: Participant) => ({
                     id: participant.id,
                     username: participant.username,
                     login: participant.login,

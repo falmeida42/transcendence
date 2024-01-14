@@ -230,7 +230,7 @@ export class UserController {
       if (!room) {
         return;
       }
-      return res.status(HttpStatus.OK).json({ result: room });
+      return res.status(HttpStatus.OK).json(room);
     } catch (error) {
       this.logger.error(error);
       return res.json({ error: error }).send();
