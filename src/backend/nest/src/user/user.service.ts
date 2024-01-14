@@ -1,4 +1,4 @@
-import { ChatRoom, ChatType, User } from '@prisma/client';
+import { ChatType, User } from '@prisma/client';
 import {
   ForbiddenException,
   Injectable,
@@ -403,11 +403,10 @@ export class UserService {
     const channel = await this.getChatRoomById(channelId);
 
     if (!channel) {
-      throw new NotFoundException('Could not get room');
+      throw new NotFoundException('Could not get room: ', channelId);
     }
 
     const participants = channel.participants.filter((participant) => {
-      // Assuming owner and admins are stored in separate arrays within the channel
       const isAdmin = channel.admins.some(
         (admin) => admin.id === participant.id,
       );
@@ -454,8 +453,9 @@ export class UserService {
   }
 
   async kickableUsers(user: User, roomId: string) {
+    let participants;
     if (await this.isOwner(user.id, roomId)) {
-      return this.prisma.chatRoom.findMany({
+      participants = await this.prisma.chatRoom.findMany({
         where: { id: roomId },
         include: {
           participants: {
@@ -468,18 +468,8 @@ export class UserService {
         },
       });
     } else if (await this.isAdmin(user.id, roomId)) {
-      return this.prisma.chatRoom.findMany({
-        where: { id: roomId },
-        include: {
-          participants: {
-            where: { NOT: { id: user.id } },
-          },
-          admins: false,
-          owner: false,
-        },
-      });
-    } else {
-      return null;
+      participants = await this.getChannelParticipants(roomId);
     }
+    return participants;
   }
 }

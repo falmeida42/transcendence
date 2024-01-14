@@ -34,7 +34,6 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
         console.log("handle yes: ", userToInvite.id)
         console.log("handle yes: ", userToInvite.login)
         if (userToInvite.login === "") {
-           
 
             toggleVisibility(true);
             return;
@@ -97,7 +96,7 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
                 image: participant.image,
                 chatRoomId: participant.chatRoomId,
               }));
-              
+
           setChatData(participants);
         } else {
           console.log("No data received");
@@ -126,8 +125,8 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
                                         login !== data.login && (
                                             <li>
                                             <label>
-                                            <input 
-                                            type="radio" 
+                                            <input
+                                            type="radio"
                                             value="public"
                                             name="group"
                                             onChange={() => handleRadioChange(data)}
@@ -147,9 +146,8 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
                             <button type="button" className="btn btn-secondary" onClick={handleClickClose}>Cancel</button>
                         </div>
                     </div>}
-                    { chatData.length === 0 && 
+                    { chatData.length === 0 &&
                         <p style={{color: "red", padding: "25px"}}>You don't have participants to promote</p>}
-                                  
                     </div>
                 </div>
                 </div>

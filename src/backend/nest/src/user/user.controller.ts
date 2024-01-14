@@ -225,11 +225,16 @@ export class UserController {
     @Query('roomId') roomId: string,
     @Res() res: Response,
   ) {
-    const room = await this.userService.kickableUsers(user, roomId);
-    if (!room) {
-      return;
+    try {
+      const room = await this.userService.kickableUsers(user, roomId);
+      if (!room) {
+        return;
+      }
+      return res.status(HttpStatus.OK).json({ result: room });
+    } catch (error) {
+      this.logger.error(error);
+      return res.json({ error: error }).send();
     }
-    return res.status(HttpStatus.OK).json({ result: room });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -240,9 +245,6 @@ export class UserController {
     @Body('participantId') kickedId: string,
     @Res() res: Response,
   ) {
-    this.logger.debug('User: ', user);
-    this.logger.debug('Room: ', roomId);
-    this.logger.debug('Kicking: ', kickedId);
     try {
       if (await this.userService.isOwner(user.id, roomId)) {
         await this.userService.kickUser(kickedId, roomId);
@@ -272,7 +274,6 @@ export class UserController {
     @Body('password') password: any,
     @Param('roomId') roomId: string,
   ) {
-    this.logger.debug('Entering update-room-privacy');
     if (type && password) {
       await this.userService.updateChatRoomPrivacy(roomId, type, password);
     }
