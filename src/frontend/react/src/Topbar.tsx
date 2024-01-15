@@ -1,19 +1,38 @@
+import { useState } from "react";
 import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
+import NotifList from "./NotifList.tsx";
+import { navigate } from "wouter/use-location";
 
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
-  const { first_name, image } = useApi();
+  const { user, image } = useApi();
+  const [isVisibleNotif, setIsVisibleNotif] = useState(false);
+
+  const handleClickNotif = () => {
+    setIsVisibleNotif(!isVisibleNotif);
+  }
+  
+    const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
+
+  const handleClickLogout = () => {
+    if (token !== undefined) {
+      document.cookie = `${'token'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
+      navigate('/login');
+    }
+  }
 
   return (
     <div id="content">
       <div className="topbar">
         <nav className="navbar navbar-expand-lg navbar-light">
           <div className="full">
-            <button
-              type="button"
+            <div
               id="sidebarCollapse"
-              className="sidebar_toggle"
+              className="sidebar_toggle special-button"
               onClick={() => setOpen(!isOpen)}
               onKeyDown={(event) => {
                 if (event.key === " ") {
@@ -22,7 +41,7 @@ const Topbar = () => {
               }}
             >
               <i className="fa fa-bars"></i>
-            </button>
+            </div>
             <div className="logo_section">
               {/* <a href="#Profile">
 					<img className="img-responsive" src={image} alt="#" />
@@ -32,9 +51,11 @@ const Topbar = () => {
               <div className="icon_info">
                 <ul>
                   <li className="icons_list">
-                    <a href="#">
-                      <i className="fa fa-power-off"></i>
-                    </a>
+                      <i onClick={handleClickLogout} className="fa fa-power-off"></i>
+                  </li>
+                  <li className="icons_list">
+                      <i onClick={handleClickNotif} className="fa fa-bell"></i>
+                      {isVisibleNotif && <NotifList />}
                   </li>
                   <li className="user_list">
                     <img
@@ -45,8 +66,8 @@ const Topbar = () => {
                     />
                   </li>
                   <li className="user_list">
-                    <a href="#Profile">
-                      <span className="name_user">{first_name}</span>
+                    <a>
+                      <span className="name_user">{user}</span>
                     </a>
                   </li>
                 </ul>

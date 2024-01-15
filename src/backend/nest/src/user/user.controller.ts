@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   UseGuards,
+  Req,
   Res,
   Query,
   ForbiddenException,
@@ -47,22 +48,162 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('findlogin/:login')
-  async findByLogin(@Param('login') login: string) {
-    return this.userService.getUserByLogin(login);
+  @Post('me')
+  async updateMe(@GetMe() user: User, @Body() userData: any) {
+    const updatedUser = await this.userService.updateUserById(String(user.id), userData);
+    return updatedUser;
   }
 
   @UseGuards(TwoFAGuard)
   @Get('auth')
   async getAuth(@GetMe() user: User) {
     return (await this.findById(String(user.id))).twoFactorAuthEnabled;
+    
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('find/:id')
   async findById(@Param('id') id: string) {
-    return this.userService.getUserById(id);
+    const User = await this.userService.getUserById(id)
+    return User;
+    }
+
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('find/login/:login')
+  async findByLogin(@Param('login') login: string) {
+    const User = await this.userService.getUserByLogin(login);
+      return User;
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('all')
+  async getAll() {   
+      return await this.userService.getAll();
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('friends')
+  async getFriends(@GetMe('id') id: string) {   
+      return await this.userService.getFriends(id);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('not-friends')
+  async getNotFriends(@GetMe('id') id: string) {
+      // this.logger.debug("USER ID: ", id);    
+      return await this.userService.getNotFriends(id);
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Get('blockable-users')
+  async getBlockableUsers(@GetMe('id') id: string) { 
+      return await this.userService.getBlockableUsers(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('create-friend-request')
+  async addFriendRequest(@Req() req: any, @Body() body: any) {
+    // this.logger.debug("AAAAA", body.requesteeId);
+    return await this.userService.addFriendRequest(body.requesterId, body.requesteeId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('handle-friend-request')
+  async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
+    // this.logger.debug("ACCEPT FETCH BODY:");
+    try {
+      const result = await this.userService.handleFriendRequest(body.requesterId, id, body.requestId, body.type);
+      return { statusCode: HttpStatus.CREATED, ...result };
+    } catch (error) {
+      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('block-user')
+  async blockUser(@GetMe('id') id: string, @Body() body: any) {
+    // this.logger.debug("ACCEPT FETCH BODY:");
+    try {
+      const result = await this.userService.blockUser(id, body.blockedId);
+      return { statusCode: HttpStatus.CREATED, ...result };
+    } catch (error) {
+      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
+    }
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Get('friend-requests')
+  async getFriendRequests(@GetMe('id') id: string) {
+    //  this.logger.debug("USER ID: ", id);  
+      return await this.userService.getFriendRequests(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('matches/:id')
+  async getMatches(@Param('id') id: string) {
+    try {
+      // this.logger.debug(id);
+      let matches = [];
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wins: {
+            include: {
+              winner: true,
+              loser: true,
+            }
+          },
+          losses: {
+            include: {
+              winner: true,
+              loser: true,
+            }
+          }
+        },
+      });
+      // this.logger.debug("FETCH RETURN", user);
+      matches = [...user.wins, ...user.losses].sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+
+      
+      if (!matches) throw new Error('teste');
+      return matches;
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('matches-wins/:id')
+  async getWins(@Param('id') id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wins: true,
+          losses: true,
+        }
+      });
+      
+      const winsCount = user.wins.length;
+      const lossesCount = user.losses.length;
+      
+      // this.logger.debug(winsCount, lossesCount);
+      return {winsCount, lossesCount};
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Post('change-user/:username')
@@ -71,7 +212,7 @@ export class UserController {
     @Param('username') username: string,
   ) {
     try {
-      this.prisma.user.update({
+      await this.prisma.user.update({
         where: { id: user.id },
         data: { username: username },
       });
@@ -82,17 +223,9 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('friends')
-  async getFriends(@GetMe('id') id: string) {
-    const friends = this.userService.getFriends(id);
-
-    return friends;
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get('chatRooms')
   async getChatRooms(@GetMe('id') id: string) {
-    const ChatRooms = this.userService.getChatRooms(id);
+    const ChatRooms = await this.userService.getChatRooms(id);
 
     return ChatRooms;
   }
@@ -100,13 +233,13 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('chatRoom/:id')
   async getChatRoomById(@Param('id') id: string) {
-    return this.userService.getChatRoomById(id);
+    return await this.userService.getChatRoomById(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('chatHistory/:id')
   async getChatHistory(@GetMe('id') userId: string, @Param('id') id: string) {
-    return this.userService.getChatHistory(userId, id);
+    return await this.userService.getChatHistory(userId, id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -116,7 +249,7 @@ export class UserController {
     @Param('friendName') friendName: string,
   ): Promise<string> {
     try {
-      const user = this.userService.getUserById(id);
+      const user = await this.userService.getUserById(id);
 
       if (!user) {
         return 'User not found';
@@ -171,7 +304,7 @@ export class UserController {
     if (await this.userService.isBanned(username, roomId)) {
       throw new ForbiddenException('Banned');
     }
-    return this.userService.joinRoom(username, roomId, password, roomType);
+    return await this.userService.joinRoom(username, roomId, password, roomType);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -180,7 +313,7 @@ export class UserController {
     @GetMe('username') username: string,
     @Body('roomId') roomId: string,
   ) {
-    return this.userService.leaveRoom(username, roomId);
+    return await this.userService.leaveRoom(username, roomId);
   }
 
   @UseGuards(JwtAuthGuard)

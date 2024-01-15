@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum FriendRequestType {
+  CANCELED
+  PENDING
+  ACCEPTED
+}
+
 enum ChatType {
   DIRECT_MESSAGE
   PUBLIC
@@ -34,6 +40,12 @@ model User {
 
   friends  User[] @relation("UserFriends")
   friendOf User[] @relation("UserFriends")
+
+  blockedUsers User[] @relation("BlockedUsers")
+  blockedBy User[] @relation("BlockedUsers")
+
+  sentFriendRequests		FriendRequest[] @relation("FriendsRequestor")
+	receivedFriendRequests	FriendRequest[] @relation("FriendsRequestee")
 
   chatRoomId String?
   Message    Message[]
@@ -78,4 +90,16 @@ model Match {
   userwinId      String?
   userlosId      String?
   createdAt      DateTime @default(now())
+}
+
+model FriendRequest {
+  id                  String @id @default(uuid()) @unique
+  type                FriendRequestType
+
+  requestor				    User @relation("FriendsRequestor", fields: [requesterId], references: [id])
+  requestee				    User @relation("FriendsRequestee", fields: [requesteeId], references: [id])
+  requesteeId         String 
+  requesterId         String
+
+  @@map("friendRequest")
 }

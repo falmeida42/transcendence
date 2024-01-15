@@ -8,18 +8,17 @@ interface UseAuthProps {
 
 const UseAuth = ({ code }: UseAuthProps) => {
   const [name, setName] = useState(code);
-  const { setauth } = useApi();
+  const [status, setStatus] = useState('SEND');
+  const {setauth, auth} = useApi();
 
   const handleSendClick = async () => {
-    // Move the logic from UseAuth to handleSendClick
-    // Make sure not to call hooks here
     try {
       const newUserData = name;
       const token = document.cookie
         .split("; ")
         .find((row) => row.startsWith("token2fa="))
         ?.split("=")[1];
-      console.log(token, "@");
+      // console.log(token, "@");
       if (token === undefined) return;
 
       const UpResponse = await fetch(
@@ -36,36 +35,38 @@ const UseAuth = ({ code }: UseAuthProps) => {
       );
       if (!UpResponse.ok) {
         if (UpResponse.status === 401) {
-          // Redirect to the login page
-          window.location.href = "http://localhost:3000/auth/login";
+          navigate('/login');
         }
+        setStatus("WRONG");
+        console.log('222');
+        navigate('/2fa');
         return;
       }
-    } catch (error) {
-      navigate("/");
-      // console.error(error);
-    }
-
-    document.cookie = `'token2fa'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
-    setauth(true);
-    navigate("/2fa");
+      document.cookie = `${'token2fa'}'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+      setauth(true);
+      navigate('/');
+    } catch (error) {}
   };
 
+  // useEffect(() => {},[auth]);
+
   return (
-    <div className=".this-input">
-      <input
-        type="string"
-        name="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleSendClick();
-          }
-        }}
-      />
-      <div className=".this-button">
-        <button onClick={handleSendClick}>SEND</button>
+    <div className="centered2-container">
+      <div className=".small-input.container">
+        <input
+          type="string"
+          name="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSendClick();
+            }
+          }}
+          />
+      </div>
+      <div className="special-button" onClick={handleSendClick}>
+        {status}
       </div>
     </div>
   );

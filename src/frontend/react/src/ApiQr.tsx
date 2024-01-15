@@ -1,12 +1,14 @@
-import React, { ReactNode, useEffect } from "react";
-import { useApi } from "./apiStore";
+import React, { useEffect, ReactNode } from 'react';
+import { useApi } from './apiStore';
+import { navigate } from 'wouter/use-location';
 
 interface ApiQrProps {
   children?: ReactNode;
 }
 
 const ApiQr: React.FC<ApiQrProps> = (props) => {
-  const { setqrcode } = useApi();
+  const { setqrcode, auth } = useApi();
+  useEffect(() => {},[auth]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,29 +18,20 @@ const ApiQr: React.FC<ApiQrProps> = (props) => {
         ?.split("=")[1];
       if (token === undefined) return;
 
-      // console.log(token, 'QR');
-
       try {
-        const response = await fetch(
-          "http://localhost:3000/auth/2fa/generate",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (!response.ok) {
-          if (response.status === 401) {
-            // Redirect to the login page
-            window.location.href = "http://localhost:3000/auth/login";
-          }
+        const response = await fetch('http://localhost:3000/auth/2fa/generate', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok){
+          navigate('/login');
           return;
         }
 
         const data = await response.json();
-        // console.log(JSON.stringify(data));
         setqrcode(data);
       } catch (error) {
         console.error(error);

@@ -2,8 +2,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  background-color: #fff;
-  background-image: url(https://cdn.intra.42.fr/users/6e834c7689fb6ec761861181e5fc177c/maxthecorgi.png);
+  background-color: #0b143c;
+  /* background-image: url('public/background2.jpg'); */
 }
 
 .game {
@@ -171,4 +171,8 @@ body {
   border-bottom: 1px solid rgb(92, 110, 244);
   outline: none;
   flex: 1;
+}
+
+.special-button {
+  cursor: pointer;
 }

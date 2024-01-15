@@ -16,7 +16,7 @@ function Chat() {
     setSelectedChatData(data);
   };
 
-  console.log("Chat:", selectedChatData);
+  // console.log("Chat:", selectedChatData);
     return (
       <div className="container container_chat clearfix">
         <ChatProvider>

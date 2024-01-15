@@ -1,15 +1,16 @@
 import { useEffect } from "react";
-import { Route, Switch } from "wouter";
-import { navigate } from "wouter/use-location";
-import AuthApi from "./ApiAuth.tsx";
-import ApiData2faProvider from "./ApiData2faProvider.tsx";
 import "./App.css";
 import Website from "./Website.tsx";
 import { useApi } from "./apiStore.tsx";
+import { Redirect, Route, Switch, useLocation } from 'wouter';
+import { navigate } from "wouter/use-location";
+import AuthApi from "./ApiAuth.tsx";
+import ApiData2faProvider from "./ApiData2faProvider.tsx";
+
 
 function App() {
-  const { auth } = useApi();
-  // const location = useLocation();
+  const { auth, setauth } = useApi();
+  const [location] = useLocation();
 
   const token = document.cookie
     .split("; ")
@@ -23,20 +24,19 @@ function App() {
 
   useEffect(() => {
     if (token && token2fa) {
-      // document.cookie = `${'token'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
-      document.cookie = `${"token2fa"}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
-      navigate("/");
+      document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
+      navigate('/');
     } else if (token2fa) {
-      <ApiData2faProvider />;
-      navigate("/2fa");
+      <ApiData2faProvider />
+      navigate('/2fa');
     } else if (token) {
-      // document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost; SameSite=None`;
-      // <ApiDataProvider/>
-      navigate("/");
-    } else {
-      navigate("/login");
+      navigate(location);
+        if (auth === false) {
+          setauth(true);
+    }} else {
+      navigate('/login');
     }
-  }, [token, token2fa, navigate]);
+  }, [token, token2fa, navigate, auth]);
   const handleButtonClick = () => {
     window.location.href = "http://localhost:3000/auth/login";
   };
@@ -53,8 +53,11 @@ function App() {
         </div>
       </Route>
       <Route path="/2fa">
-        <AuthApi code="" />
-      </Route>
+        {auth ? (
+          <Redirect to="/"/>
+        ) : (<AuthApi code="" />
+        )}
+        </Route>
       <Route>
         <Website />
       </Route>

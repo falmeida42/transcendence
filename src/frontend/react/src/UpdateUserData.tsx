@@ -1,47 +1,40 @@
-import { useEffect } from "react";
+import React, { ReactNode, useEffect } from 'react';
 
 interface UseUpdateUserDataProps {
-  updateFunction: () => { username?: string; image?: any };
+  username: string | undefined;
+  image: string | undefined;
 }
 
-const useUpdateUserData = ({ updateFunction }: UseUpdateUserDataProps) => {
-  useEffect(() => {
-    const updateUserData = async () => {
-      try {
-        const newUserData = updateFunction();
-        const token = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("token="))
-          ?.split("=")[1];
-        if (token === undefined) {
-          return;
-        }
+const useUpdateUserData = (props: UseUpdateUserDataProps) => {
+  const token = document.cookie
+  .split('; ')
+  .find((row) => row.startsWith('token='))
+  ?.split('=')[1];
+  if (token === undefined){
+    return;
+  }
 
-        const updateResponse = await fetch("http://localhost:3000/user/me", {
-          method: "POST",
+  useEffect(() => {
+    const updateData = async () => {
+      try {
+        await fetch('http://localhost:3000/user/me', {
+          method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(newUserData),
+          body: JSON.stringify({
+            username: props.username,
+            image: props.image,
+          }),
         });
-
-        if (!updateResponse.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-
-        const updatedData = await updateResponse.json();
-        console.log(updatedData);
+        
       } catch (error) {
-        // console.error(error);
+        console.error(error);
       }
     };
-
-    // Call updateUserData when the component mounts
-    // updateUserData();
-  }, [updateFunction]);
-
-  return { updateFunction };
+    updateData();
+}, [props.username, props.image]);
 };
 
 export default useUpdateUserData;
