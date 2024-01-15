@@ -7,6 +7,8 @@ import {
   Param,
   Post,
   UseGuards,
+  Res,
+  Query
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
@@ -15,6 +17,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guard';
 import * as bcrypt from '../utils';
 import { UserService } from './user.service';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -145,23 +148,6 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('update-room-privacy/:roomId')
-  async updateRoomPrivacy(
-    @Body('type') type: any,
-    @Body('password') password: any,
-    @Param('roomId') roomId: string,
-  ) {
-    if (type && password) {
-      const hashedPassword = await bcrypt.hashPassword(password);
-      await this.userService.updateChatRoomPrivacy(
-        roomId,
-        type,
-        hashedPassword,
-      );
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get('joinable-rooms')
   async joinableRooms(@GetMe('id') id: string) {
     try {
@@ -190,5 +176,112 @@ export class UserController {
     @Body('roomId') roomId: string,
   ) {
     return this.userService.leaveRoom(username, roomId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('add-admin')
+  async addAdmin(
+    @GetMe('login') login: string,
+    @Body('chatId') chatId: string,
+    @Body('userId') userId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      this.logger.debug('adding room', login);
+      await this.userService.addAdminToChat(login, chatId, userId);
+      return res
+        .status(HttpStatus.OK)
+        .json({ message: 'User added as admin successfully' });
+    } catch (error) {
+      this.logger.debug('Error received from add admin', error);
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: error.message })
+        .send();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('channelParticipants/:chatId')
+  async getChannelParticipants(
+    @Param('chatId') chatId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      // this.logger.debug('getting channel participants');
+      const result = await this.userService.getChannelParticipants(chatId);
+      return res.status(HttpStatus.OK).json({ result: result });
+    } catch (error) {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: error.message })
+        .send();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('can-kick')
+  async canKick(
+    @GetMe() user: User,
+    @Query('roomId') roomId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const room = await this.userService.kickableUsers(user, roomId);
+      if (!room) {
+        return;
+      }
+      return res.status(HttpStatus.OK).json(room);
+    } catch (error) {
+      this.logger.error(error);
+      return res.json({ error: error }).send();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('kick')
+  async kickUser(
+    @GetMe() user: User,
+    @Body('roomId') roomId: string,
+    @Body('participantId') kickedId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      if (await this.userService.isOwner(user.id, roomId)) {
+        await this.userService.kickUser(kickedId, roomId);
+        return res.status(HttpStatus.OK).send();
+      } else if (await this.userService.isAdmin(user.id, roomId)) {
+        if (
+          (await this.userService.isOwner(kickedId, roomId)) ||
+          (await this.userService.isAdmin(kickedId, roomId))
+        ) {
+          return res.status(HttpStatus.FORBIDDEN).send();
+        }
+        await this.userService.kickUser(kickedId, roomId);
+        return res.status(HttpStatus.OK).send();
+      } else {
+        return res.status(HttpStatus.FORBIDDEN).send();
+      }
+    } catch (error) {
+      this.logger.error(error);
+      res.status(error.status).json({ message: error.message }).send();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('update-room-privacy/:roomId')
+  async updateRoomPrivacy(
+    @Body('type') type: any,
+    @Body('password') password: any,
+    @Param('roomId') roomId: string,
+  ) {
+    if (type && password) {
+      const hashedPassword = await bcrypt.hashPassword(password);
+      await this.userService.updateChatRoomPrivacy(
+        roomId,
+        type,
+        hashedPassword,
+      );
+    }
   }
 }

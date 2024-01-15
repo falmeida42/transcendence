@@ -12,8 +12,6 @@ const Message = (messageProps : MessageProps) => {
     
     const { login } = useApi()
 
-    console.log(`Message received: ${messageProps.text}`)
-    console.log( "username: ", messageProps.username)
     
     
     return (

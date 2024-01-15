@@ -13,13 +13,9 @@ const Input = (content: any) => {
   const {login, image} = useApi();
   const {socket} = useContext(ChatContext) ?? {}
 
-  console.log("CONTENT: ", JSON.stringify(content.content))
 
   const sendMessage = () => {
     if (validInput(text)) {
-      console.log("This is the user content: ", login )
-      console.log("props: ", content)
-      console.log("props id: ", content.content.selectedChatData.id)
       socket.emit("messageToServer", { to: content.content.selectedChatData.id , message: text, sender: login , senderImage: image});
       setText("");
     }
