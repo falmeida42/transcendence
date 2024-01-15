@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   UseGuards,
+  Req,
   Res,
   Query
 } from '@nestjs/common';
@@ -46,22 +47,160 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('findlogin/:login')
-  async findByLogin(@Param('login') login: string) {
-    return this.userService.getUserByLogin(login);
+  @Post('me')
+  async updateMe(@GetMe() user: User, @Body() userData: any) {
+    const updatedUser = await this.userService.updateUserById(String(user.id), userData);
+    return updatedUser;
   }
 
   @UseGuards(TwoFAGuard)
   @Get('auth')
   async getAuth(@GetMe() user: User) {
     return (await this.findById(String(user.id))).twoFactorAuthEnabled;
+    
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('find/:id')
   async findById(@Param('id') id: string) {
-    return this.userService.getUserById(id);
+      return this.userService.getUserById(id);
+    }
+
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('find/:login')
+  async findByLogin(@Param('login') login: string) {   
+      return this.userService.getUserByLogin(login);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('all')
+  async getAll() {   
+      return this.userService.getAll();
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('friends')
+  async getFriends(@GetMe('id') id: string) {   
+      return this.userService.getFriends(id);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('not-friends')
+  async getNotFriends(@GetMe('id') id: string) {
+      // this.logger.debug("USER ID: ", id);    
+      return this.userService.getNotFriends(id);
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Get('blockable-users')
+  async getBlockableUsers(@GetMe('id') id: string) { 
+      return this.userService.getBlockableUsers(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('create-friend-request')
+  async addFriendRequest(@Req() req: any, @Body() body: any) {
+    // this.logger.debug("AAAAA", body.requesteeId);
+    return await this.userService.addFriendRequest(body.requesterId, body.requesteeId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('handle-friend-request')
+  async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
+    // this.logger.debug("ACCEPT FETCH BODY:");
+    try {
+      const result = await this.userService.handleFriendRequest(body.requesterId, id, body.requestId, body.type);
+      return { statusCode: HttpStatus.CREATED, ...result };
+    } catch (error) {
+      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('block-user')
+  async blockUser(@GetMe('id') id: string, @Body() body: any) {
+    // this.logger.debug("ACCEPT FETCH BODY:");
+    try {
+      const result = await this.userService.blockUser(id, body.blockedId);
+      return { statusCode: HttpStatus.CREATED, ...result };
+    } catch (error) {
+      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
+    }
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Get('friend-requests')
+  async getFriendRequests(@GetMe('id') id: string) {
+    //  this.logger.debug("USER ID: ", id);  
+      return this.userService.getFriendRequests(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('matches/:id')
+  async getMatches(@Param('id') id: string) {
+    try {
+      // this.logger.debug(id);
+      let matches = [];
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wins: {
+            include: {
+              winner: true,
+              loser: true,
+            }
+          },
+          losses: {
+            include: {
+              winner: true,
+              loser: true,
+            }
+          }
+        },
+      });
+      // this.logger.debug("FETCH RETURN", user);
+      matches = [...user.wins, ...user.losses].sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+
+      
+      if (!matches) throw new Error('teste');
+      return matches;
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('matches-wins/:id')
+  async getWins(@Param('id') id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wins: true,
+          losses: true,
+        }
+      });
+      
+      const winsCount = user.wins.length;
+      const lossesCount = user.losses.length;
+      
+      // this.logger.debug(winsCount, lossesCount);
+      return {winsCount, lossesCount};
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Post('change-user/:username')
@@ -78,14 +217,6 @@ export class UserController {
       this.logger.error(error);
       return { message: error, code: HttpStatus.BAD_REQUEST };
     }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('friends')
-  async getFriends(@GetMe('id') id: string) {
-    const friends = this.userService.getFriends(id);
-
-    return friends;
   }
 
   @UseGuards(JwtAuthGuard)

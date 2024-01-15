@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { useApi } from "../../apiStore";
 import {
   SocketContext,
   createRoom,
@@ -9,6 +8,7 @@ import {
 } from "../context/SocketContext";
 import "../game.css";
 import RealPong from "./RealPong";
+import { useApi } from "../../apiStore";
 
 const Home = () => {
   const { isConnected, room, username, onQueue, rooms } =
