@@ -13,12 +13,8 @@ import FriendProfile from './FriendProfile';
 
 interface User {
 	id: string,
-	userName: string,
+	username: string,
 	userImage: string,
-	userLogin: string
-	userFirst_name: string;
-	userLast_name: string;
-	userEmail: string;
 }
 
 function Profile() {
@@ -133,10 +129,6 @@ function Profile() {
   ?.split('=')[1];
 	if (token === undefined)
   return;
-
-  const handleClickFriendProfile = () => {
-	
-  }
 
   useUpdateUserData({ username: textValue, image: selectedImage });
 	
@@ -255,10 +247,10 @@ function Profile() {
 								
 									{
 										userFriends.map((friend: User) => (
-											<li>
+											<li key={friend.id}>
 												<span ><img src={friend.userImage} className="img-responsive" alt="#" ></img></span>
 												<span>
-													<span className="name_user" >{friend.userLogin}</span>
+													<span className="name_user" >{friend.username}</span>
 												</span>
 											</li>
 										))

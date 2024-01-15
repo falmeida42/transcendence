@@ -56,7 +56,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     .then((data) => {
         const mappedFriends = data.map((friend: any) => ({
             id: friend.id,
-            username: friend.login,
+            username: friend.username,
             userImage: friend.image,
         }));
         
@@ -88,7 +88,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     .then((data) => {
         const mappedBlockableUsers = data.map((friend: any) => ({
             id: friend.id,
-            username: friend.login,
+            username: friend.username,
             userImage: friend.image,
         }));
         
@@ -99,7 +99,12 @@ function ProfileProvider({ children }: ProfileProviderProps) {
   }
 
   useEffect(() => {
-    if (auth === false) return;
+    const tk = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    ?.split('=')[1];
+    if (auth === false || tk === undefined) return;
+
     fetch(`http://localhost:3000/user/friends`, {
       method: "GET",
       headers: {
@@ -119,7 +124,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     .then((data) => {
         const mappedFriends = data.map((friend: any) => ({
             id: friend.id,
-            username: friend.login,
+            username: friend.username,
             userImage: friend.image,
         }));
         
@@ -147,7 +152,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     .then((data) => {
         const mappedBlockableUsers = data.map((friend: any) => ({
             id: friend.id,
-            username: friend.login,
+            username: friend.username,
             userImage: friend.image,
         }));
         
@@ -155,7 +160,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     })
     .catch((error) => console.error("Fetch error:", error));
 
-  }, [auth]);
+  }, [auth, ProfileContext]);
 
 
   const contextValue: ProfileContextProps = {
