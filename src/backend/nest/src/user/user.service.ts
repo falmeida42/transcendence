@@ -408,16 +408,18 @@ export class UserService {
         if (room.type === ('DIRECT_MESSAGE' as ChatType)) {
           //Find the other user in the direct message room
           const directUser = room.participants.find(
-            (user) => user.id !== userId,
+            (user) => user.id !== userId
           );
-
-          return {
-            ...room,
-            name: directUser.login || 'User',
-            image:
+          
+          if (directUser) {
+            return {
+              ...room,
+              name: directUser.login || 'User',
+              image:
               directUser.image ||
               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiJuFZF4sFjZGf3JtXkRDHrtQXNjx3QSRI_NqN2pbWiCXddEPYQ89a0MH91XEp6IwICW8&usqp=CAU',
-          };
+            };
+          }
         }
 
         // Return other room types unchanged
