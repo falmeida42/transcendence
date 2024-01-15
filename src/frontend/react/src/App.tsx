@@ -36,7 +36,7 @@ function App() {
     }} else {
       navigate('/login');
     }
-  }, [token, token2fa, navigate]);
+  }, [token, token2fa, navigate, auth]);
   const handleButtonClick = () => {
     window.location.href = "http://localhost:3000/auth/login";
   };

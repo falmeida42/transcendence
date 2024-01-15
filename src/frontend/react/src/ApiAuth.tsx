@@ -8,6 +8,7 @@ interface UseAuthProps {
 
 const UseAuth = ({ code }: UseAuthProps) => {
   const [name, setName] = useState(code);
+  const [status, setStatus] = useState('SEND');
   const {setauth, auth} = useApi();
 
   const handleSendClick = async () => {
@@ -17,7 +18,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
         .split("; ")
         .find((row) => row.startsWith("token2fa="))
         ?.split("=")[1];
-      console.log(token, "@");
+      // console.log(token, "@");
       if (token === undefined) return;
 
       const UpResponse = await fetch(
@@ -36,34 +37,36 @@ const UseAuth = ({ code }: UseAuthProps) => {
         if (UpResponse.status === 401) {
           navigate('/login');
         }
+        setStatus("WRONG");
+        console.log('222');
+        navigate('/2fa');
         return;
       }
-      console.log('setauth');
-      document.cookie = `'token2fa'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+      document.cookie = `${'token2fa'}'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
       setauth(true);
       navigate('/');
-    } catch (error) {
-      navigate('/');
-    }
+    } catch (error) {}
   };
 
   // useEffect(() => {},[auth]);
 
   return (
-    <div className=".this-input">
-      <input
-        type="string"
-        name="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleSendClick();
-          }
-        }}
-      />
-      <div className=".this-button">
-        <button onClick={handleSendClick}>SEND</button>
+    <div className="centered2-container">
+      <div className=".small-input.container">
+        <input
+          type="string"
+          name="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSendClick();
+            }
+          }}
+          />
+      </div>
+      <div className="special-button" onClick={handleSendClick}>
+        {status}
       </div>
     </div>
   );

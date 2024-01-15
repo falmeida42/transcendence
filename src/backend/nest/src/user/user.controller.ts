@@ -63,28 +63,30 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('find/:id')
   async findById(@Param('id') id: string) {
-      return this.userService.getUserById(id);
+    const User = await this.userService.getUserById(id)
+    return User;
     }
 
 
 
   @UseGuards(JwtAuthGuard)
-  @Get('find/:login')
-  async findByLogin(@Param('login') login: string) {   
-      return this.userService.getUserByLogin(login);
+  @Get('find/login/:login')
+  async findByLogin(@Param('login') login: string) {
+    const User = await this.userService.getUserByLogin(login);
+      return User;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('all')
   async getAll() {   
-      return this.userService.getAll();
+      return await this.userService.getAll();
   }
 
 
   @UseGuards(JwtAuthGuard)
   @Get('friends')
   async getFriends(@GetMe('id') id: string) {   
-      return this.userService.getFriends(id);
+      return await this.userService.getFriends(id);
   }
 
 
@@ -92,13 +94,13 @@ export class UserController {
   @Get('not-friends')
   async getNotFriends(@GetMe('id') id: string) {
       // this.logger.debug("USER ID: ", id);    
-      return this.userService.getNotFriends(id);
+      return await this.userService.getNotFriends(id);
   }
   
   @UseGuards(JwtAuthGuard)
   @Get('blockable-users')
   async getBlockableUsers(@GetMe('id') id: string) { 
-      return this.userService.getBlockableUsers(id);
+      return await this.userService.getBlockableUsers(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -136,7 +138,7 @@ export class UserController {
   @Get('friend-requests')
   async getFriendRequests(@GetMe('id') id: string) {
     //  this.logger.debug("USER ID: ", id);  
-      return this.userService.getFriendRequests(id);
+      return await this.userService.getFriendRequests(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -209,7 +211,7 @@ export class UserController {
     @Param('username') username: string,
   ) {
     try {
-      this.prisma.user.update({
+      await this.prisma.user.update({
         where: { id: user.id },
         data: { username: username },
       });
@@ -222,7 +224,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('chatRooms')
   async getChatRooms(@GetMe('id') id: string) {
-    const ChatRooms = this.userService.getChatRooms(id);
+    const ChatRooms = await this.userService.getChatRooms(id);
 
     return ChatRooms;
   }
@@ -230,13 +232,13 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('chatRoom/:id')
   async getChatRoomById(@Param('id') id: string) {
-    return this.userService.getChatRoomById(id);
+    return await this.userService.getChatRoomById(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('chatHistory/:id')
   async getChatHistory(@GetMe('id') userId: string, @Param('id') id: string) {
-    return this.userService.getChatHistory(userId, id);
+    return await this.userService.getChatHistory(userId, id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -246,7 +248,7 @@ export class UserController {
     @Param('friendName') friendName: string,
   ): Promise<string> {
     try {
-      const user = this.userService.getUserById(id);
+      const user = await this.userService.getUserById(id);
 
       if (!user) {
         return 'User not found';
@@ -297,7 +299,7 @@ export class UserController {
     @Body('password') password: string,
     @Body('roomType') roomType: string,
   ) {
-    return this.userService.joinRoom(username, roomId, password, roomType);
+    return await this.userService.joinRoom(username, roomId, password, roomType);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -306,7 +308,7 @@ export class UserController {
     @GetMe('username') username: string,
     @Body('roomId') roomId: string,
   ) {
-    return this.userService.leaveRoom(username, roomId);
+    return await this.userService.leaveRoom(username, roomId);
   }
 
   @UseGuards(JwtAuthGuard)

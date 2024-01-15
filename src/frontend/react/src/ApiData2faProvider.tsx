@@ -18,7 +18,7 @@ const ApiData2faProvider: React.FC<ApiData2faProviderProps> = (props) => {
           ?.split("=")[1];
         if (token === undefined) return;
 
-        console.log('token: ', token, 'cus: ', document.cookie);
+        // console.log('token: ', token, 'cus: ', document.cookie);
       
 
         const UpResponse = await fetch("http://localhost:3000/user/auth", {
@@ -36,7 +36,7 @@ const ApiData2faProvider: React.FC<ApiData2faProviderProps> = (props) => {
         }
 
         const data = await UpResponse.json();
-        console.log(data);
+        // console.log(data);
         setInfo("", "", "", "", "", "", "", data, "");
       } catch (error) {
         console.error(error);

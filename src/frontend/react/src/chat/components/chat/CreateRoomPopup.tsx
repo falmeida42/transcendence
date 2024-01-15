@@ -151,7 +151,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                     test(id)
                     // updateChatRooms
                 )
-                .catch((error) => console.error("Fetch error:", error));
+                .catch();
 
             handleClose();
         }

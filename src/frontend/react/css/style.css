@@ -781,7 +781,8 @@ span {
     box-shadow: 0 0 3px 0px rgba(0, 0, 0, 0.4);
     float: left;
     width: 100%;
-    background-image: url('images/layout_img/pattern_h.png');
+    background-image: url('/background.jpg');
+    background-attachment: fixed;
     position: fixed;
     height: 100%;
     overflow: auto;
@@ -1090,9 +1091,11 @@ a[data-toggle="collapse"] {
 
 .topbar .navbar {
     padding: 0;
-    background: #3c4753;
+    background-image: url("/background.jpg");
+    /* background: #ff0000; */
     border: none;
     border-radius: 0;
+    background-attachment: fixed;
 }
 
 .user_profle_side {
@@ -1101,7 +1104,8 @@ a[data-toggle="collapse"] {
 
 .sidebar_user_info {
     padding: 15px 25px;
-    background: #214162;
+    background-image: url("/background.jpg");
+    background: #f6f6f7;
 }
 
 .user_img img {
@@ -1598,7 +1602,7 @@ a[data-toggle="collapse"] {
 -------------------------------------------------------------------*/
 
 .dash_head {
-    background-image: url('images/layout_img/pattern_h.png');
+    background-image: url('/background.jpg');
     font-weight: normal;
     height: auto;
     border-radius: 5px 5px 0 0;
@@ -2066,7 +2070,7 @@ body {
 }
 
 .background-image {
-  background-image: url("https://media.istockphoto.com/id/1329920974/photo/blue-watercolor-background-grunge-vignette.webp?b=1&s=170667a&w=0&k=20&c=bb-ho5LRuTJcrhtKAjqRg_2-iuzUptuXRkBf-D3YFZA="); /* Replace with the path to your background image */
+  background-image: url("/background.jpg"); /* Replace with the path to your background image */
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -2076,36 +2080,22 @@ body {
 }
 
 .centered-container {
-  width: 50%; /* Adjust the width as needed */
+  width: 50%;
   text-align: center;
 }
 
-.lock-checkbox {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
-}
+.centered2-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
 
-.lock-checkbox input[type="checkbox"] {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+.small-input-container {
+    margin-bottom: 10px;
+  }
 
-.lock-icon {
-  fill: #00ff40;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 34px;
-  height: 34px;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.lock-checkbox input[type="checkbox"]:checked + .lock-icon {
-  fill: #ff0000;
-}
+.this2-button {
+    margin-top: 10px;
+  }
