@@ -19,6 +19,7 @@ async function bootstrap() {
   app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   app.enableCors(corsOptions);
+  
   await app.listen(3000);
 }
 bootstrap();

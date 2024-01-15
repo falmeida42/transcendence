@@ -40,8 +40,6 @@ function Website() {
 					</SocketProvider>
 				</div>
 				</Route>
-
-				<Switch>
 				<Route path="/Profile">
 					<div className="game">
 					<Profile/>
@@ -52,7 +50,6 @@ function Website() {
 						<FriendProfilePage/>
 					</div>
 				</Route>
-				</Switch>
 				<Route path="/Chat">
 					<div className="game">
 					<Chat/>
@@ -69,5 +66,6 @@ export default Website;
 const FriendProfilePage = () => {
 	const { login } = useParams();
   
-	return <FriendProfile login={login} />;
+	if (login !== undefined) {
+	return <FriendProfile login={login} />;}
   };

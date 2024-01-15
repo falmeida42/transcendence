@@ -10,6 +10,7 @@ import {
   Res,
   UnauthorizedException,
   UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Response } from 'express';
@@ -19,6 +20,7 @@ import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { TwoFAGuard } from './guard/2FA.guard';
+import { FTAuthExceptionFilter } from 'src/filters';
 
 @Controller('auth')
 export class AuthController {
@@ -34,6 +36,7 @@ export class AuthController {
   login() {}
 
   @UseGuards(FTGuard)
+  @UseFilters(new FTAuthExceptionFilter())
   @Get('intra-clbk')
   async callbackIntra(@Req() req: any, @Res() res: Response): Promise<any> {
     const dto: AuthDto = req.user;
