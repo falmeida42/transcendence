@@ -209,6 +209,49 @@ export class UserService {
             },
           },
         });
+
+        await this.prisma.user.update({
+          where: {
+            id: requesterId,
+          },
+          data: {
+            friends: {
+              connect: { id: requesteeId }
+            },
+          },
+        });
+
+        const requester = await this.prisma.user.findUnique({
+          where: { id: requesterId },
+        });
+    
+        const requestee = await this.prisma.user.findUnique({
+          where: { id: requesteeId },
+        });
+    
+        if (!requester || !requestee) {
+          return { message: 'User not found' };
+        }
+    
+        // Create the chat room
+        const chatRoom = await this.prisma.chatRoom.create({
+          data: {
+            id: crypto.randomUUID().toString(),
+            name: requesterId + requesteeId,
+            image: "#",
+            type: "DIRECT_MESSAGE",
+            owner: {
+              connect: requester
+            },
+            participants: {
+              connect: [
+                { id: requesterId },
+                { id: requesteeId },
+              ],
+            },
+          },
+        });
+        console.log("chatRoom", JSON.stringify(chatRoom))
         return { message: 'Friend request accepted', friendRequest };
       }
       else
