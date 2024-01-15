@@ -2,7 +2,7 @@ import { create } from "zustand";
 export var token: string | null;
 
 interface ap {
-  id: string;
+  id: string,
   user: string;
   first_name: string;
   last_name: string;
@@ -33,14 +33,14 @@ interface ap {
 }
 
 export const useApi = create<ap>((set) => ({
-  user: "",
-  id: "",
-  first_name: "",
-  last_name: "",
-  login: "",
-  email: "",
-  image: "",
-  qrcode: "",
+  id: '',
+  user: '',
+  first_name: '',
+  last_name: '',
+  login: '',
+  email: '',
+  image: '',
+  qrcode: '',
   twofa: false,
   auth: false,
   friends: [],

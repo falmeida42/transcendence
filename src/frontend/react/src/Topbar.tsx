@@ -1,9 +1,16 @@
+import { useState } from "react";
 import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
+import NotifList from "./NotifList.tsx";
 
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
-  const { first_name, image } = useApi();
+  const { user, image } = useApi();
+  const [isVisibleNotif, setIsVisibleNotif] = useState(false);
+
+  const handleClickNotif = () => {
+    setIsVisibleNotif(!isVisibleNotif);
+  }
 
   return (
     <div id="content">
@@ -32,9 +39,11 @@ const Topbar = () => {
               <div className="icon_info">
                 <ul>
                   <li className="icons_list">
-                    <a href="#">
                       <i className="fa fa-power-off"></i>
-                    </a>
+                  </li>
+                  <li className="icons_list">
+                      <i onClick={handleClickNotif} className="fa fa-bell"></i>
+                      {isVisibleNotif && <NotifList />}
                   </li>
                   <li className="user_list">
                     <img
@@ -45,8 +54,8 @@ const Topbar = () => {
                     />
                   </li>
                   <li className="user_list">
-                    <a href="#Profile">
-                      <span className="name_user">{first_name}</span>
+                    <a href="/Profile">
+                      <span className="name_user">{user}</span>
                     </a>
                   </li>
                 </ul>

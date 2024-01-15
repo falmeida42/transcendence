@@ -8,11 +8,9 @@ interface UseAuthProps {
 
 const UseAuth = ({ code }: UseAuthProps) => {
   const [name, setName] = useState(code);
-  const { setauth } = useApi();
+  const {setauth, auth} = useApi();
 
   const handleSendClick = async () => {
-    // Move the logic from UseAuth to handleSendClick
-    // Make sure not to call hooks here
     try {
       const newUserData = name;
       const token = document.cookie
@@ -36,20 +34,20 @@ const UseAuth = ({ code }: UseAuthProps) => {
       );
       if (!UpResponse.ok) {
         if (UpResponse.status === 401) {
-          // Redirect to the login page
-          window.location.href = "http://localhost:3000/auth/login";
+          navigate('/login');
         }
         return;
       }
+      console.log('setauth');
+      document.cookie = `'token2fa'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+      setauth(true);
+      navigate('/');
     } catch (error) {
-      navigate("/");
-      // console.error(error);
+      navigate('/');
     }
-
-    document.cookie = `'token2fa'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
-    setauth(true);
-    navigate("/2fa");
   };
+
+  // useEffect(() => {},[auth]);
 
   return (
     <div className=".this-input">

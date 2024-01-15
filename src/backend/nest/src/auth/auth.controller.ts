@@ -36,28 +36,32 @@ export class AuthController {
   @Get('intra-clbk')
   async callbackIntra(@Req() req: any, @Res() res: Response): Promise<any> {
     const dto: AuthDto = req.user;
-    if (await this.authService.is2FAActive(String(dto.id))) {
-      // Execute 2FA logic
-      this.logger.debug('2FA IS ENABLED');
+    try {
+      if (await this.authService.is2FAActive(String(dto.id))) {
+        // Execute 2FA logic
+        this.logger.debug('2FA IS ENABLED');
 
-      const user = await this.userService.getUserById(dto.id);
-      if (!user) {
-        throw new ForbiddenException('User not found');
+        const user = await this.userService.getUserById(dto.id);
+        if (!user) {
+          throw new ForbiddenException('User not found');
+        }
+        this.logger.debug('USER: ', user);
+
+        const token = await this.authService.sign2FAToken(user.id);
+
+        // this.logger.debug('ACCESS TOKEN: ', token);
+
+        res
+          .cookie('token2fa', token, {
+            expires: new Date(Date.now() + 2 * 60 * 1000),
+            domain: 'localhost',
+            path: '/',
+            sameSite: 'none',
+          })
+          .redirect(`${process.env.FRONTEND_URL}`);
+        return;
       }
-
-      const token = await this.authService.sign2FAToken(user.id);
-
-      res
-        .cookie('token2fa', token, {
-          expires: new Date(Date.now() + 2 * 60 * 1000),
-          domain: 'localhost',
-          path: '/',
-          sameSite: 'none',
-          secure: true,
-        })
-        .redirect(`${process.env.FRONTEND_URL}`);
-      return;
-    }
+    } catch {}
     // Execute login without 2FA
 
     const data = await this.authService.signup(dto);
@@ -67,7 +71,6 @@ export class AuthController {
         domain: 'localhost',
         path: '/',
         sameSite: 'none',
-        secure: true,
       })
       .redirect(`${process.env.FRONTEND_URL}`);
     return;
@@ -169,7 +172,6 @@ export class AuthController {
         domain: 'localhost',
         path: '/',
         sameSite: 'none',
-        secure: true,
       })
       .redirect(`${process.env.FRONTEND_URL}`);
     // this.logger.debug('ACCESS TOKEN: ', tokenPerm);

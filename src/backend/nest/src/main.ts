@@ -9,6 +9,7 @@ async function bootstrap() {
   const corsOptions: CorsOptions = {
     origin: ['http://localhost:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   };
 

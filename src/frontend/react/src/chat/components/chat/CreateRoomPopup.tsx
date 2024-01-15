@@ -14,9 +14,9 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
     const [inputImage, setInputImage] = useState<string | undefined>("");
     const [inputPassword, setInputPassword] = useState("");
     const [inputPrivacy, setInputPrivacy] = useState<string>("");
-    const [checkboxValues, setCheckboxValues] = useState<string[]>([]);
     const [modal, setModal] = useState(1);
     const {friends, login} = useApi();
+    const [checkboxValues, setCheckboxValues] = useState<string[]>([login]);
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const [id] = useState(crypto.randomUUID().toString())
 
@@ -89,7 +89,6 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
       };
 
     const handleCheckboxChange = (value: string) => {
-        setCheckboxValues([login])
         
         const isChecked = checkboxValues.includes(value);
 
