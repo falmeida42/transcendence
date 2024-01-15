@@ -33,10 +33,10 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
       })
       if (!res.ok) {
         if (res.status === 401) {
-        console.log('401');
+        // console.log('401');
         setErr("WRONG!");
-        const data = await res.json();
-        console.log('401', JSON.stringify(data));
+        // const data = await res.json();
+        // console.log('401', JSON.stringify(data));
         return; }
       }
       setauth(true);

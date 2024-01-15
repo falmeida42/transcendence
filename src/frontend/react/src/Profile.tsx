@@ -9,11 +9,16 @@ import getHookers from "./Hookers";
 import MatchHistory from "./MatchHistory";
 import BlockPopup from './BlockPopUp';
 import ScoreBar from './ScoreBar';
+import FriendProfile from './FriendProfile';
 
 interface User {
 	id: string,
-	username: string,
-	userImage: string
+	userName: string,
+	userImage: string,
+	userLogin: string
+	userFirst_name: string;
+	userLast_name: string;
+	userEmail: string;
 }
 
 function Profile() {
@@ -26,6 +31,7 @@ function Profile() {
     email,
     image,
     twofa,
+	auth,
     setUsername,
     setImage,
   } = useApi();
@@ -85,21 +91,39 @@ function Profile() {
       setImage(selectedImage);
     }
 	};
-  
+
 	const { userFriends } = useContext(ProfileContext) ?? {};
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 	const [isVisible2FA, setIsVisible2FA] = useState(false);
   const [isVisibleBlock, setIsVisibleBlock] = useState(false);
   
 	const handleClickAddFriend = () => {
+	if (isVisible2FA) {
+		setIsVisible2FA(!isVisible2FA);
+	}
+	if (isVisibleBlock) {
+		setIsVisibleBlock(!isVisibleBlock);
+	}
     setIsVisibleAddFriend(!isVisibleAddFriend);
 	};
   
 	const handleClick2FA = () => {
+	if (isVisibleBlock) {
+		setIsVisibleBlock(!isVisibleBlock);
+	}
+	if (isVisibleAddFriend) {
+		setIsVisibleAddFriend(!isVisibleAddFriend);
+	}
     setIsVisible2FA(!isVisible2FA);
 	};
 
   const handleClickBlock = () => {
+	if (isVisibleAddFriend) {
+		setIsVisibleAddFriend(!isVisibleAddFriend);
+	}
+	if (isVisible2FA) {
+		setIsVisible2FA(!isVisible2FA);
+	}
     setIsVisibleBlock(!isVisibleBlock);
 	};
   
@@ -109,6 +133,10 @@ function Profile() {
   ?.split('=')[1];
 	if (token === undefined)
   return;
+
+  const handleClickFriendProfile = () => {
+	
+  }
 
   useUpdateUserData({ username: textValue, image: selectedImage });
 	
@@ -223,13 +251,14 @@ function Profile() {
           		<MatchHistory id={id}/>
 						<div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-home-tab">
 							<div className="msg_list_main">
-								<ul className="msg_list">
+								<ul className="msg_list"> 
+								
 									{
 										userFriends.map((friend: User) => (
 											<li>
-												<span><img src={friend.userImage} className="img-responsive" alt="#"></img></span>
+												<span ><img src={friend.userImage} className="img-responsive" alt="#" ></img></span>
 												<span>
-													<span className="name_user">{friend.username}</span>
+													<span className="name_user" >{friend.userLogin}</span>
 												</span>
 											</li>
 										))

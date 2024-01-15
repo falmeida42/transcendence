@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "./apiStore";
+import { navigate } from "wouter/use-location";
 
 interface User {
   id: string,
@@ -25,13 +26,15 @@ const MatchHistory = ({ id }: props) => {
   const[matchHistory, setMatchHistory] = useState<Match[]>([])
 
   
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("token="))
-    ?.split("=")[1];
-  if (token === undefined || id === undefined) return;
-
+  
   const getMatchHistory = async () => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+    if (token === undefined || id === undefined || id === '') return;
+    console.log(id);
+
     fetch(`http://localhost:3000/user/matches/${id}`, {
       method: "GET",
       headers: {
@@ -41,13 +44,15 @@ const MatchHistory = ({ id }: props) => {
     })
     .then(async (response) => {
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        if (response.status === 401) {
+          navigate('/login')
+        }
       }
       const data = await response.text();
       return data ? JSON.parse(data) : null;
       })
     .then((data) => {
-      console.log("MATCH DATA:", data);
+      // console.log("MATCH DATA:", data);
       const mappedHistory = data.map((match: any) => ({
         id: match.id,
         winner: match.winner,
@@ -86,8 +91,8 @@ const MatchHistory = ({ id }: props) => {
                 </span>
                 <span>
                   {match.winner.id === id ? (
-                    <span className="name_user">Win against {match.loser.username}</span>
-                  ) : <span className="name_user">Loss against {match.winner.username}</span>
+                    <span className="name_user" style={{ color: 'green' }}>Win against {match.loser.username}</span>
+                  ) : <span className="name_user" style={{ color: 'red' }}>Lose against {match.winner.username}</span>
                   }
                   <span className="msg_user">{match.playerWinScore}-{match.playerLosScore}</span>
                   <span className="time_ago">

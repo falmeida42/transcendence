@@ -8,6 +8,7 @@ import {
   Post,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
@@ -39,13 +40,13 @@ export class AuthController {
     try {
       if (await this.authService.is2FAActive(String(dto.id))) {
         // Execute 2FA logic
-        this.logger.debug('2FA IS ENABLED');
+        // this.logger.debug('2FA IS ENABLED');
 
         const user = await this.userService.getUserById(dto.id);
         if (!user) {
           throw new ForbiddenException('User not found');
         }
-        this.logger.debug('USER: ', user);
+        // this.logger.debug('USER: ', user);
 
         const token = await this.authService.sign2FAToken(user.id);
 
@@ -115,7 +116,7 @@ export class AuthController {
       }
 
       const isCodeValid = await this.authService.is2FACodeValid(code, user);
-      this.logger.debug(isCodeValid);
+      // this.logger.debug(isCodeValid);
 
       if (isCodeValid === false) {
         return res.status(401).json({ error: 'Wrong 2FA code' });
@@ -158,22 +159,22 @@ export class AuthController {
     const isCodeValid = await this.authService.is2FACodeValid(body.code, user);
 
     if (!isCodeValid) {
-      res
-        // .status(401)
-        .redirect(`${process.env.FRONTEND_URL}/2fa`);
-      return;
+      // res
+      //   .status(403)
+      //   .redirect(`${process.env.FRONTEND_URL}/2fa`);
+      // return;
       throw new ForbiddenException('Wrong 2FA code');
     }
     const tokenPerm = await this.authService.signAccessToken(Number(user.id));
 
     res
       .cookie('token', tokenPerm, {
-        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + 14 * 60 * 1000),
         domain: 'localhost',
         path: '/',
         sameSite: 'none',
       })
-      .redirect(`${process.env.FRONTEND_URL}`);
+      .status(200).send()
     // this.logger.debug('ACCESS TOKEN: ', tokenPerm);
     return;
   }

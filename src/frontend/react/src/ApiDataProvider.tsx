@@ -16,7 +16,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
           .split("; ")
           .find((row) => row.startsWith("token="))
           ?.split("=")[1];
-        if (token === undefined) return;
+        if (token === undefined || auth === false) return;
 
         const response = await fetch('http://localhost:3000/user/me', {
           method: 'GET',
@@ -38,6 +38,11 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
             "Content-Type": "application/json",
           },
         });
+        if (!friends.ok) {
+          if (friends.status === 401) {
+            navigate('/login');
+          }
+        }
 
         const data = await response.json();
         const dataFriends = await friends.json();
@@ -53,7 +58,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
           dataFriends
         );
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
