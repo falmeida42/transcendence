@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import SVG, { Circle, Line, Rect } from "react-svg-draw";
 import {
   SocketContext,
+  clearRoom,
   gameLoaded,
   pauseGame,
   sendKey,
@@ -56,6 +57,7 @@ const RealPong = (props: props) => {
         <button
           className="pauseButton"
           onClick={() => {
+            clearRoom();
             props.setPage(3);
           }}
         >

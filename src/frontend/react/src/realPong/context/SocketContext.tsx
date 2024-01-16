@@ -65,7 +65,7 @@ const SocketProvider = (props: any) => {
       case "SET_WINNER":
         return {
           ...state,
-          match: action.payload,
+          room: action.payload,
         };
       default:
         return state;
