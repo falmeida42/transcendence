@@ -20,10 +20,10 @@ const RealPong = (props: props) => {
   useEffect(() => {
     const sendKeyEvent = (e: KeyboardEvent) => {
       const { key, type } = e;
+      e.preventDefault();
       if (e.repeat) return;
       if (key === "ArrowUp" || key === "ArrowDown") {
         sendKey(key, type);
-        e.preventDefault();
       }
     };
 
@@ -44,9 +44,20 @@ const RealPong = (props: props) => {
         </button>
       )}
       {status === "PLAY" && (
-        <button className="pauseButton" onClick={() => pauseGame()}>
-          Pause
-        </button>
+        <div>
+          <button className="pauseButton" onClick={() => pauseGame()}>
+            Pause
+          </button>
+          <button
+            className="pauseButton"
+            onClick={() => {
+              clearRoom();
+              props.setPage(3);
+            }}
+          >
+            Leave
+          </button>
+        </div>
       )}
       {status === "PAUSE" && (
         <button className="pauseButton" onClick={() => gameLoaded()}>
@@ -152,7 +163,7 @@ const RealPong = (props: props) => {
             cx={ball.x.toString()}
             cy={ball.y.toString()}
             r={ball.radius.toString()}
-            style={{ fill: "#61ff22" }}
+            style={{ fill: "rgb(92, 110, 244)" }}
           />
         )}
         {player1 && (
