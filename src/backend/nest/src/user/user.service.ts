@@ -12,7 +12,7 @@ import { UserDto } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private readonly logger = new Logger('UserService');
 
@@ -796,5 +796,16 @@ export class UserService {
         where: { username },
       })
       .then((bannedUsers) => bannedUsers.length > 0);
+  }
+
+  async isBlocked(requesterId: string, requesteeId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: requesterId },
+      select: {
+        blockedBy: {
+          where: { id: requesteeId }
+        }
+      }
+    }).then((blocked) => blocked.blockedBy.length > 0)
   }
 }

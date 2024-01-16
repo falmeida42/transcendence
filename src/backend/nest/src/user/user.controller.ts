@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   HttpStatus,
   Logger,
@@ -27,7 +26,7 @@ export class UserController {
   constructor(
     private userService: UserService,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   private readonly logger = new Logger('UserController');
 
@@ -108,18 +107,24 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('create-friend-request')
-  async addFriendRequest(@Req() req: any, @Body() body: any) {
-    // this.logger.debug("AAAAA", body.requesteeId);
+  async addFriendRequest(
+    @Req() req: Request,
+    @Body('requesterId') requesterId: string,
+    @Body('requesteeId') requesteeId: string,
+    @Res() res: Response,
+  ) {
+    if (await this.userService.isBlocked(requesterId, requesteeId)) {
+      return res.status(HttpStatus.FORBIDDEN).json({ message: 'This user blocked you' }).send();
+    }
     return await this.userService.addFriendRequest(
-      body.requesterId,
-      body.requesteeId,
+      requesterId,
+      requesteeId,
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('handle-friend-request')
   async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
-    // this.logger.debug("ACCEPT FETCH BODY:");
     try {
       const result = await this.userService.handleFriendRequest(
         body.requesterId,
