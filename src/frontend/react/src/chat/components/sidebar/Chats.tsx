@@ -28,7 +28,7 @@ const Chats = (chatsProps: ChatsProps) => {
       rooms.push({
         id: room.id,
         name: room.name,
-        image: room.image,
+        image: room.image || "../../../dog.png",
         type: room.type,
         status: matchingUser ? matchingUser.userStatus : 0, // Use 0 as a default status
       });
