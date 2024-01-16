@@ -89,8 +89,17 @@ CREATE TABLE "_Participants" (
     "B" TEXT NOT NULL
 );
 
+-- CreateTable
+CREATE TABLE "_Banned" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_login_key" ON "User"("login");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "friendRequest_id_key" ON "friendRequest"("id");
@@ -118,6 +127,12 @@ CREATE UNIQUE INDEX "_Participants_AB_unique" ON "_Participants"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_Participants_B_index" ON "_Participants"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_Banned_AB_unique" ON "_Banned"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_Banned_B_index" ON "_Banned"("B");
 
 -- AddForeignKey
 ALTER TABLE "ChatRoom" ADD CONSTRAINT "ChatRoom_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -163,3 +178,9 @@ ALTER TABLE "_Participants" ADD CONSTRAINT "_Participants_A_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "_Participants" ADD CONSTRAINT "_Participants_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_Banned" ADD CONSTRAINT "_Banned_A_fkey" FOREIGN KEY ("A") REFERENCES "ChatRoom"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_Banned" ADD CONSTRAINT "_Banned_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
