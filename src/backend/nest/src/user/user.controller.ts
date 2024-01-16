@@ -95,7 +95,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('not-friends')
   async getNotFriends(@GetMe('id') id: string) {
-    // this.logger.debug("USER ID: ", id);
     return await this.userService.getNotFriends(id);
   }
 
@@ -369,7 +368,6 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      // this.logger.debug('getting channel participants');
       const result = await this.userService.getChannelParticipants(chatId);
       return res.status(HttpStatus.OK).json({ result: result });
     } catch (error) {

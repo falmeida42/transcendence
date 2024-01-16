@@ -144,7 +144,15 @@ export class UserService {
       },
     });
 
-    return notFriends || null;
+    const list = await Promise.all(
+      notFriends.map(async (notFriend) => {
+        return (await this.isBlocked(userId, notFriend.id)) ? null : notFriend;
+      })
+    );
+
+    const filteredList = list.filter((user) => user !== null);
+
+    return filteredList.length > 0 ? filteredList : null;
   }
 
   async addFriendRequest(
