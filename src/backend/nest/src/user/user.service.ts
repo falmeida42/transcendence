@@ -298,7 +298,21 @@ export class UserService {
         },
         data: {
           blockedBy: {
-            connect: { id: id },
+            connect: { id },
+          },
+          friends: {
+            disconnect: { id },
+          },
+        },
+      });
+
+      await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          friends: {
+            disconnect: { id: blockedId },
           },
         },
       });
