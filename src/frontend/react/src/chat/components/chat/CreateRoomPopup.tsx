@@ -39,40 +39,48 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
     
             reader.onloadend = async () => {
                 if (reader.readyState === FileReader.DONE) {
-                    const image = new Image();
-                    image.src = reader.result as string;
-    
-                    image.onload = async () => {
-                        const canvas = document.createElement('canvas');
-                        const maxImageSize = 1024; // Set your maximum image size here
-    
-                        let width = image.width;
-                        let height = image.height;
-    
-                        if (width > maxImageSize || height > maxImageSize) {
-                            const aspectRatio = width / height;
-    
-                            if (width > height) {
-                                width = maxImageSize;
-                                height = maxImageSize / aspectRatio;
-                            } else {
-                                height = maxImageSize;
-                                width = maxImageSize * aspectRatio;
+
+                    if (file.type === 'image/svg+xml') {
+                        const svgContent = reader.result as string;
+                        setInputImage(svgContent);
+                    }
+                        else
+                    {
+                                const image = new Image();
+                                image.src = reader.result as string;
+                
+                                image.onload = async () => {
+                                    const canvas = document.createElement('canvas');
+                                    const maxImageSize = 1024; // Set your maximum image size here
+                
+                                    let width = image.width;
+                                    let height = image.height;
+                
+                                    if (width > maxImageSize || height > maxImageSize) {
+                                        const aspectRatio = width / height;
+                
+                                        if (width > height) {
+                                            width = maxImageSize;
+                                            height = maxImageSize / aspectRatio;
+                                        } else {
+                                            height = maxImageSize;
+                                            width = maxImageSize * aspectRatio;
+                                        }
+                                    }
+                
+                                    canvas.width = width;
+                                    canvas.height = height;
+                
+                                    const ctx = canvas.getContext('2d');
+                                    ctx?.drawImage(image, 0, 0, width, height);
+                
+                                    const resizedDataURL = canvas.toDataURL('image/jpeg'); // You can change the format if needed
+                
+                                    setInputImage(resizedDataURL);
+                                };
                             }
-                        }
-    
-                        canvas.width = width;
-                        canvas.height = height;
-    
-                        const ctx = canvas.getContext('2d');
-                        ctx?.drawImage(image, 0, 0, width, height);
-    
-                        const resizedDataURL = canvas.toDataURL('image/jpeg'); // You can change the format if needed
-    
-                        setInputImage(resizedDataURL);
-                    };
-                }
-            };
+                        };
+                    }
     
             reader.readAsDataURL(file);
         }
