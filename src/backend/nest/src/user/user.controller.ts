@@ -314,6 +314,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
+    @GetMe() user: User,
     @Body('username') username: string,
     @Body('roomId') roomId: string,
     @Body('password') password: string,

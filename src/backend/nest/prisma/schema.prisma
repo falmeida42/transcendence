@@ -53,6 +53,7 @@ model User {
   losses     Match[]   @relation("loser")
 
   bannedFrom ChatRoom[] @relation("Banned")
+  mutedFrom  MutedIn[]
   RoomMute   RoomMute[]
 }
 
@@ -67,10 +68,11 @@ model ChatRoom {
   messages     Message[]
   participants User[]    @relation("Participants")
 
-  bannedUsers  User[]     @relation("Banned")
-  mutedPlayers RoomMute[]
+  bannedUsers User[]    @relation("Banned")
+  mutedUsers  MutedIn[]
 
-  userId String
+  userId   String
+  RoomMute RoomMute[]
 }
 
 model RoomMute {
@@ -113,4 +115,15 @@ model FriendRequest {
   requesterId String
 
   @@map("friendRequest")
+}
+
+model MutedIn {
+  userId    String
+  channelId String
+  mutedAt   DateTime
+
+  user    User     @relation(fields: [userId], references: [id])
+  channel ChatRoom @relation(fields: [channelId], references: [id])
+
+  @@id([userId, channelId])
 }
