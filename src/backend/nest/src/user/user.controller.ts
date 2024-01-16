@@ -9,7 +9,8 @@ import {
   UseGuards,
   Req,
   Res,
-  Query
+  Query,
+  ForbiddenException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
@@ -137,7 +138,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('friend-requests')
   async getFriendRequests(@GetMe('id') id: string) {
-    //  this.logger.debug("USER ID: ", id);  
       return await this.userService.getFriendRequests(id);
   }
 
@@ -145,7 +145,6 @@ export class UserController {
   @Get('matches/:id')
   async getMatches(@Param('id') id: string) {
     try {
-      // this.logger.debug(id);
       let matches = [];
       const user = await this.prisma.user.findUnique({
         where: {
@@ -166,7 +165,6 @@ export class UserController {
           }
         },
       });
-      // this.logger.debug("FETCH RETURN", user);
       matches = [...user.wins, ...user.losses].sort(
         (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
       );
@@ -196,7 +194,6 @@ export class UserController {
       const winsCount = user.wins.length;
       const lossesCount = user.losses.length;
       
-      // this.logger.debug(winsCount, lossesCount);
       return {winsCount, lossesCount};
     } catch (e) {
       this.logger.error(e.message);
@@ -298,7 +295,11 @@ export class UserController {
     @Body('roomId') roomId: string,
     @Body('password') password: string,
     @Body('roomType') roomType: string,
+    @Res() res: Response,
   ) {
+    if (await this.userService.isBanned(username, roomId)) {
+      return res.status(HttpStatus.FORBIDDEN).send();
+    }
     return await this.userService.joinRoom(username, roomId, password, roomType);
   }
 
@@ -394,6 +395,40 @@ export class UserController {
         return res.status(HttpStatus.OK).send();
       } else {
         return res.status(HttpStatus.FORBIDDEN).send();
+      }
+    } catch (error) {
+      this.logger.error(error);
+      res.status(error.status).json({ message: error.message }).send();
+    }
+  }
+
+  // SAME CODE AS ABOVE
+  @UseGuards(JwtAuthGuard)
+  @Post('ban-user')
+  async banUser(
+    @GetMe() user: User,
+    @Body('roomId') roomId: string,
+    @Body('participantId') participantId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      if (await this.userService.isOwner(user.id, roomId)) {
+        await this.userService.banUser(participantId, roomId);
+        return res.status(HttpStatus.OK).send();
+      } else if (await this.userService.isAdmin(user.id, roomId)) {
+        if (
+          (await this.userService.isOwner(participantId, roomId)) ||
+          (await this.userService.isAdmin(participantId, roomId))
+        ) {
+          return res.status(HttpStatus.FORBIDDEN).send();
+        }
+        await this.userService.banUser(participantId, roomId);
+        return res.status(HttpStatus.OK).send();
+      } else {
+        return res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: 'User is banned' })
+          .send();
       }
     } catch (error) {
       this.logger.error(error);
