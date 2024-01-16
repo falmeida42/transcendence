@@ -33,7 +33,6 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
             image: props.image,
           }),
         });
-        console.log(response.status);
         if (!response.ok) {
           if (response.status === 401) {
             navigate('/login');

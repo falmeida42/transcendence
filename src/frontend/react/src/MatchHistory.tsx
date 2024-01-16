@@ -29,7 +29,6 @@ const MatchHistory = ({ id }: props) => {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
     if (token === undefined || id === undefined || id === "") return;
-    console.log(id);
 
     fetch(`http://localhost:3000/user/matches/${id}`, {
       method: "GET",

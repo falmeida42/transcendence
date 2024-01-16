@@ -34,7 +34,6 @@ useEffect(() => {
           .find((row) => row.startsWith("token="))
           ?.split("=")[1];
 		if (token === undefined || login === undefined) return;
-		console.log('fuck', login)
 
         const response = await fetch(`http://localhost:3000/user/find/login/${login}`, {
           method: 'GET',
