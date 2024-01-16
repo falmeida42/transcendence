@@ -53,7 +53,12 @@ const RealPong = (props: props) => {
         </button>
       )}
       {status === "END" && (
-        <button className="pauseButton" onClick={() => props.setPage(3)}>
+        <button
+          className="pauseButton"
+          onClick={() => {
+            props.setPage(3);
+          }}
+        >
           Leave
         </button>
       )}

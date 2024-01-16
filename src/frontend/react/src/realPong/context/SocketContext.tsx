@@ -43,6 +43,7 @@ const disconnect = () => {
 };
 
 let set_name: (name: string) => void;
+let clearRoom: () => void;
 
 const SocketContext = React.createContext(initialState);
 
@@ -108,6 +109,10 @@ const SocketProvider = (props: any) => {
       socket.emit("Login", { name: name.trim() });
     };
 
+    clearRoom = () => {
+      dispatch({ type: "SET_WINNER", payload: undefined });
+    };
+
     socket.connect();
     return () => disconnect();
   }, []);
@@ -151,6 +156,7 @@ const joinRoomSpec = (roomId: string) => {
 export {
   SocketContext,
   SocketProvider,
+  clearRoom,
   createRoom,
   gameLoaded,
   joinQueue,
