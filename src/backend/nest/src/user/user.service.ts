@@ -12,7 +12,7 @@ import { UserDto } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private readonly logger = new Logger('UserService');
 
@@ -146,7 +146,15 @@ export class UserService {
       },
     });
 
-    return notFriends || null;
+    const list = await Promise.all(
+      notFriends.map(async (notFriend) => {
+        return (await this.isBlocked(userId, notFriend.id)) ? null : notFriend;
+      })
+    );
+
+    const filteredList = list.filter((user) => user !== null);
+
+    return filteredList.length > 0 ? filteredList : null;
   }
 
   async addFriendRequest(
@@ -292,7 +300,21 @@ export class UserService {
         },
         data: {
           blockedBy: {
-            connect: { id: id },
+            connect: { id },
+          },
+          friends: {
+            disconnect: { id },
+          },
+        },
+      });
+
+      await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          friends: {
+            disconnect: { id: blockedId },
           },
         },
       });
@@ -454,6 +476,14 @@ export class UserService {
   }
 
   async getChatHistory(userId: string, chatId: string) {
+    const blocked = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        blockedUsers: true,
+      }
+    }
+    )
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -464,6 +494,7 @@ export class UserService {
               include: {
                 sender: true,
               },
+
             },
           },
         },
@@ -477,7 +508,17 @@ export class UserService {
     // Extract messages from the chat room
     const messages = user?.chatRooms[0]?.messages || [];
 
-    return messages;
+    const list = await Promise.all(
+      messages.map(async (message) => {
+        this.logger.debug(message);
+        return (await this.isBlocked(message.userId, userId)) ? null : message;
+      })
+    );
+
+    const filteredList = list.filter((message) => message !== null);
+    this.logger.debug('list: ', list)
+    this.logger.debug('FILTERED list ', filteredList)
+    return filteredList;
   }
 
   async insertFriend(userId: string, friend: any) {
@@ -814,5 +855,16 @@ export class UserService {
         where: { username },
       })
       .then((bannedUsers) => bannedUsers.length > 0);
+  }
+
+  async isBlocked(requesterId: string, requesteeId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: requesterId },
+      select: {
+        blockedBy: {
+          where: { id: requesteeId }
+        }
+      }
+    }).then((blocked) => blocked.blockedBy.length > 0)
   }
 }

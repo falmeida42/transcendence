@@ -71,7 +71,6 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
 
     const handleClickYes = () => {
 
-        // console.log("USER TO CREATE REQUEST TO:", userToAdd)
         if (userToAdd?.username === "")
         {
             setWarningText("This field is mandatory");
@@ -79,7 +78,6 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
             return;
         }
 
-        // console.log("CREATE FRIEND REQUEST: DATA PASSED TO THE BACKEND", id, userToAdd.id);
         fetch(`http://localhost:3000/user/create-friend-request`, {
                 method: "POST",
                 headers: {
