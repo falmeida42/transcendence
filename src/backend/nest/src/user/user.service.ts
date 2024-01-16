@@ -51,14 +51,20 @@ export class UserService {
       }
     });
 
-    if (Object.keys(nonEmptyData).length === 0) {
+    if (Object.keys(nonEmptyData).length === 0 || (Object.entries(nonEmptyData).toString().trim().length < 1)) {
       // If there are no non-empty values, return null or handle accordingly
       return null;
     }
-    return await this.prisma.user.update({
-      where: { id: userId },
-      data: nonEmptyData,
-    });
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: nonEmptyData,
+      });
+      if (user)
+        return user;
+    } catch {
+      throw new ForbiddenException("Username not unique.");
+    }
   }
 
   async getAll(): Promise<UserDto[] | null> {

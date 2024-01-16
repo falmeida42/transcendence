@@ -51,7 +51,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
   // useEffect(() => {},[auth]);
 
   return (
-    <div className="centered2-container">
+    <div className="centered2-container"> <h2 style={{paddingBottom: `45px`, color: '#FFF'}}>Please insert your 2FA code.</h2>
       <div className=".small-input.container">
         <input
           type="string"

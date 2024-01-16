@@ -34,7 +34,6 @@ useEffect(() => {
           .find((row) => row.startsWith("token="))
           ?.split("=")[1];
 		if (token === undefined || login === undefined) return;
-		console.log('fuck', login)
 
         const response = await fetch(`http://localhost:3000/user/find/login/${login}`, {
           method: 'GET',
@@ -47,8 +46,12 @@ useEffect(() => {
 			if (response.status === 401) {
 				navigate('/login');
 			}
+			if (response.status === 404) {
+				navigate('/Profile');
+			}
 			return;
         }
+		// console.log('seu cu');
 		
 		const data = await response.json();
 		setId(data.id);
@@ -57,7 +60,7 @@ useEffect(() => {
 		setLastName(data.last_name);
 		setEmail(data.email);
 		setImage(data.image);
-      } catch (error) {
+      } catch {
       }
     };
 
@@ -106,11 +109,11 @@ useEffect(() => {
 					<nav>
 						<div className="nav nav-tabs" id="nav-tab" role="tablist">
 							<a className="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#recent_activity" role="tab" aria-selected="true">Match History</a>
-							<a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a>
+							{/* <a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a> */}
 						</div>
 					</nav>
 					<div className="tab-content" id="nav-tabContent">
-          		<MatchHistory id={id}/>
+          			<MatchHistory id={id}/>
 						<div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-home-tab">
 							<div className="msg_list_main">
 								<ul className="msg_list">
