@@ -1,11 +1,15 @@
 import React, { ReactNode, useEffect } from 'react';
+import { useApi } from './apiStore';
+import { navigate } from 'wouter/use-location';
 
 interface UseUpdateUserDataProps {
-  username: string | undefined;
-  image: string | undefined;
+  username?: string;
+  image?: string;
 }
 
 const useUpdateUserData = (props: UseUpdateUserDataProps) => {
+
+  const {setfailToUpdate, setImage, setUsername} = useApi();
   const token = document.cookie
   .split('; ')
   .find((row) => row.startsWith('token='))
@@ -17,20 +21,35 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
   useEffect(() => {
     const updateData = async () => {
       try {
-        await fetch('http://localhost:3000/user/me', {
+        const response = await fetch('http://localhost:3000/user/me', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          
           body: JSON.stringify({
             username: props.username,
             image: props.image,
           }),
         });
-        
-      } catch (error) {
-        console.error(error);
+        console.log(response.status);
+        if (!response.ok) {
+          if (response.status === 401) {
+            navigate('/login');
+            return;
+          }
+          setfailToUpdate(true);
+        }
+        else {
+          setfailToUpdate(false);
+          if (props.image !== undefined) {
+            setImage(props.image);}
+          if (props.username !== undefined) {
+            setUsername(props.username);}
+        }
+      } catch {
+        // console.error(error);
       }
     };
     updateData();

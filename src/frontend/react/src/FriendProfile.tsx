@@ -106,11 +106,11 @@ useEffect(() => {
 					<nav>
 						<div className="nav nav-tabs" id="nav-tab" role="tablist">
 							<a className="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#recent_activity" role="tab" aria-selected="true">Match History</a>
-							<a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a>
+							{/* <a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a> */}
 						</div>
 					</nav>
 					<div className="tab-content" id="nav-tabContent">
-          		<MatchHistory id={id}/>
+          			<MatchHistory id={id}/>
 						<div className="tab-pane fade" id="project_worked" role="tabpanel" aria-labelledby="nav-home-tab">
 							<div className="msg_list_main">
 								<ul className="msg_list">

@@ -30,7 +30,7 @@ model User {
   image                String
   first_name           String?
   last_name            String?
-  username             String?
+  username             String?    @unique
   chatRooms            ChatRoom[] @relation("Participants")
   twoFactorAuthSecret  String?
   twoFactorAuthEnabled Boolean    @default(false)
