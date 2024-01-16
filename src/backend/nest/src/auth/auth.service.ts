@@ -6,7 +6,6 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
-import { UserDto } from 'src/user/dto';
 
 @Injectable()
 export class AuthService {
@@ -72,7 +71,6 @@ export class AuthService {
     });
   }
 
-
   generate2FASecret() {
     return authenticator.generateSecret();
   }
@@ -119,6 +117,14 @@ export class AuthService {
     return this.jwtService.signAsync(payload, {
       expiresIn: '10m',
       secret: this.config.get('JWT_2FA_SECRET'),
+    });
+  }
+
+  // #TODO take This off on the final version
+  generateToken(user: any) {
+    const payload = { sub: user.id };
+    return this.jwtService.sign(payload, {
+      secret: this.config.get('JWT_SECRET'),
     });
   }
 }

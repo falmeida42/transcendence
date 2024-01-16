@@ -24,9 +24,10 @@ const Home = () => {
         return;
       }
       if (!username) {
-        // set_name(login);
-        // setPage(2);
-        setPage(1);
+        set_name(login);
+        setPage(2);
+
+        // setPage(1);
         return;
       }
       if (onQueue) {

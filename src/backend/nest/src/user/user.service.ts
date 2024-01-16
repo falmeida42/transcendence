@@ -51,7 +51,10 @@ export class UserService {
       }
     });
 
-    if (Object.keys(nonEmptyData).length === 0 || (Object.entries(nonEmptyData).toString().trim().length < 1)) {
+    if (
+      Object.keys(nonEmptyData).length === 0 ||
+      Object.entries(nonEmptyData).toString().trim().length < 1
+    ) {
       // If there are no non-empty values, return null or handle accordingly
       return null;
     }
@@ -60,10 +63,9 @@ export class UserService {
         where: { id: userId },
         data: nonEmptyData,
       });
-      if (user)
-        return user;
+      if (user) return user;
     } catch {
-      throw new ForbiddenException("Username not unique.");
+      throw new ForbiddenException('Username not unique.');
     }
   }
 
@@ -763,6 +765,22 @@ export class UserService {
         bannedFrom: {
           connect: { id },
         },
+      },
+    });
+  }
+
+  async muteUser(id: string, roomId: string, duration: number) {
+    await this.getChatRoomById(roomId);
+    await this.getUserById(id);
+
+    const muteExpiration = new Date();
+    muteExpiration.setMinutes(muteExpiration.getMinutes() + duration);
+
+    await this.prisma.roomMute.create({
+      data: {
+        chatRoomId: roomId,
+        userId: id,
+        muteExpiration,
       },
     });
   }

@@ -42,10 +42,10 @@ model User {
   friendOf User[] @relation("UserFriends")
 
   blockedUsers User[] @relation("BlockedUsers")
-  blockedBy User[] @relation("BlockedUsers")
+  blockedBy    User[] @relation("BlockedUsers")
 
-  sentFriendRequests		FriendRequest[] @relation("FriendsRequestor")
-	receivedFriendRequests	FriendRequest[] @relation("FriendsRequestee")
+  sentFriendRequests     FriendRequest[] @relation("FriendsRequestor")
+  receivedFriendRequests FriendRequest[] @relation("FriendsRequestee")
 
   chatRoomId String?
   Message    Message[]
@@ -53,6 +53,7 @@ model User {
   losses     Match[]   @relation("loser")
 
   bannedFrom ChatRoom[] @relation("Banned")
+  RoomMute   RoomMute[]
 }
 
 model ChatRoom {
@@ -66,9 +67,19 @@ model ChatRoom {
   messages     Message[]
   participants User[]    @relation("Participants")
 
-  bannedUsers User[] @relation("Banned")
+  bannedUsers  User[]     @relation("Banned")
+  mutedPlayers RoomMute[]
 
   userId String
+}
+
+model RoomMute {
+  id             String   @id @default(uuid())
+  userId         String
+  chatRoomId     String
+  muteExpiration DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
+  chatRoom       ChatRoom @relation(fields: [chatRoomId], references: [id])
 }
 
 model Message {
@@ -93,13 +104,13 @@ model Match {
 }
 
 model FriendRequest {
-  id                  String @id @default(uuid()) @unique
-  type                FriendRequestType
+  id   String            @id @unique @default(uuid())
+  type FriendRequestType
 
-  requestor				    User @relation("FriendsRequestor", fields: [requesterId], references: [id])
-  requestee				    User @relation("FriendsRequestee", fields: [requesteeId], references: [id])
-  requesteeId         String 
-  requesterId         String
+  requestor   User   @relation("FriendsRequestor", fields: [requesterId], references: [id])
+  requestee   User   @relation("FriendsRequestee", fields: [requesteeId], references: [id])
+  requesteeId String
+  requesterId String
 
   @@map("friendRequest")
 }

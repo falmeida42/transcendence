@@ -15,6 +15,7 @@ import { User } from '@prisma/client';
 import { Response } from 'express';
 import { GetMe } from 'src/decorators';
 import { FTAuthExceptionFilter } from 'src/filters';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { FTGuard, JwtAuthGuard } from '../auth/guard';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
@@ -26,6 +27,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private prisma: PrismaService,
   ) {}
 
   private readonly logger = new Logger('AuthController');
@@ -183,5 +185,29 @@ export class AuthController {
       .send();
     // this.logger.debug('ACCESS TOKEN: ', tokenPerm);
     return;
+  }
+
+  @Get('dummy-user-token')
+  async getDummyUserToken(@Res() res: Response): Promise<any> {
+    // Assuming you have a dummy user in your database
+    const dummyUser = await this.prisma.user.findUnique({
+      where: { login: 'dummyUser' },
+    });
+
+    if (!dummyUser) {
+      throw new Error('Dummy user not found');
+    }
+
+    const token = this.authService.generateToken(dummyUser);
+    return res
+      .cookie('token', token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        domain: 'localhost',
+        path: '/',
+        sameSite: 'none',
+        secure: true,
+      })
+      .status(200)
+      .send();
   }
 }
