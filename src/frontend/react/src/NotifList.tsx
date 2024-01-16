@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Notif from "./Notif";
+import { useApi } from "./apiStore";
 
 interface NotifListProps {
     
@@ -15,17 +16,18 @@ interface FriendRequest {
 const NotifList: React.FC<NotifListProps> = () => {
 
 const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+const { setfriendreq, auth, setInfo, friendreq } = useApi();
 
-const token = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
-if (token === undefined)
-    return;
 // console.log(token);
 
 useEffect(() => {
-
+    const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
+    if (token === undefined)
+        return;
+    
     fetch(`http://localhost:3000/user/friend-requests`, {
         method: "GET",
         headers: {
@@ -50,10 +52,11 @@ useEffect(() => {
             }));
 
             setFriendRequests([...mappedRequests]);
+            setfriendreq(mappedRequests.length);
         })
         .catch((error) => console.error("Fetch error:", error));
 
-}, []);
+}, [auth, setInfo, setfriendreq, friendreq]);
 
 return (
     <div className="request-container">

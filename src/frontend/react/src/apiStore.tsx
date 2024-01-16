@@ -13,6 +13,7 @@ interface ap {
   twofa: boolean;
   auth: boolean;
   friends: any;
+  friendreq: number;
   setInfo: (
     id: string,
     user: string,
@@ -22,13 +23,14 @@ interface ap {
     email: string,
     image: string,
     twofa: boolean,
-    friends: any
+    friends: any,
   ) => void;
   setUsername: (user: string | undefined) => void;
   setImage: (newImage: string | undefined) => void;
   setqrcode: (newqr: any | undefined) => void;
   setauth: (authorized: boolean | undefined) => void;
   settwofa: (Twofa: boolean | undefined) => void;
+  setfriendreq: (Friendreq: number) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
@@ -44,6 +46,7 @@ export const useApi = create<ap>((set) => ({
   twofa: false,
   auth: false,
   friends: [],
+  friendreq: 0,
   setInfo: (
     Id,
     User,
@@ -53,7 +56,7 @@ export const useApi = create<ap>((set) => ({
     Email,
     Image,
     Twofa,
-    Friends
+    Friends,
   ) =>
     set(() => ({
       id: Id,
@@ -71,6 +74,7 @@ export const useApi = create<ap>((set) => ({
   setqrcode: (newqr) => set(() => ({ qrcode: newqr })),
   setauth: (authorized) => set(() => ({ auth: authorized })),
   settwofa: (Twofa) => set(() => ({ twofa: Twofa })),
+  setfriendreq: (Friendreq) => set(() => ({ friendreq: Friendreq })),
   [Symbol.iterator]: function* () {
     yield this.id;
     yield this.user;

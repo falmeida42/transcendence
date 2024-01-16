@@ -39,11 +39,11 @@ const disconnect = () => {
   socket.off("GameOver");
   socket.off("QueueJoined");
   socket.off("QueueLeft");
-  socket.off("RoomList");
   socket.disconnect();
 };
 
 let set_name: (name: string) => void;
+let clearRoom: () => void;
 
 const SocketContext = React.createContext(initialState);
 
@@ -62,12 +62,10 @@ const SocketProvider = (props: any) => {
         return { ...state, match: action.payload, onQueue: false };
       case "QUEUE_JOINED":
         return { ...state, onQueue: action.payload };
-      case "ROOMS_UPDATE":
-        return { ...state, rooms: action.payload };
       case "SET_WINNER":
         return {
           ...state,
-          match: action.payload,
+          room: action.payload,
         };
       default:
         return state;
@@ -105,14 +103,14 @@ const SocketProvider = (props: any) => {
       dispatch({ type: "SET_WINNER", payload: undefined });
     });
 
-    socket.on("RoomList", (rooms) => {
-      dispatch({ type: "ROOMS_UPDATE", payload: rooms });
-    });
-
     set_name = (name: string) => {
       if (!name.trim()) return;
       dispatch({ type: "NAME_SET", payload: name });
       socket.emit("Login", { name: name.trim() });
+    };
+
+    clearRoom = () => {
+      dispatch({ type: "SET_WINNER", payload: undefined });
     };
 
     socket.connect();
@@ -158,6 +156,7 @@ const joinRoomSpec = (roomId: string) => {
 export {
   SocketContext,
   SocketProvider,
+  clearRoom,
   createRoom,
   gameLoaded,
   joinQueue,

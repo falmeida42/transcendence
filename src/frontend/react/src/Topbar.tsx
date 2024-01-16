@@ -1,22 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
 import NotifList from "./NotifList.tsx";
 import { navigate } from "wouter/use-location";
+import Badge from '@mui/material/Badge';
 
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
-  const { user, image } = useApi();
+  const { user, image, friendreq, auth, setInfo } = useApi();
   const [isVisibleNotif, setIsVisibleNotif] = useState(false);
 
   const handleClickNotif = () => {
     setIsVisibleNotif(!isVisibleNotif);
   }
   
-    const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("token="))
-    ?.split("=")[1];
+  const token = document.cookie
+  .split("; ")
+  .find((row) => row.startsWith("token="))
+  ?.split("=")[1];
 
   const handleClickLogout = () => {
     if (token !== undefined) {
@@ -24,6 +25,9 @@ const Topbar = () => {
       navigate('/login');
     }
   }
+
+  useEffect(() => {
+  }, [auth, friendreq, setInfo])
 
   return (
     <div id="content">
@@ -54,6 +58,7 @@ const Topbar = () => {
                       <i onClick={handleClickLogout} className="fa fa-power-off"></i>
                   </li>
                   <li className="icons_list">
+                  <Badge badgeContent={friendreq} color="error" style={{height:`30px`}}/>
                       <i onClick={handleClickNotif} className="fa fa-bell"></i>
                       {isVisibleNotif && <NotifList />}
                   </li>

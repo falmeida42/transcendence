@@ -1,14 +1,14 @@
 // chat.gateway.ts
 
-import { HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import {
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  OnGatewayInit,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
@@ -135,5 +135,10 @@ export class ChatGateway
   @SubscribeMessage('AddChannel')
   addChannel(client: Socket, @MessageBody('id') id: string) {
     this.io.emit('UpdateRooms');
+  }
+
+  @SubscribeMessage('inviteToGame')
+  inviteToGame(client: Socket, @MessageBody('login') login: string) {
+    this.io.emit('inviteToGame');
   }
 }

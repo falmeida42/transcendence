@@ -51,6 +51,8 @@ model User {
   Message    Message[]
   wins       Match[]   @relation("winner")
   losses     Match[]   @relation("loser")
+
+  bannedFrom ChatRoom[] @relation("Banned")
 }
 
 model ChatRoom {
@@ -63,6 +65,8 @@ model ChatRoom {
   admins       User[]    @relation("Admins")
   messages     Message[]
   participants User[]    @relation("Participants")
+
+  bannedUsers User[] @relation("Banned")
 
   userId String
 }
