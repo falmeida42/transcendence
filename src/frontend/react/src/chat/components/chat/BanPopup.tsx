@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { tk } from "../../context/ChatContext";
-import { useApi } from "../../../apiStore";
 
 interface BanPopupProps {
     isVisible: boolean;
@@ -10,21 +9,22 @@ interface BanPopupProps {
 
 const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
 
-    const [chatData, setChatData] = useState<Data>();
-    const [userToInvite, setUserToInvite] = useState<Participant>({id: "", login: "", image: "", chatRoomId: ""});
+    const [chatData, setChatData] = useState<Participant[]>();
+    const [userToInvite, setUserToInvite] = useState<Participant>({id: "", login: "", image: "", chatRoomId: "", username: ""});
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const [warningText, setWarningText] = useState("This field is mandatory");
-    const { login } = useApi();
+    const [kickError, setKickError] = useState(false);
 
     interface Participant {
         id: string;
         login: string;
+        username: string;
         image: string;
-        chatRoomId: string | null;
+        // chatRoomId: string | null;
     }
-    
+
     interface Data {
-        participants: Participant[]; 
+        participants: Participant[];
     }
 
     const handleClickClose = () => {
@@ -37,6 +37,26 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
             toggleVisibility(true);
             return;
         }
+        fetch(`http://localhost:3000/user/ban-user`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${tk}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+                {
+                    roomId: props.channelId,
+                    participantId: userToInvite.id,
+                }
+            )
+        })
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => {
+            console.error('Error: ', error);
+            setKickError(true);
+    });
+
         //send to backend
         props.handleClose();
     };
@@ -50,29 +70,35 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
         toggleVisibility(false);
     };
 
-    fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${tk}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.text();
-        return data ? JSON.parse(data) : null;
-      })
-      .then((data) => {
-        if (data) {
-          console.log("Room info received ", JSON.stringify(data));
-          setChatData(data);
-        } else {
-          console.log("No data received");
-        }
-      })
-      .catch((error) => console.error("Fetch error:", error));
+    useEffect(() => {
+        fetch(`http://localhost:3000/user/can-kick?roomId=${props.channelId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tk}`,
+            "Content-Type": "application/json",
+          },
+        })
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          return data ? JSON.parse(data) : null;
+        })
+        .then((data) => {
+          if (data) {
+            const mappedParticipants = data.map((participant: Participant) => ({
+                    id: participant.id,
+                    username: participant.username,
+                    login: participant.login,
+                    image: participant.image,
+            }));
+            setChatData([...mappedParticipants]);
+          } else {
+            console.log("No data received");
+          }
+        })
+    },[])
 
     return (
             <div>
@@ -81,31 +107,29 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
                 <div className="modal-dialog">
                     <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">Ban User</h5>
+                        <h5 className="modal-title">Kick User</h5>
                         <button type="button" className="close" onClick={handleClickClose}>
                         <span>&times;</span>
                         </button>
                     </div>
-                    <div>
+                    {!kickError && <div>
                         <div className="modal-body">
-                            <p>Select a user to ban from the chatroom:</p>
+                            <p>Select a user to kick out of the chatroom:</p>
                             <ul className="popup-input">
                             {
-                                    chatData?.participants.map((data) => (
-                                        login !== data.login && (
-                                            <li>
-                                            <label>
-                                            <input 
-                                            type="radio" 
-                                            value="public"
-                                            name="group"
-                                            onChange={() => handleRadioChange(data)}
-                                            />
-                                            <img src={data.image}></img>
-                                                {data.login}
-                                            </label>
-                                            </li>
-                                        )
+                                    chatData?.map((data: Participant) => (
+                                        <li>
+                                        <label>
+                                        <input
+                                        type="radio"
+                                        value="public"
+                                        name="group"
+                                        onChange={() => handleRadioChange(data)}
+                                        />
+                                        <img src={data.image}></img>
+                                            {data.login}
+                                        </label>
+                                        </li>
                                     ))
                                 }
                             </ul>
@@ -115,7 +139,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
                             <button type="button" className="btn btn-clear" onClick={handleClickYes}>Submit</button>
                             <button type="button" className="btn btn-secondary" onClick={handleClickClose}>Cancel</button>
                         </div>
-                    </div>                   
+                    </div>}
                     </div>
                 </div>
                 </div>

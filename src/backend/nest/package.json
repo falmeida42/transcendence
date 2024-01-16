@@ -15,7 +15,7 @@
     "backend:restart": "npm run backend:rm && npm run backend:up",
     "backend:hard-reset": "docker compose down --rmi all --volumes && docker compose up backend --build -d",
     "prisma:studio": "docker exec -it backend npx prisma studio",
-    "prisma:migrate:": "docker exec -ti backend npx prisma migrate dev",
+    "prisma:migrate": "docker exec -ti backend npx prisma migrate dev",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

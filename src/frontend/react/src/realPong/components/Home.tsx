@@ -14,6 +14,7 @@ const Home = () => {
   const { isConnected, room, username, onQueue, rooms } =
     useContext(SocketContext);
   const [page, setPage] = useState<number>(0);
+  const [name, setName] = useState<string>("");
   const { login } = useApi();
 
   useEffect(() => {
@@ -23,8 +24,9 @@ const Home = () => {
         return;
       }
       if (!username) {
-        set_name(login);
-        setPage(2);
+        // set_name(login);
+        // setPage(2);
+        setPage(1);
         return;
       }
       if (onQueue) {
@@ -48,21 +50,21 @@ const Home = () => {
     );
   }
 
-  // if (page === 1) {
-  //   return (
-  //     <div>
-  //       <input
-  //         type="text"
-  //         name="name"
-  //         onChange={(e) => setName(e.target.value)}
-  //         onKeyDown={(e) => {
-  //           if (e.key === "Enter") set_name(name);
-  //         }}
-  //       />
-  //       <button onClick={() => set_name(name)}>Set Name</button>
-  //     </div>
-  //   );
-  // }
+  if (page === 1) {
+    return (
+      <div>
+        <input
+          type="text"
+          name="name"
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") set_name(name);
+          }}
+        />
+        <button onClick={() => set_name(name)}>Set Name</button>
+      </div>
+    );
+  }
 
   if (page === 2)
     return (
