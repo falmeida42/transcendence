@@ -93,7 +93,7 @@ const rejectRequest = (requestor_id: string, id: string) =>
 return (
         <div>
             { isVisible &&
-            <li className="request-item">
+            <li className="request-item" key={props.requestor_id}>
                 <img src={props.requestor_image} className="mr-2" alt="#"></img>
                 <p className="mr-2">Friend request from <strong>{props.requestor_username}</strong></p>
                 <i onClick={() => acceptRequest(props.requestor_id, props.id)} className="fa fa-check mr-2"></i>

@@ -10,11 +10,13 @@ import MatchHistory from "./MatchHistory";
 import BlockPopup from './BlockPopUp';
 import ScoreBar from './ScoreBar';
 import FriendProfile from './FriendProfile';
+import { navigate } from 'wouter/use-location';
 
 interface User {
 	id: string,
 	username: string,
 	userImage: string,
+	userLogin: string,
 }
 
 function Profile() {
@@ -28,6 +30,7 @@ function Profile() {
 		image,
 		twofa,
 		auth,
+		failToUpdate,
 		setUsername,
 		setImage,
 	} = useApi();
@@ -39,6 +42,8 @@ function Profile() {
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [textValue, setTextValue] = useState<string | undefined>(user);
+	const [finalText, setfinalText] = useState<string | undefined>(undefined);
+	const [finalImage, setfinalImage] = useState<string | undefined>(undefined);
 
 	const handleEditClick = () => {
 		setIsEditing(true);
@@ -46,15 +51,16 @@ function Profile() {
 
 	const handleSubmitClick = () => {
 		if (textValue) {
-			setIsEditing(false);
-			setUsername(textValue);
+			setfinalText(textValue);
+			if (!failToUpdate) {
+				// setUsername(textValue);
+				setIsEditing(false);}
 		}
 	};
 
 	const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setTextValue(event.target.value);
 	};
-
 
 	/////////////// Image update /////////////////
 
@@ -81,10 +87,19 @@ function Profile() {
 
 	const handleSubmitClickImage = () => {
 		if (selectedImage) {
-			setIsEditingImage(false);
-			setImage(selectedImage);
+			setfinalImage(selectedImage);
+			if (!failToUpdate) {
+				setIsEditingImage(false);}
+				// setImage(selectedImage);}
 		}
 	};
+	
+	useUpdateUserData({ username: finalText, image: finalImage});
+	
+	const handleNavigate = (friendId: string) => {
+		navigate(`/Profile/${friendId}`);
+	};
+
 
 	const { userFriends } = useContext(ProfileContext) ?? {};
 	const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
@@ -127,8 +142,6 @@ function Profile() {
 		?.split('=')[1];
 	if (token === undefined)
 		return;
-
-	useUpdateUserData({ username: textValue, image: selectedImage });
 
 	return (
 		<div className="container-fluid profile_container">
@@ -200,11 +213,12 @@ function Profile() {
 										type="button"
 										style={{ maxHeight: "25px" }}
 										onClick={handleEditClick}
-									>
+										>
 										<i className="fa fa-pencil green_color" style={{ verticalAlign: "super" }}> </i>
 									</button>
 								</div>
 							</div>
+							{failToUpdate && <div style={{color: 'red', fontWeight: 'bold', padding: '8px 50px'}}>Username already exists!</div>}
 						</div>
 
 						{isEditing && (
@@ -225,11 +239,9 @@ function Profile() {
 					<button className="btn btn-lg btn-secondary mr-2 mb-1" onClick={handleClickBlock}>
 						Block User
 					</button>
-					<div style={{ paddingTop: `20px` }}>
-						<ScoreBar id={id} />
-					</div>
+					<p style={{paddingTop: '20px'}}/>
+					<ScoreBar id={id} />
 				</div>
-
 			</div>
 
 			<div className="tabbar">
@@ -248,7 +260,7 @@ function Profile() {
 								{
 									userFriends.map((friend: User) => (
 										<li key={friend.id}>
-											<span ><img src={friend.userImage} className="img-responsive" alt="#" ></img></span>
+											<span><a onClick={() => {handleNavigate(friend.userLogin)}}><img src={friend.userImage} className="img-responsive" alt="#"></img></a></span>
 											<span>
 												<span className="name_user" >{friend.username}</span>
 											</span>

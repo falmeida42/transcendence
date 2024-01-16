@@ -15,6 +15,7 @@ interface User {
 	id: string,
 	username: string,
 	userImage: string,
+  userLogin: string,
 }
 
 const ProfileContext = createContext<ProfileContextProps | undefined>(undefined);
@@ -58,6 +59,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
             id: friend.id,
             username: friend.username,
             userImage: friend.image,
+            userLogin: friend.login,
         }));
         
         setUserFriends([...mappedFriends]);
@@ -126,6 +128,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
             id: friend.id,
             username: friend.username,
             userImage: friend.image,
+            userLogin: friend.login,
         }));
         
         setUserFriends([...mappedFriends]);

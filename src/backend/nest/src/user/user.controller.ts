@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpStatus,
   Logger,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -73,6 +75,9 @@ export class UserController {
   @Get('find/login/:login')
   async findByLogin(@Param('login') login: string) {
     const User = await this.userService.getUserByLogin(login);
+    if (!User) {
+      throw new NotFoundException("User not found.")
+    }
     return User;
   }
 

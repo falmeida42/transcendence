@@ -14,6 +14,7 @@ interface ap {
   auth: boolean;
   friends: any;
   friendreq: number;
+  failToUpdate: boolean;
   setInfo: (
     id: string,
     user: string,
@@ -31,6 +32,7 @@ interface ap {
   setauth: (authorized: boolean | undefined) => void;
   settwofa: (Twofa: boolean | undefined) => void;
   setfriendreq: (Friendreq: number) => void;
+  setfailToUpdate: (fail: boolean) => void;
   [Symbol.iterator]: () => Iterator<string>;
 }
 
@@ -47,6 +49,7 @@ export const useApi = create<ap>((set) => ({
   auth: false,
   friends: [],
   friendreq: 0,
+  failToUpdate: false,
   setInfo: (
     Id,
     User,
@@ -75,6 +78,7 @@ export const useApi = create<ap>((set) => ({
   setauth: (authorized) => set(() => ({ auth: authorized })),
   settwofa: (Twofa) => set(() => ({ twofa: Twofa })),
   setfriendreq: (Friendreq) => set(() => ({ friendreq: Friendreq })),
+  setfailToUpdate: (fail) => set(() => ({ failToUpdate: fail })),
   [Symbol.iterator]: function* () {
     yield this.id;
     yield this.user;
