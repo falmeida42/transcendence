@@ -1525,7 +1525,7 @@ a[data-toggle="collapse"] {
 .skill {
     font-size: 14px;
     color: #455a64;
-    margin-top: 20px;
+    /* margin-top: 20px; */
     font-weight: 500;
 }
 
