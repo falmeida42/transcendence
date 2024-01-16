@@ -210,4 +210,28 @@ export class AuthController {
       .status(200)
       .send();
   }
+
+  @Get('dummy-user-token2')
+  async getDummyUser2Token(@Res() res: Response): Promise<any> {
+    // Assuming you have a dummy user in your database
+    const dummyUser = await this.prisma.user.findUnique({
+      where: { login: 'dummyUser2' },
+    });
+
+    if (!dummyUser) {
+      throw new Error('Dummy user not found');
+    }
+
+    const token = this.authService.generateToken(dummyUser);
+    return res
+      .cookie('token', token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        domain: 'localhost',
+        path: '/',
+        sameSite: 'none',
+        secure: true,
+      })
+      .status(200)
+      .send();
+  }
 }

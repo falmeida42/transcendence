@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpStatus,
   Logger,
@@ -27,7 +28,7 @@ export class UserController {
   constructor(
     private userService: UserService,
     private prisma: PrismaService,
-  ) { }
+  ) {}
 
   private readonly logger = new Logger('UserController');
 
@@ -114,12 +115,12 @@ export class UserController {
     @Res() res: Response,
   ) {
     if (await this.userService.isBlocked(requesterId, requesteeId)) {
-      return res.status(HttpStatus.FORBIDDEN).json({ message: 'This user blocked you' }).send();
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: 'This user blocked you' })
+        .send();
     }
-    return await this.userService.addFriendRequest(
-      requesterId,
-      requesteeId,
-    );
+    return await this.userService.addFriendRequest(requesterId, requesteeId);
   }
 
   @UseGuards(JwtAuthGuard)
