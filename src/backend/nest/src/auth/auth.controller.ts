@@ -8,19 +8,18 @@ import {
   Post,
   Req,
   Res,
-  UnauthorizedException,
-  UseGuards,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Response } from 'express';
 import { GetMe } from 'src/decorators';
+import { FTAuthExceptionFilter } from 'src/filters';
 import { FTGuard, JwtAuthGuard } from '../auth/guard';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { TwoFAGuard } from './guard/2FA.guard';
-import { FTAuthExceptionFilter } from 'src/filters';
 
 @Controller('auth')
 export class AuthController {
@@ -61,6 +60,7 @@ export class AuthController {
             domain: 'localhost',
             path: '/',
             sameSite: 'none',
+            secure: true,
           })
           .redirect(`${process.env.FRONTEND_URL}`);
         return;
@@ -75,6 +75,7 @@ export class AuthController {
         domain: 'localhost',
         path: '/',
         sameSite: 'none',
+        secure: true,
       })
       .redirect(`${process.env.FRONTEND_URL}`);
     return;
@@ -176,8 +177,10 @@ export class AuthController {
         domain: 'localhost',
         path: '/',
         sameSite: 'none',
+        secure: true,
       })
-      .status(200).send()
+      .status(200)
+      .send();
     // this.logger.debug('ACCESS TOKEN: ', tokenPerm);
     return;
   }
