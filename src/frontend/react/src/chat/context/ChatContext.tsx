@@ -64,6 +64,12 @@ function ChatProvider({ children }: ChatProviderProps) {
   };
 
   useEffect(() => {
+    tk = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+    if (tk === undefined) return;
+    
     if (channelSelected) {
       fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
         method: "GET",
