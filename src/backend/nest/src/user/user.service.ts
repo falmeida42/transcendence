@@ -17,7 +17,13 @@ export class UserService {
   private readonly logger = new Logger('UserService');
 
   async getUsers() {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({
+      where: {
+        NOT: {
+          login: 'AI',
+        },
+      },
+    });
   }
 
   async getUserById(userId: string) {
@@ -53,7 +59,13 @@ export class UserService {
   }
 
   async getAll(): Promise<UserDto[] | null> {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      where: {
+        NOT: {
+          login: 'AI',
+        },
+      },
+    });
   }
 
   async create(user: UserDto) {
@@ -112,9 +124,10 @@ export class UserService {
     // Fetch users who are not friends and don't have pending friend requests
     const notFriends = await this.prisma.user.findMany({
       where: {
-        NOT: {
-          id: { in: excludeUserIds },
-        },
+        NOT: [
+          {id: { in: excludeUserIds } },
+          {login: 'AI'},
+        ],
       },
     });
   
@@ -308,6 +321,9 @@ export class UserService {
             none: {
               id: id,
             },
+          },
+          login: {
+            not: 'AI',
           },
         },
       });

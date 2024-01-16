@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "./apiStore";
+import { navigate } from "wouter/use-location";
 
 interface props {
     id: string;
@@ -8,15 +9,16 @@ interface props {
 const ScoreBar = ({ id }: props) => {
     
     const[wins, setWin] = useState<number>(0);
-    const[loses, setLoses] = useState<number>(0);
+    const[losses, setLosses] = useState<number>(0);
 
-    const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("token="))
-    ?.split("=")[1];
-    if (token === undefined || id == undefined) return;
-
+    
     const getScore = async () => {
+      const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+      if (token === undefined || id == undefined || id === '') return;
+
         fetch(`http://localhost:3000/user/matches-wins/${id}`, {
           method: "GET",
           headers: {
@@ -26,23 +28,25 @@ const ScoreBar = ({ id }: props) => {
         })
         .then(async (response) => {
           if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            if (response.status === 401) {
+              navigate('/login')
+            }
           }
           const data = await response.text();
           return data ? JSON.parse(data) : null;
           })
         .then((data) => {
             setWin(data.winsCount);
-            setLoses(data.lossesCount);
+            setLosses(data.lossesCount);
           })
-      .catch((error) => console.error("Fetch error:", error));
+      .catch();
     }
 
     useEffect(() => {
         getScore();
     }, [id])
 
-    const percentage = (wins / (wins + loses)) * 100;
+    const percentage = (losses > 0 || wins > 0) ? (wins / (wins + losses)) * 100 : 50;
 
     const componentStyle = {
     width: `${percentage}%`,
@@ -56,7 +60,7 @@ const ScoreBar = ({ id }: props) => {
                 <div className="progress skill-bar">
                     <div className="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style={{width: `${percentage}%`}}> <h5 style={{ textAlign: 'right', color: 'white', paddingRight: '4%', marginLeft: '-20px' }}>{wins}</h5>
                     </div>
-                    <h5 style={{ lineHeight: "30px", paddingLeft: '3%', marginRight: '-39px' }}>{loses}</h5 >
+                    <h5 style={{ lineHeight: "30px", paddingLeft: '3%', marginRight: '-39px' }}>{losses}</h5 >
                 </div>
             </h2>
         </div>

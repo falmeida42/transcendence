@@ -22,9 +22,11 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
     const [users, setUsers] = useState<User[]>([])
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
-    const { id } = useApi();
+    const { id, auth } = useApi();
  
     useEffect(() => {
+
+    if (auth === false) return;
     fetch(`http://localhost:3000/user/not-friends`, {
       method: "GET",
       headers: {
@@ -69,7 +71,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
 
     const handleClickYes = () => {
 
-        console.log("USER TO CREATE REQUEST TO:", userToAdd)
+        // console.log("USER TO CREATE REQUEST TO:", userToAdd)
         if (userToAdd?.username === "")
         {
             setWarningText("This field is mandatory");
@@ -77,7 +79,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({ isVisible, handleClose,
             return;
         }
 
-        console.log("CREATE FRIEND REQUEST: DATA PASSED TO THE BACKEND", id, userToAdd.id);
+        // console.log("CREATE FRIEND REQUEST: DATA PASSED TO THE BACKEND", id, userToAdd.id);
         fetch(`http://localhost:3000/user/create-friend-request`, {
                 method: "POST",
                 headers: {

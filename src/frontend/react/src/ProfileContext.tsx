@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useState, useEffect, useRef } from "react";
 import { navigate } from "wouter/use-location";
+import { useApi } from "./apiStore";
 
 interface ProfileContextProps {
   userFriends: any,
@@ -13,7 +14,7 @@ interface ProfileProviderProps {
 interface User {
 	id: string,
 	username: string,
-	userImage: string
+	userImage: string,
 }
 
 const ProfileContext = createContext<ProfileContextProps | undefined>(undefined);
@@ -25,6 +26,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     
     const [userFriends, setUserFriends] = useState<User[]>([])
     const [blockableUsers, setBlockableUsers] = useState<User[]>([])
+    const {auth} = useApi();
     
     const tk = document.cookie
     .split('; ')
@@ -32,6 +34,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     ?.split('=')[1];
   
   updateUserFriends = () => {
+    if (auth === false) return;
 
     fetch(`http://localhost:3000/user/friends`, {
       method: "GET",
@@ -96,7 +99,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
   }
 
   useEffect(() => {
-
+    if (auth === false) return;
     fetch(`http://localhost:3000/user/friends`, {
       method: "GET",
       headers: {
@@ -109,7 +112,6 @@ function ProfileProvider({ children }: ProfileProviderProps) {
           if (response.status === 401) {
             navigate('/login');
           }
-            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
         return data ? JSON.parse(data) : null;
@@ -153,7 +155,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
     })
     .catch((error) => console.error("Fetch error:", error));
 
-  }, []);
+  }, [auth]);
 
 
   const contextValue: ProfileContextProps = {

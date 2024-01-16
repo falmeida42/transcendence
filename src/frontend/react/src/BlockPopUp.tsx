@@ -39,7 +39,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
 
     const handleClickYes = () => {
 
-        console.log("USER TO BLOCK:", userToBlock)
+        // console.log("USER TO BLOCK:", userToBlock)
         if (userToBlock?.username === "")
         {
             setWarningText("This field is mandatory");
@@ -47,7 +47,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
             return;
         }
 
-        console.log("BLOCK REQUEST: DATA PASSED TO THE BACKEND", id, userToBlock.id);
+        // console.log("BLOCK REQUEST: DATA PASSED TO THE BACKEND", id, userToBlock.id);
         fetch(`http://localhost:3000/user/block-user`, {
                 method: "POST",
                 headers: {

@@ -17,7 +17,7 @@ const token = document.cookie
     ?.split('=')[1];
 if (token === undefined)
     return;
-console.log(token);
+// console.log(token);
 
 
 
