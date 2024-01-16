@@ -152,7 +152,7 @@ const RealPong = (props: props) => {
             cx={ball.x.toString()}
             cy={ball.y.toString()}
             r={ball.radius.toString()}
-            style={{ fill: "#61ff22" }}
+            style={{ fill: "rgb(92, 110, 244)" }}
           />
         )}
         {player1 && (
