@@ -39,19 +39,22 @@ export class UserService {
     return await this.prisma.user.findUnique({ where: { login: userLogin } });
   }
 
-  async updateUserById(userId: string, userData: Partial<UserDto>): Promise<UserDto | null> {
-  // Filter out the empty values from userData
-  const nonEmptyData: Record<string, any> = {};
-  Object.entries(userData).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
-      nonEmptyData[key] = value;
-    }
-  });
+  async updateUserById(
+    userId: string,
+    userData: Partial<UserDto>,
+  ): Promise<UserDto | null> {
+    // Filter out the empty values from userData
+    const nonEmptyData: Record<string, any> = {};
+    Object.entries(userData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        nonEmptyData[key] = value;
+      }
+    });
 
-  if (Object.keys(nonEmptyData).length === 0) {
-    // If there are no non-empty values, return null or handle accordingly
-    return null;
-  }
+    if (Object.keys(nonEmptyData).length === 0) {
+      // If there are no non-empty values, return null or handle accordingly
+      return null;
+    }
     return await this.prisma.user.update({
       where: { id: userId },
       data: nonEmptyData,
@@ -78,16 +81,16 @@ export class UserService {
   async getFriendRequests(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { 
+      include: {
         receivedFriendRequests: {
           where: {
-            type: "PENDING",
+            type: 'PENDING',
           },
           include: { requestor: true },
         },
       },
     });
-  
+
     return user?.receivedFriendRequests;
   }
 
@@ -114,48 +117,53 @@ export class UserService {
         },
       },
     });
-  
+
     const friendsIds = user?.friends.map((friend) => friend.id) || [];
-    const receivedFriendRequestsIds = user?.receivedFriendRequests.map((request) => request.requestor.id) || [];
-    const sentFriendRequestsIds = user?.sentFriendRequests.map((request) => request.requestee.id) || [];
-  
-    const excludeUserIds = [...friendsIds, ...receivedFriendRequestsIds, ...sentFriendRequestsIds, userId];
-  
+    const receivedFriendRequestsIds =
+      user?.receivedFriendRequests.map((request) => request.requestor.id) || [];
+    const sentFriendRequestsIds =
+      user?.sentFriendRequests.map((request) => request.requestee.id) || [];
+
+    const excludeUserIds = [
+      ...friendsIds,
+      ...receivedFriendRequestsIds,
+      ...sentFriendRequestsIds,
+      userId,
+    ];
+
     // Fetch users who are not friends and don't have pending friend requests
     const notFriends = await this.prisma.user.findMany({
       where: {
-        NOT: [
-          {id: { in: excludeUserIds } },
-          {login: 'AI'},
-        ],
+        NOT: [{ id: { in: excludeUserIds } }, { login: 'AI' }],
       },
     });
-  
+
     return notFriends || null;
   }
-  
 
-  async addFriendRequest(requesterId: string, requesteeId: string): Promise<{ message: string; friendRequest?: any }> {
+  async addFriendRequest(
+    requesterId: string,
+    requesteeId: string,
+  ): Promise<{ message: string; friendRequest?: any }> {
     try {
       // Check if both users exist
       const requestor = await this.prisma.user.findUnique({
         where: { id: requesterId },
       });
-  
+
       const requestee = await this.prisma.user.findUnique({
         where: { id: requesteeId },
       });
-  
+
       if (!requestor || !requestee) {
         return { message: 'User not found' };
       }
-  
 
       const friends = await this.getFriends(requesterId);
 
       // Check if the requestee is already a friend
       if (friends.some((friend) => friend.id === requesteeId)) {
-       return { message: 'Requestee is already a friend' };
+        return { message: 'Requestee is already a friend' };
       }
 
       // Check if a friend request already exists
@@ -166,11 +174,11 @@ export class UserService {
           type: 'PENDING', // You might want to include the type in the check
         },
       });
-  
+
       if (existingFriendRequest) {
         return { message: 'Friend request already exists' };
       }
-  
+
       // Create the friend request
       const friendRequest = await this.prisma.friendRequest.create({
         data: {
@@ -179,17 +187,21 @@ export class UserService {
           requestee: { connect: { id: requesteeId } },
         },
       });
-  
+
       return { message: 'Friend request created', friendRequest };
     } catch (error) {
       throw new Error('Error creating friend request');
     }
   }
 
-  async handleFriendRequest(requesterId: string, requesteeId: string, id: string, type: string) {
+  async handleFriendRequest(
+    requesterId: string,
+    requesteeId: string,
+    id: string,
+    type: string,
+  ) {
     try {
-      if (type === "ACCEPTED")
-      {
+      if (type === 'ACCEPTED') {
         const friendRequest = await this.prisma.friendRequest.update({
           where: {
             id: id,
@@ -198,21 +210,31 @@ export class UserService {
             type: 'ACCEPTED',
           },
         });
-  
-        await this.prisma.user.update({
-          where: {
-            id: requesteeId,
-          },
-          data: {
-            friends: {
-              connect: { id: requesterId }
-            },
-          },
-        });
+
+        // await this.prisma.user.update({
+        //   where: {
+        //     id: requesteeId,
+        //   },
+        //   data: {
+        //     friends: {
+        //       connect: { id: requesterId },
+        //     },
+        //   },
+        // });
+        this.insertFriend(requesteeId, requesterId);
+        this.insertFriend(requesterId, requesteeId);
+        // await this.prisma.user.update({
+        //   where: {
+        //     id: requesterId,
+        //   },
+        //   data: {
+        //     friends: {
+        //       connect: { id: requesteeId },
+        //     },
+        //   },
+        // });
         return { message: 'Friend request accepted', friendRequest };
-      }
-      else
-      {
+      } else {
         const friendRequest = await this.prisma.friendRequest.update({
           where: {
             id: id,
@@ -221,10 +243,9 @@ export class UserService {
             type: 'CANCELED',
           },
         });
-  
+
         return { message: 'Friend request denied', friendRequest };
       }
-  
     } catch (error) {
       throw new Error('Error accepting friend request');
     }
@@ -232,48 +253,46 @@ export class UserService {
 
   async blockUser(id: string, blockedId: string) {
     try {
+      const existingUser = await this.prisma.user.findUnique({
+        where: {
+          id: blockedId,
+        },
+      });
 
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        id: blockedId,
-      },
-    });
+      if (!existingUser) {
+        return { message: 'User with blockedId not found:', blockedId };
+      }
 
-    if (!existingUser) {
-      return { message: 'User with blockedId not found:', blockedId };
-    }
-
-    const isAlreadyBlocked = await this.prisma.user.findFirst({
-      where: {
-        id: blockedId,
-        blockedBy: {
-          some: {
-            id: id,
+      const isAlreadyBlocked = await this.prisma.user.findFirst({
+        where: {
+          id: blockedId,
+          blockedBy: {
+            some: {
+              id: id,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (isAlreadyBlocked) {
-      return { message: 'User is already blocked:', blockedId };
-    }
+      if (isAlreadyBlocked) {
+        return { message: 'User is already blocked:', blockedId };
+      }
 
-    await this.prisma.user.update({
-      where: {
-        id: blockedId,
-      },
-      data: {
-        blockedBy: {
-          connect: { id: id },
+      await this.prisma.user.update({
+        where: {
+          id: blockedId,
         },
-      },
-    });
-   
+        data: {
+          blockedBy: {
+            connect: { id: id },
+          },
+        },
+      });
     } catch (error) {
       throw new Error('Error blocking user');
     }
   }
-  
+
   async set2FASecret(id: string, secret: string) {
     try {
       return await this.prisma.user.update({
@@ -327,7 +346,7 @@ export class UserService {
           },
         },
       });
-  
+
       return users;
     } catch (error) {
       throw new Error('Error fetching users');
@@ -733,4 +752,3 @@ export class UserService {
     }
   }
 }
-
