@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from "react";
 import { useApi } from "./apiStore";
 import { navigate } from "wouter/use-location";
+import { useParams } from "wouter";
 
 interface ApiDataProviderProps {
   children?: ReactNode;
@@ -8,6 +9,7 @@ interface ApiDataProviderProps {
 
 const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
   const { auth, setInfo } = useApi();
+  const {  } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {

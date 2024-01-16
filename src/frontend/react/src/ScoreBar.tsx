@@ -11,35 +11,32 @@ const ScoreBar = ({ id }: props) => {
     const[wins, setWin] = useState<number>(0);
     const[losses, setLosses] = useState<number>(0);
 
-    
     const getScore = async () => {
+      try {
       const token = document.cookie
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
       if (token === undefined || id == undefined || id === '') return;
 
-        fetch(`http://localhost:3000/user/matches-wins/${id}`, {
+        const response = await fetch(`http://localhost:3000/user/matches-wins/${id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         })
-        .then(async (response) => {
+        if (response) {
           if (!response.ok) {
             if (response.status === 401) {
               navigate('/login')
             }
           }
-          const data = await response.text();
-          return data ? JSON.parse(data) : null;
-          })
-        .then((data) => {
-            setWin(data.winsCount);
-            setLosses(data.lossesCount);
-          })
-      .catch();
+        }
+        const data = await response.json();
+        setWin(data.winsCount);
+        setLosses(data.lossesCount);
+        } catch {}
     }
 
     useEffect(() => {

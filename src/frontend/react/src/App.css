@@ -61,6 +61,7 @@ body {
   width: 120px;
   height: 90px;
   margin: 0 auto;
+  margin-top: 100px;
 }
 
 .loader:before {
@@ -71,7 +72,7 @@ body {
   height: 30px;
   width: 30px;
   border-radius: 50%;
-  background: #2a9d8f;
+  background: rgb(92, 110, 244);
   animation: loading-bounce 0.5s ease-in-out infinite alternate;
 }
 
@@ -84,9 +85,9 @@ body {
   width: 45px;
   border-radius: 4px;
   box-shadow:
-    0 5px 0 #000,
-    -35px 50px 0 #000,
-    -70px 95px 0 #000;
+    0 5px 0 #fff,
+    -35px 50px 0 #fff,
+    -70px 95px 0 #fff;
   animation: loading-step 1s ease-in-out infinite;
 }
 
@@ -111,36 +112,19 @@ body {
 @keyframes loading-step {
   0% {
     box-shadow:
-      0 10px 0 rgba(0, 0, 0, 0),
-      0 10px 0 #000,
-      -35px 50px 0 #000,
-      -70px 90px 0 #000;
+      0 10px 0 #fff,
+      0 10px 0 #fff,
+      -35px 50px 0 #fff,
+      -70px 90px 0 #fff;
   }
 
   100% {
     box-shadow:
-      0 10px 0 #000,
-      -35px 50px 0 #000,
-      -70px 90px 0 #000,
-      -70px 90px 0 rgba(0, 0, 0, 0);
+      0 10px 0 #fff,
+      -35px 50px 0 #fff,
+      -70px 90px 0 #fff,
+      -70px 90px 0 #fff;
   }
-}
-
-.gamePage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.pauseButton {
-  background-color: #000;
-  width: 100%;
-  margin-bottom: 1rem;
-}
-
-.pauseButton:hover {
-  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .this-button {

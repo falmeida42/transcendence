@@ -6,20 +6,19 @@ import {
   Logger,
   Param,
   Post,
-  UseGuards,
+  Query,
   Req,
   Res,
-  Query,
-  ForbiddenException,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { Response } from 'express';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
 import { GetMe } from 'src/decorators';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guard';
 import * as bcrypt from '../utils';
 import { UserService } from './user.service';
-import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -50,7 +49,10 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('me')
   async updateMe(@GetMe() user: User, @Body() userData: any) {
-    const updatedUser = await this.userService.updateUserById(String(user.id), userData);
+    const updatedUser = await this.userService.updateUserById(
+      String(user.id),
+      userData,
+    );
     return updatedUser;
   }
 
@@ -58,57 +60,55 @@ export class UserController {
   @Get('auth')
   async getAuth(@GetMe() user: User) {
     return (await this.findById(String(user.id))).twoFactorAuthEnabled;
-    
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('find/:id')
   async findById(@Param('id') id: string) {
-    const User = await this.userService.getUserById(id)
+    const User = await this.userService.getUserById(id);
     return User;
-    }
-
-
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('find/login/:login')
   async findByLogin(@Param('login') login: string) {
     const User = await this.userService.getUserByLogin(login);
-      return User;
+    return User;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('all')
-  async getAll() {   
-      return await this.userService.getAll();
+  async getAll() {
+    return await this.userService.getAll();
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Get('friends')
-  async getFriends(@GetMe('id') id: string) {   
-      return await this.userService.getFriends(id);
+  async getFriends(@GetMe('id') id: string) {
+    return await this.userService.getFriends(id);
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Get('not-friends')
   async getNotFriends(@GetMe('id') id: string) {
-      // this.logger.debug("USER ID: ", id);    
-      return await this.userService.getNotFriends(id);
+    // this.logger.debug("USER ID: ", id);
+    return await this.userService.getNotFriends(id);
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Get('blockable-users')
-  async getBlockableUsers(@GetMe('id') id: string) { 
-      return await this.userService.getBlockableUsers(id);
+  async getBlockableUsers(@GetMe('id') id: string) {
+    return await this.userService.getBlockableUsers(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('create-friend-request')
   async addFriendRequest(@Req() req: any, @Body() body: any) {
     // this.logger.debug("AAAAA", body.requesteeId);
-    return await this.userService.addFriendRequest(body.requesterId, body.requesteeId);
+    return await this.userService.addFriendRequest(
+      body.requesterId,
+      body.requesteeId,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -116,10 +116,19 @@ export class UserController {
   async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
     // this.logger.debug("ACCEPT FETCH BODY:");
     try {
-      const result = await this.userService.handleFriendRequest(body.requesterId, id, body.requestId, body.type);
+      const result = await this.userService.handleFriendRequest(
+        body.requesterId,
+        id,
+        body.requestId,
+        body.type,
+      );
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
-      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Error accepting friend request',
+        error,
+      };
     }
   }
 
@@ -131,14 +140,18 @@ export class UserController {
       const result = await this.userService.blockUser(id, body.blockedId);
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
-      return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Error accepting friend request', error };
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Error accepting friend request',
+        error,
+      };
     }
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Get('friend-requests')
   async getFriendRequests(@GetMe('id') id: string) {
-      return await this.userService.getFriendRequests(id);
+    return await this.userService.getFriendRequests(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -155,21 +168,20 @@ export class UserController {
             include: {
               winner: true,
               loser: true,
-            }
+            },
           },
           losses: {
             include: {
               winner: true,
               loser: true,
-            }
-          }
+            },
+          },
         },
       });
       matches = [...user.wins, ...user.losses].sort(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       );
 
-      
       if (!matches) throw new Error('teste');
       return matches;
     } catch (e) {
@@ -188,18 +200,17 @@ export class UserController {
         include: {
           wins: true,
           losses: true,
-        }
+        },
       });
-      
+
       const winsCount = user.wins.length;
       const lossesCount = user.losses.length;
-      
-      return {winsCount, lossesCount};
+
+      return { winsCount, lossesCount };
     } catch (e) {
       this.logger.error(e.message);
     }
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Post('change-user/:username')
@@ -256,6 +267,7 @@ export class UserController {
         return 'Friend not found';
       }
 
+      this.userService.insertFriend(friend.id, id);
       this.userService.insertFriend(id, friend.id);
 
       return 'Friend added';
@@ -300,7 +312,12 @@ export class UserController {
     if (await this.userService.isBanned(username, roomId)) {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
-    return await this.userService.joinRoom(username, roomId, password, roomType);
+    return await this.userService.joinRoom(
+      username,
+      roomId,
+      password,
+      roomType,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
