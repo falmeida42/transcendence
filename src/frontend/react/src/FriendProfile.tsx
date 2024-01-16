@@ -46,8 +46,12 @@ useEffect(() => {
 			if (response.status === 401) {
 				navigate('/login');
 			}
+			if (response.status === 404) {
+				navigate('/Profile');
+			}
 			return;
         }
+		// console.log('seu cu');
 		
 		const data = await response.json();
 		setId(data.id);
@@ -56,7 +60,7 @@ useEffect(() => {
 		setLastName(data.last_name);
 		setEmail(data.email);
 		setImage(data.image);
-      } catch (error) {
+      } catch {
       }
     };
 

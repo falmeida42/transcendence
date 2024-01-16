@@ -218,7 +218,7 @@ function Profile() {
 									</button>
 								</div>
 							</div>
-							{failToUpdate && <div style={{color: 'red', fontWeight: 'bold'}}>Username already exists!</div>}
+							{failToUpdate && <div style={{color: 'red', fontWeight: 'bold', padding: '8px 50px'}}>Username already exists!</div>}
 						</div>
 
 						{isEditing && (
