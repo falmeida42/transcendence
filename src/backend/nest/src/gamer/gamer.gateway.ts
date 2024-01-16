@@ -506,5 +506,6 @@ export class GamerGateway
 
     socket1.emit('RoomCreated', this.rooms[roomId]);
     socket2.emit('RoomCreated', this.rooms[roomId]);
+    this.runGame(roomId, false);
   }
 }
