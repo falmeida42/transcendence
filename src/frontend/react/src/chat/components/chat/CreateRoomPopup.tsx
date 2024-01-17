@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
 import { test } from "../../context/ChatContext";
 
@@ -17,10 +17,13 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
   const [inputPassword, setInputPassword] = useState("");
   const [inputPrivacy, setInputPrivacy] = useState<string>("");
   const [modal, setModal] = useState(1);
-  const { friends, login } = useApi();
+  const { login } = useApi();
   const [checkboxValues, setCheckboxValues] = useState<string[]>([login]);
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
   const [id] = useState(crypto.randomUUID().toString());
+  const [friends, setFriends] = useState([])
+
+
 
   const toggleVisibility = (visibility: boolean) => {
     setIsVisibleWarning(visibility);

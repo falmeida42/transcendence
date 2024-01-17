@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
 import { updateChatRooms } from "../../context/ChatContext";
+import { colors } from "@mui/material";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -22,6 +23,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
   const [warningText, setWarningText] = useState("This field is mandatory");
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
   const [channels, setChannels] = useState([]);
+  const [isChannelListEmpty, setIsChannelListEmpty] = useState(false)
   const { login } = useApi();
 
   interface Channel {
@@ -54,6 +56,9 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
         if (data) {
           console.log("Rooms received ", JSON.stringify(data));
           setChannels(data);
+          if (channels.length == 0) {
+            setIsChannelListEmpty(true)
+          }
         } else {
           console.log("No data received");
         }
@@ -157,8 +162,14 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   <span>&times;</span>
                 </button>
               </div>
+              <div> 
+                {isChannelListEmpty &&
+                  <p style={{color: "red", padding: "20px 0px 10px 30px"}}>You don't have channels to join</p>
+
+                }
+              </div>
               <div>
-                <div className="modal-body">
+                {!isChannelListEmpty && <div className="modal-body">
                   <p>Select a room from the list:</p>
                   <ul className="popup-input" style={{ padding: "4px 0" }}>
                     {channels.map((channel) => (
@@ -195,8 +206,8 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   {isVisibleWarning && (
                     <p style={{ color: "red" }}>{warningText}</p>
                   )}
-                </div>
-                <div className="modal-footer">
+                </div>}
+                {!isChannelListEmpty && <div className="modal-footer">
                   <button
                     type="button"
                     className="btn btn-clear"
@@ -211,7 +222,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   >
                     Cancel
                   </button>
-                </div>
+                </div>}
               </div>
             </div>
           </div>
