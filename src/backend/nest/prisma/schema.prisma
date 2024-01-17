@@ -54,7 +54,6 @@ model User {
 
   bannedFrom ChatRoom[] @relation("Banned")
   mutedFrom  MutedIn[]
-  RoomMute   RoomMute[]
 }
 
 model ChatRoom {
@@ -71,17 +70,7 @@ model ChatRoom {
   bannedUsers User[]    @relation("Banned")
   mutedUsers  MutedIn[]
 
-  userId   String
-  RoomMute RoomMute[]
-}
-
-model RoomMute {
-  id             String   @id @default(uuid())
-  userId         String
-  chatRoomId     String
-  muteExpiration DateTime @default(now())
-  user           User     @relation(fields: [userId], references: [id])
-  chatRoom       ChatRoom @relation(fields: [chatRoomId], references: [id])
+  userId String
 }
 
 model Message {

@@ -1,13 +1,11 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   HttpStatus,
   Logger,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -464,36 +462,36 @@ export class UserController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('mute-user')
-  async muteUser(
-    @GetMe() user: User,
-    @Body('participantId') participantId: string,
-    @Body('roomId') roomId: string,
-    @Body('duration', ParseIntPipe) duration: number,
-    @Res() res: Response,
-  ) {
-    if (duration < 1) {
-      throw new ForbiddenException('Mute duration must be greater than 0');
-    }
-    if (!roomId || !participantId) {
-      throw new ForbiddenException('Missing roomId or userId');
-    }
-    if (
-      (await this.userService.isOwner(participantId, roomId)) ||
-      (!(await this.userService.isOwner(user.id, roomId)) &&
-        !(await this.userService.isAdmin(user.id, roomId)))
-    )
-      return res.status(HttpStatus.FORBIDDEN).send();
-    if (
-      (await this.userService.isAdmin(user.id, roomId)) &&
-      (await this.userService.isAdmin(participantId, roomId))
-    )
-      return res.status(HttpStatus.FORBIDDEN).send();
+  // @UseGuards(JwtAuthGuard)
+  // @Post('mute-user')
+  // async muteUser(
+  //   @GetMe() user: User,
+  //   @Body('participantId') participantId: string,
+  //   @Body('roomId') roomId: string,
+  //   @Body('duration', ParseIntPipe) duration: number,
+  //   @Res() res: Response,
+  // ) {
+  //   if (duration < 1) {
+  //     throw new ForbiddenException('Mute duration must be greater than 0');
+  //   }
+  //   if (!roomId || !participantId) {
+  //     throw new ForbiddenException('Missing roomId or userId');
+  //   }
+  //   if (
+  //     (await this.userService.isOwner(participantId, roomId)) ||
+  //     (!(await this.userService.isOwner(user.id, roomId)) &&
+  //       !(await this.userService.isAdmin(user.id, roomId)))
+  //   )
+  //     return res.status(HttpStatus.FORBIDDEN).send();
+  //   if (
+  //     (await this.userService.isAdmin(user.id, roomId)) &&
+  //     (await this.userService.isAdmin(participantId, roomId))
+  //   )
+  //     return res.status(HttpStatus.FORBIDDEN).send();
 
-    await this.userService.muteUser(participantId, roomId, duration);
-    return res.status(HttpStatus.OK).send();
-  }
+  //   await this.userService.muteUser(participantId, roomId, duration);
+  //   return res.status(HttpStatus.OK).send();
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Post('update-room-privacy/:roomId')

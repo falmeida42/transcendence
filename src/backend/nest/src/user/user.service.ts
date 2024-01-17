@@ -12,7 +12,7 @@ import { UserDto } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   private readonly logger = new Logger('UserService');
 
@@ -149,7 +149,7 @@ export class UserService {
     const list = await Promise.all(
       notFriends.map(async (notFriend) => {
         return (await this.isBlocked(userId, notFriend.id)) ? null : notFriend;
-      })
+      }),
     );
 
     const filteredList = list.filter((user) => user !== null);
@@ -480,9 +480,8 @@ export class UserService {
       where: { id: userId },
       include: {
         blockedUsers: true,
-      }
-    }
-    )
+      },
+    });
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -494,7 +493,6 @@ export class UserService {
               include: {
                 sender: true,
               },
-
             },
           },
         },
@@ -512,12 +510,12 @@ export class UserService {
       messages.map(async (message) => {
         this.logger.debug(message);
         return (await this.isBlocked(message.userId, userId)) ? null : message;
-      })
+      }),
     );
 
     const filteredList = list.filter((message) => message !== null);
-    this.logger.debug('list: ', list)
-    this.logger.debug('FILTERED list ', filteredList)
+    this.logger.debug('list: ', list);
+    this.logger.debug('FILTERED list ', filteredList);
     return filteredList;
   }
 
@@ -810,21 +808,21 @@ export class UserService {
     });
   }
 
-  async muteUser(id: string, roomId: string, duration: number) {
-    await this.getChatRoomById(roomId);
-    await this.getUserById(id);
+  // async muteUser(id: string, roomId: string, duration: number) {
+  //   await this.getChatRoomById(roomId);
+  //   await this.getUserById(id);
 
-    const muteExpiration = new Date();
-    muteExpiration.setMinutes(muteExpiration.getMinutes() + duration);
+  //   const muteExpiration = new Date();
+  //   muteExpiration.setMinutes(muteExpiration.getMinutes() + duration);
 
-    await this.prisma.roomMute.create({
-      data: {
-        chatRoomId: roomId,
-        userId: id,
-        muteExpiration,
-      },
-    });
-  }
+  //   await this.prisma.roomMute.create({
+  //     data: {
+  //       chatRoomId: roomId,
+  //       userId: id,
+  //       muteExpiration,
+  //     },
+  //   });
+  // }
 
   async kickableUsers(user: User, roomId: string) {
     if (await this.isOwner(user.id, roomId)) {
@@ -858,13 +856,15 @@ export class UserService {
   }
 
   async isBlocked(requesterId: string, requesteeId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: requesterId },
-      select: {
-        blockedBy: {
-          where: { id: requesteeId }
-        }
-      }
-    }).then((blocked) => blocked.blockedBy.length > 0)
+    return this.prisma.user
+      .findUnique({
+        where: { id: requesterId },
+        select: {
+          blockedBy: {
+            where: { id: requesteeId },
+          },
+        },
+      })
+      .then((blocked) => blocked.blockedBy.length > 0);
   }
 }
