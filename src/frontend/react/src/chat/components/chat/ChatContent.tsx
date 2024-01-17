@@ -12,13 +12,6 @@ import MatchPopup from "./MatchPopup";
 import Messages from "./Messages";
 import MutePopup from "./MutePopup";
 
-export const toggleChatVisibility = () => {
-  const element = document.getElementById("chat") as HTMLDivElement;
-  console.log(element);
-  const visibility = element.style.visibility;
-  element.style.visibility = visibility === "hidden" ? "visible" : "hidden";
-};
-
 interface ChatContentProps {
   selectedChatData: ChatData;
   passSelectedChatData: (data: ChatData) => void;

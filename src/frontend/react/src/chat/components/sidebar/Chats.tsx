@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { ChatContext } from "../../context/ChatContext";
-import { toggleChatVisibility } from "../chat/ChatContent";
 import ChatInfo, { ChatData } from "./ChatInfo";
 
 interface RoomData {
@@ -37,7 +36,7 @@ const Chats = (chatsProps: ChatsProps) => {
   });
 
   return (
-    <div className="chats" onClick={toggleChatVisibility}>
+    <div className="chats">
       {rooms.map((room) => (
         <ChatInfo
           passSelectedChatData={chatsProps.passSelectedChatData}
