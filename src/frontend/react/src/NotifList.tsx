@@ -1,74 +1,84 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Notif from "./Notif";
 import { useApi } from "./apiStore";
 
-interface NotifListProps {
-    
-}
+interface NotifListProps {}
 
 interface FriendRequest {
-    id: string;
-    requestor_id: string;
-    requestor_username: string;
-    requestor_image: string;
+  id: string;
+  requestor_id: string;
+  requestor_username: string;
+  requestor_image: string;
 }
 
+let checkFriendRequests: () => void;
+
 const NotifList: React.FC<NotifListProps> = () => {
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const { setfriendreq, auth, setInfo, friendreq } = useApi();
 
-const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-const { setfriendreq, auth, setInfo, friendreq } = useApi();
+  // console.log(token);
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
+  if (token === undefined) return;
 
-// console.log(token);
-
-useEffect(() => {
-    const token = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('token='))
-        ?.split('=')[1];
-    if (token === undefined)
-        return;
-    
+  checkFriendRequests = () => {
+    console.log("Checking friend requests");
     fetch(`http://localhost:3000/user/friend-requests`, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     })
-        .then(async (response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.json();
-            return data as FriendRequest[]; 
-        })
-        .then((data) => {
-            console.log("FR Return: ", data);
-            const mappedRequests = data.map((request: any) => ({
-                id: request.id,
-                requestor_id: request.requestor.id,
-                requestor_username: request.requestor.login,
-                requestor_image: request.requestor.image
-            }));
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data as FriendRequest[];
+      })
+      .then((data) => {
+        console.log("FR Return: ", data);
+        const mappedRequests = data.map((request: any) => ({
+          id: request.id,
+          requestor_id: request.requestor.id,
+          requestor_username: request.requestor.login,
+          requestor_image: request.requestor.image,
+        }));
 
-            setFriendRequests([...mappedRequests]);
-            setfriendreq(mappedRequests.length);
-        })
-        .catch((error) => console.error("Fetch error:", error));
+        setFriendRequests([...mappedRequests]);
+        setfriendreq(mappedRequests.length);
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  };
 
-}, [auth, setInfo, setfriendreq, friendreq]);
+  //   useEffect(() => {
+  //     const token = document.cookie
+  //       .split("; ")
+  //       .find((row) => row.startsWith("token="))
+  //       ?.split("=")[1];
+  //     if (token === undefined) return;
+  //   }, [auth, setInfo, setfriendreq, friendreq]);
 
-return (
+  return (
     <div className="request-container">
-        <ul className="request-list">
-            {
-                friendRequests.map((request: FriendRequest) => (
-                        <Notif requestor_id={request.requestor_id} requestor_image={request.requestor_image} 
-                            requestor_username={request.requestor_username} id={request.id}></Notif>
-                ))
-            }
-        </ul>
+      <ul className="request-list">
+        {friendRequests.map((request: FriendRequest) => (
+          <Notif
+            requestor_id={request.requestor_id}
+            requestor_image={request.requestor_image}
+            requestor_username={request.requestor_username}
+            id={request.id}
+          ></Notif>
+        ))}
+      </ul>
     </div>
-)}
+  );
+};
+
+export { checkFriendRequests };
 
 export default NotifList;

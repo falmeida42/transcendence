@@ -15,7 +15,7 @@ const Home = () => {
     useContext(SocketContext);
   const [page, setPage] = useState<number>(0);
   const [name, setName] = useState<string>("");
-  const { login } = useApi();
+  const { user } = useApi();
 
   useEffect(() => {
     const changePage = () => {
@@ -24,7 +24,7 @@ const Home = () => {
         return;
       }
       if (!username) {
-        set_name(login);
+        set_name(user);
         setPage(2);
 
         // setPage(1);
@@ -41,7 +41,7 @@ const Home = () => {
       setPage(5);
     };
     changePage();
-  }, [isConnected, room, username, onQueue, rooms, login]);
+  }, [isConnected, room, username, onQueue, rooms, user]);
 
   if (page === 0) {
     return (

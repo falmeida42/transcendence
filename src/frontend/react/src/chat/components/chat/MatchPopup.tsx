@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
-import { tk } from "../../context/ChatContext";
 
 interface MatchPopupProps {
   isVisible: boolean;
@@ -53,7 +52,10 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
     setUserToInvite(data);
     toggleVisibility(false);
   };
-
+  const tk = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
   fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
     method: "GET",
     headers: {

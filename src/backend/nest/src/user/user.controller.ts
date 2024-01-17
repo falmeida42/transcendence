@@ -312,16 +312,15 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
-    @GetMe() user: User,
     @Body('username') username: string,
     @Body('roomId') roomId: string,
     @Body('password') password: string,
     @Body('roomType') roomType: string,
-    @Res() res: Response,
+    // @Res() res: Response,
   ) {
-    if (await this.userService.isBanned(username, roomId)) {
-      return res.status(HttpStatus.FORBIDDEN).send();
-    }
+    // if (await this.userService.isBanned(username, roomId)) {
+    //   return res.status(HttpStatus.FORBIDDEN).send();
+    // }
     return await this.userService.joinRoom(
       username,
       roomId,
@@ -333,7 +332,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('leave-room')
   async leaveRoom(
-    @GetMe('username') username: string,
+    @Body('username') username: string,
     @Body('roomId') roomId: string,
   ) {
     return await this.userService.leaveRoom(username, roomId);
@@ -348,13 +347,13 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      this.logger.debug('adding room', login);
+      // this.logger.debug('adding room', login);
       await this.userService.addAdminToChat(login, chatId, userId);
       return res
         .status(HttpStatus.OK)
         .json({ message: 'User added as admin successfully' });
     } catch (error) {
-      this.logger.debug('Error received from add admin', error);
+      // this.logger.debug('Error received from add admin', error);
       return res
         .status(HttpStatus.FORBIDDEN)
         .json({ message: error.message })

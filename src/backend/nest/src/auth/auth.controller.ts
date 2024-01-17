@@ -208,7 +208,7 @@ export class AuthController {
         secure: true,
       })
       .status(200)
-      .send();
+      .redirect(`${process.env.FRONTEND_URL}`);
   }
 
   @Get('dummy-user-token2')
@@ -232,6 +232,6 @@ export class AuthController {
         secure: true,
       })
       .status(200)
-      .send();
+      .redirect(`${process.env.FRONTEND_URL}`);
   }
 }

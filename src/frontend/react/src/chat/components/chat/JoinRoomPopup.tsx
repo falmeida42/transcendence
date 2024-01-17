@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
-import { test, tk, updateChatRooms } from "../../context/ChatContext";
+import { updateChatRooms } from "../../context/ChatContext";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -30,8 +30,11 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
     image: string;
     type: string;
   }
+  const tk = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
 
-  console.log("token:", tk);
   useEffect(() => {
     fetch(`http://localhost:3000/user/joinable-rooms`, {
       method: "GET",
@@ -78,13 +81,18 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
     handleClose();
   };
 
-  const handleClickYes = () => {
-    console.log("ROOM TO JOIN", roomToJoin?.name);
+  const handleClickYes = async () => {
+    // console.log("ROOM TO JOIN", roomToJoin?.name);
     if (roomToJoin?.name === "") {
       setWarningText("This field is mandatory");
       toggleVisibility(true);
       return;
     }
+
+    const tk = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
 
     fetch(`http://localhost:3000/user/join-room`, {
       method: "POST",
@@ -100,13 +108,14 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       }),
     })
       .then(async (response) => {
+        console.log("teste");
         if (!response.ok) {
           if (response.status == 403) {
             setWarningText("You were banned from this channel");
             toggleVisibility(true);
             return;
           }
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          // throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
         return data ? JSON.parse(data) : null;
@@ -129,6 +138,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       .catch((error) => {
         console.error("Error:", error);
       });
+    console.log("seu cu", tk);
   };
 
   return (
@@ -152,7 +162,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   <p>Select a room from the list:</p>
                   <ul className="popup-input" style={{ padding: "4px 0" }}>
                     {channels.map((channel) => (
-                      <li>
+                      <li key={channel.id}>
                         <label>
                           <input
                             type="radio"
@@ -190,7 +200,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   <button
                     type="button"
                     className="btn btn-clear"
-                    onClick={handleClickYes}
+                    onClick={async () => await handleClickYes()}
                   >
                     Submit
                   </button>

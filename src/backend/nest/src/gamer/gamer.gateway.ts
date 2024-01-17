@@ -248,7 +248,9 @@ export class GamerGateway
       },
       player2: {
         id: againstAi ? 'AI' : player2Id,
-        name: againstAi ? 'AI' : this.players[player2Id].name,
+        name: againstAi
+          ? 'Artificial Intelligence'
+          : this.players[player2Id].name,
         ready: false,
         x: gameConfig.width - 20,
         y: gameConfig.height / 2 - 50,
@@ -441,12 +443,12 @@ export class GamerGateway
     try {
       const user1Id = await this.prisma.user.findUniqueOrThrow({
         where: {
-          login: match.player1.name,
+          username: match.player1.name,
         },
       });
       const user2Id = await this.prisma.user.findUniqueOrThrow({
         where: {
-          login: match.player2.name,
+          username: match.player2.name,
         },
       });
       const winnerScore =

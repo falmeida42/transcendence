@@ -260,7 +260,7 @@ function Profile() {
 								{
 									userFriends.map((friend: User) => (
 										<li key={friend.id}>
-											<span><a onClick={() => {handleNavigate(friend.userLogin)}}><img src={friend.userImage} className="img-responsive" alt="#"></img></a></span>
+											<span><a onClick={() => {handleNavigate(friend.userLogin)}}><img src={friend.userImage} title={`See the ${friend.username} profile`} className="img-responsive" alt="#"></img></a></span>
 											<span>
 												<span className="name_user" >{friend.username}</span>
 											</span>

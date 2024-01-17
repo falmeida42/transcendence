@@ -508,14 +508,14 @@ export class UserService {
 
     const list = await Promise.all(
       messages.map(async (message) => {
-        this.logger.debug(message);
+        // this.logger.debug(message);
         return (await this.isBlocked(message.userId, userId)) ? null : message;
       }),
     );
 
     const filteredList = list.filter((message) => message !== null);
-    this.logger.debug('list: ', list);
-    this.logger.debug('FILTERED list ', filteredList);
+    // this.logger.debug('list: ', list);
+    // this.logger.debug('FILTERED list ', filteredList);
     return filteredList;
   }
 
@@ -845,14 +845,15 @@ export class UserService {
   }
 
   async isBanned(username: string, roomId: string) {
-    return this.prisma.chatRoom
+    const bannedUsers = await this.prisma.chatRoom
       .findUnique({
         where: { id: roomId },
       })
       .bannedUsers({
         where: { username },
-      })
-      .then((bannedUsers) => bannedUsers.length > 0);
+      });
+    if (bannedUsers.length > 0) return true;
+    else return false;
   }
 
   async isBlocked(requesterId: string, requesteeId: string) {
