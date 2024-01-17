@@ -12,7 +12,7 @@ import { UserDto } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   private readonly logger = new Logger('UserService');
 
@@ -31,7 +31,7 @@ export class UserService {
       return await this.prisma.user.findUnique({ where: { id: userId } });
     } catch (error) {
       this.logger.error(error);
-      throw new Error(`Failed to return user with id ${userId}`);
+      throw new NotFoundException(`Failed to return user with id ${userId}`);
     }
   }
 
@@ -51,7 +51,10 @@ export class UserService {
       }
     });
 
-    if (Object.keys(nonEmptyData).length === 0 || (Object.entries(nonEmptyData).toString().trim().length < 1)) {
+    if (
+      Object.keys(nonEmptyData).length === 0 ||
+      Object.entries(nonEmptyData).toString().trim().length < 1
+    ) {
       // If there are no non-empty values, return null or handle accordingly
       return null;
     }
@@ -60,10 +63,9 @@ export class UserService {
         where: { id: userId },
         data: nonEmptyData,
       });
-      if (user)
-        return user;
+      if (user) return user;
     } catch {
-      throw new ForbiddenException("Username not unique.");
+      throw new ForbiddenException('Username not unique.');
     }
   }
 
@@ -147,7 +149,7 @@ export class UserService {
     const list = await Promise.all(
       notFriends.map(async (notFriend) => {
         return (await this.isBlocked(userId, notFriend.id)) ? null : notFriend;
-      })
+      }),
     );
 
     const filteredList = list.filter((user) => user !== null);
@@ -350,7 +352,7 @@ export class UserService {
   }
 
   async is2FAEnabled(id: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: id } });
+    const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
@@ -478,9 +480,8 @@ export class UserService {
       where: { id: userId },
       include: {
         blockedUsers: true,
-      }
-    }
-    )
+      },
+    });
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -492,7 +493,6 @@ export class UserService {
               include: {
                 sender: true,
               },
-
             },
           },
         },
@@ -510,12 +510,12 @@ export class UserService {
       messages.map(async (message) => {
         this.logger.debug(message);
         return (await this.isBlocked(message.userId, userId)) ? null : message;
-      })
+      }),
     );
 
     const filteredList = list.filter((message) => message !== null);
-    this.logger.debug('list: ', list)
-    this.logger.debug('FILTERED list ', filteredList)
+    this.logger.debug('list: ', list);
+    this.logger.debug('FILTERED list ', filteredList);
     return filteredList;
   }
 
@@ -840,13 +840,15 @@ export class UserService {
   }
 
   async isBlocked(requesterId: string, requesteeId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: requesterId },
-      select: {
-        blockedBy: {
-          where: { id: requesteeId }
-        }
-      }
-    }).then((blocked) => blocked.blockedBy.length > 0)
+    return this.prisma.user
+      .findUnique({
+        where: { id: requesterId },
+        select: {
+          blockedBy: {
+            where: { id: requesteeId },
+          },
+        },
+      })
+      .then((blocked) => blocked.blockedBy.length > 0);
   }
 }

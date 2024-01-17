@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -20,6 +21,7 @@ import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { TwoFAGuard } from './guard/2FA.guard';
+import { InputStringValidationPipe } from 'src/pipes';
 
 @Controller('auth')
 export class AuthController {
@@ -38,21 +40,20 @@ export class AuthController {
   @UseFilters(new FTAuthExceptionFilter())
   @Get('intra-clbk')
   async callbackIntra(@Req() req: any, @Res() res: Response): Promise<any> {
+    if (!req.user) {
+      throw new BadRequestException('FortyTwo login failed: User not found');
+    }
     const dto: AuthDto = req.user;
     try {
       if (await this.authService.is2FAActive(String(dto.id))) {
         // Execute 2FA logic
-        // this.logger.debug('2FA IS ENABLED');
 
         const user = await this.userService.getUserById(dto.id);
         if (!user) {
           throw new ForbiddenException('User not found');
         }
-        // this.logger.debug('USER: ', user);
 
         const token = await this.authService.sign2FAToken(user.id);
-
-        // this.logger.debug('ACCESS TOKEN: ', token);
 
         res
           .cookie('token2fa', token, {
@@ -65,7 +66,10 @@ export class AuthController {
           .redirect(`${process.env.FRONTEND_URL}`);
         return;
       }
-    } catch {}
+    } catch (error) {
+      this.logger.error(error);
+      return res.status(HttpStatus.BAD_REQUEST).json(error).send();
+    }
     // Execute login without 2FA
 
     const data = await this.authService.signup(dto);
@@ -85,7 +89,10 @@ export class AuthController {
   @Get('2fa/generate')
   async register(@Res() res: Response, @GetMe() user: User) {
     if (!user) {
-      throw new ForbiddenException('User does not exist');
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: 'User does not exist' })
+        .send();
     }
 
     if (!user.twoFactorAuthSecret) {
@@ -93,9 +100,9 @@ export class AuthController {
         // generate 2FA secret
         const secret = this.authService.generate2FASecret();
         // update user data
-        await this.userService.set2FASecret(String(user.id), secret);
+        await this.userService.set2FASecret(user.id, secret);
       } catch (error) {
-        console.error(error);
+        this.logger.error(error);
         return res.status(HttpStatus.NOT_IMPLEMENTED).send(error);
       }
     }
@@ -111,7 +118,7 @@ export class AuthController {
   @Post('2fa/turn-on')
   async turn2FAOn(
     @GetMe() user: User,
-    @Body('code') code: string,
+    @Body('code', InputStringValidationPipe) code: string,
     @Res() res: Response,
   ) {
     if ((await this.userService.is2FAEnabled(user.id)).valueOf() === false) {
@@ -152,36 +159,38 @@ export class AuthController {
   async authenticate2FA(
     @Res() res: Response,
     @GetMe('id') id: string,
-    @Body() body: any,
+    @Body('code', InputStringValidationPipe) code: string,
   ) {
-    const user = await this.userService.getUserById(id);
+    try {
+      const user = await this.userService.getUserById(id);
 
-    if (!user) {
-      throw new ForbiddenException('No such id ', user.id);
+      const isCodeValid = await this.authService.is2FACodeValid(code, user);
+
+      if (!isCodeValid) {
+        // res
+        //   .status(403)
+        //   .redirect(`${process.env.FRONTEND_URL}/2fa`);
+        // return;
+        return res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: 'Wrong 2FA code' });
+      }
+      const tokenPerm = await this.authService.signAccessToken(Number(user.id));
+
+      res
+        .cookie('token', tokenPerm, {
+          expires: new Date(Date.now() + 14 * 60 * 1000),
+          domain: 'localhost',
+          path: '/',
+          sameSite: 'none',
+          secure: true,
+        })
+        .status(200)
+        .send();
+      return;
+    } catch (error) {
+      this.logger.error(error);
+      return res.status(HttpStatus.BAD_REQUEST).json(error);
     }
-
-    const isCodeValid = await this.authService.is2FACodeValid(body.code, user);
-
-    if (!isCodeValid) {
-      // res
-      //   .status(403)
-      //   .redirect(`${process.env.FRONTEND_URL}/2fa`);
-      // return;
-      throw new ForbiddenException('Wrong 2FA code');
-    }
-    const tokenPerm = await this.authService.signAccessToken(Number(user.id));
-
-    res
-      .cookie('token', tokenPerm, {
-        expires: new Date(Date.now() + 14 * 60 * 1000),
-        domain: 'localhost',
-        path: '/',
-        sameSite: 'none',
-        secure: true,
-      })
-      .status(200)
-      .send();
-    // this.logger.debug('ACCESS TOKEN: ', tokenPerm);
-    return;
   }
 }
