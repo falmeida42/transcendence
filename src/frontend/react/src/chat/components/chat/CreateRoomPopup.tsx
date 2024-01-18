@@ -166,7 +166,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
         }),
       })
         .then(
-          () => test(id)
+          () => test()
           // updateChatRooms
         )
         .catch();

@@ -227,28 +227,28 @@ export class UserService {
           },
         });
 
-        // await this.prisma.user.update({
-        //   where: {
-        //     id: requesteeId,
-        //   },
-        //   data: {
-        //     friends: {
-        //       connect: { id: requesterId },
-        //     },
-        //   },
-        // });
+     
         this.insertFriend(requesteeId, requesterId);
         this.insertFriend(requesterId, requesteeId);
-        // await this.prisma.user.update({
-        //   where: {
-        //     id: requesterId,
-        //   },
-        //   data: {
-        //     friends: {
-        //       connect: { id: requesteeId },
-        //     },
-        //   },
-        // });
+      
+        // Create the chat room
+        const chatRoom = await this.prisma.chatRoom.create({
+          data: {
+            id: crypto.randomUUID().toString(),
+            name: requesterId + requesteeId,
+            image: "#",
+            type: "DIRECT_MESSAGE",
+            owner: {
+              connect: { id: requesterId }
+            },
+            participants: {
+              connect: [
+                { id: requesterId },
+                { id: requesteeId },
+              ],
+            },
+          },
+        });
         return { message: 'Friend request accepted', friendRequest };
       } else {
         const friendRequest = await this.prisma.friendRequest.update({
@@ -414,16 +414,18 @@ export class UserService {
         if (room.type === ('DIRECT_MESSAGE' as ChatType)) {
           //Find the other user in the direct message room
           const directUser = room.participants.find(
-            (user) => user.id !== userId,
+            (user) => user.id !== userId
           );
-
-          return {
-            ...room,
-            name: directUser.login || 'User',
-            image:
+          
+          if (directUser) {
+            return {
+              ...room,
+              name: directUser.login || 'User',
+              image:
               directUser.image ||
               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiJuFZF4sFjZGf3JtXkRDHrtQXNjx3QSRI_NqN2pbWiCXddEPYQ89a0MH91XEp6IwICW8&usqp=CAU',
-          };
+            };
+          }
         }
 
         // Return other room types unchanged

@@ -47,6 +47,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     })
       .then(async (response) => {
         if (!response.ok) {
+          console.log("fatal errorrr");
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
