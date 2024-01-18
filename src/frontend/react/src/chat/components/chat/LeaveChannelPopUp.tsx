@@ -42,9 +42,7 @@ const LeaveChannelPopUp: React.FC<LeaveChannelProps> = (
         return data ? JSON.parse(data) : null;
       })
       .then((data) => {
-        if (data) {
-          console.log("Rooms received ", JSON.stringify(data));
-        } else {
+        if (!data) {
           console.log("No data received");
         }
       })

@@ -14,7 +14,7 @@ const Input = (content: any) => {
 
   const sendMessage = () => {
     if (validInput(text)) {
-      console.log("Sending message: ", text);
+      // console.log("Sending message: ", text);
       socket.emit("messageToServer", {
         to: content.content.selectedChatData.id,
         message: text,

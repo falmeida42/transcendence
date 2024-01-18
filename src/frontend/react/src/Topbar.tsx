@@ -1,9 +1,9 @@
+import Badge from "@mui/material/Badge";
 import { useEffect, useState } from "react";
+import { navigate } from "wouter/use-location";
+import NotifList from "./NotifList.tsx";
 import { useApi } from "./apiStore.tsx";
 import { usecollapseSidebar } from "./collapseSidebar.tsx";
-import NotifList from "./NotifList.tsx";
-import { navigate } from "wouter/use-location";
-import Badge from '@mui/material/Badge';
 
 const Topbar = () => {
   const { setOpen, isOpen } = usecollapseSidebar();
@@ -12,22 +12,21 @@ const Topbar = () => {
 
   const handleClickNotif = () => {
     setIsVisibleNotif(!isVisibleNotif);
-  }
-  
+  };
+
   const token = document.cookie
-  .split("; ")
-  .find((row) => row.startsWith("token="))
-  ?.split("=")[1];
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
 
   const handleClickLogout = () => {
     if (token !== undefined) {
-      document.cookie = `${'token'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
-      navigate('/login');
+      document.cookie = `${"token"}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
+      navigate("/login");
     }
-  }
+  };
 
-  useEffect(() => {
-  }, [auth, friendreq, setInfo])
+  useEffect(() => {}, [auth, friendreq, setInfo]);
 
   return (
     <div id="content">
@@ -55,12 +54,19 @@ const Topbar = () => {
               <div className="icon_info">
                 <ul>
                   <li className="icons_list">
-                      <i onClick={handleClickLogout} className="fa fa-power-off"></i>
+                    <i
+                      onClick={handleClickLogout}
+                      className="fa fa-power-off"
+                    ></i>
                   </li>
                   <li className="icons_list">
-                  <Badge badgeContent={friendreq} color="error" style={{height:`30px`}}/>
-                      <i onClick={handleClickNotif} className="fa fa-bell"></i>
-                      {isVisibleNotif && <NotifList />}
+                    <Badge
+                      badgeContent={friendreq}
+                      color="error"
+                      style={{ height: `30px` }}
+                    />
+                    <i onClick={handleClickNotif} className="fa fa-bell"></i>
+                    {isVisibleNotif && <NotifList />}
                   </li>
                   <li className="user_list">
                     <img

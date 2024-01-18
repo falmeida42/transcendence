@@ -47,7 +47,7 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
     })
     .then((data) => {
       if (data) {
-        console.log("Room info received ", JSON.stringify(data));
+        // console.log("Room info received ", JSON.stringify(data));
         setChatData(data);
       } else {
         console.log("No data received");

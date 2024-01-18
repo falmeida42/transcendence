@@ -18,8 +18,8 @@ const Chats = (chatsProps: ChatsProps) => {
   const { chatRooms = [], usersOnline } = useContext(ChatContext) ?? {};
   const rooms: RoomData[] = [];
 
-  console.log("friends in chat", chatRooms);
-  console.log("Chat list ", usersOnline);
+  // console.log("friends in chat", chatRooms);
+  // console.log("Chat list ", usersOnline);
 
   chatRooms.forEach((room: any) => {
     const matchingUser = usersOnline.find(

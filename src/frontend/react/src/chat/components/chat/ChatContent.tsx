@@ -108,7 +108,7 @@ const ChatContent = (props: ChatContentProps) => {
         }
 
         const data = await response.json();
-        console.log("Room info received ", JSON.stringify(data));
+        // console.log("Room info received ", JSON.stringify(data));
         setChatData(data);
         if (data.owner.id !== id) setUserIsOwner(false);
         const isAdmin = data.admins.some((admin) => admin.id === id);
@@ -121,7 +121,7 @@ const ChatContent = (props: ChatContentProps) => {
     };
 
     fetchData();
-    console.log("IsOwner: ", userIsOwner, "IsAdmin: ", userIsAdmin);
+    // console.log("IsOwner: ", userIsOwner, "IsAdmin: ", userIsAdmin);
   }, [props.selectedChatData.id]);
 
   return (

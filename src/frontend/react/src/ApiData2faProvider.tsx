@@ -1,6 +1,6 @@
-import React, { useEffect, ReactNode } from 'react';
-import { useApi } from './apiStore';
-import { navigate } from 'wouter/use-location';
+import React, { ReactNode, useEffect } from "react";
+import { navigate } from "wouter/use-location";
+import { useApi } from "./apiStore";
 
 interface ApiData2faProviderProps {
   children?: ReactNode;
@@ -19,7 +19,6 @@ const ApiData2faProvider: React.FC<ApiData2faProviderProps> = (props) => {
         if (token === undefined) return;
 
         // console.log('token: ', token, 'cus: ', document.cookie);
-      
 
         const UpResponse = await fetch("http://localhost:3000/user/auth", {
           method: "GET",
@@ -30,7 +29,7 @@ const ApiData2faProvider: React.FC<ApiData2faProviderProps> = (props) => {
         });
         if (!UpResponse.ok) {
           if (UpResponse.status === 401) {
-            navigate('/login');
+            navigate("/login");
           }
           return;
         }

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { ProfileContext } from "../../../ProfileContext";
 import { useApi } from "../../../apiStore";
 import { test } from "../../context/ChatContext";
 
@@ -17,10 +18,11 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
   const [inputPassword, setInputPassword] = useState("");
   const [inputPrivacy, setInputPrivacy] = useState<string>("");
   const [modal, setModal] = useState(1);
-  const { friends, login } = useApi();
+  const { login } = useApi();
   const [checkboxValues, setCheckboxValues] = useState<string[]>([login]);
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
   const [id] = useState(crypto.randomUUID().toString());
+  const { userFriends } = useContext(ProfileContext) ?? {};
 
   const toggleVisibility = (visibility: boolean) => {
     setIsVisibleWarning(visibility);
@@ -143,10 +145,8 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
 
       const token = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("token2fa="))
+        .find((row) => row.startsWith("token="))
         ?.split("=")[1];
-
-      if (token === undefined) return;
 
       fetch(`http://localhost:3000/user/add-room`, {
         method: "POST",
@@ -347,19 +347,19 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
                   <div className="modal-body">
                     <p>Please select at least another participant:</p>
                     <ul className="popup-input">
-                      {friends.map((friend: any) => (
+                      {userFriends.map((friend: any) => (
                         <li>
                           <label>
                             <input
                               type="checkbox"
                               name="name"
-                              value={friend.login}
+                              value={friend.username}
                               onChange={() =>
-                                handleCheckboxChange(friend.login)
+                                handleCheckboxChange(friend.username)
                               }
                             />
-                            <img src={friend.image}></img>
-                            {friend.login}
+                            <img src={friend.userImage}></img>
+                            {friend.username}
                           </label>
                         </li>
                       ))}

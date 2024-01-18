@@ -38,7 +38,6 @@ const UseAuth = ({ code }: UseAuthProps) => {
           navigate("/login");
         }
         setStatus("WRONG");
-        console.log("222");
         navigate("/2fa");
         return;
       }

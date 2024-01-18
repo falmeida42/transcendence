@@ -47,7 +47,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     })
       .then(async (response) => {
         if (!response.ok) {
-          console.log("fatal errorrr");
+          // console.log("fatal errorrr");
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -57,7 +57,7 @@ function ChatProvider({ children }: ChatProviderProps) {
         if (data) {
           setChatRooms(data);
         } else {
-          console.log("No data received teste");
+          console.log("No data received");
         }
       })
       .catch((error) => console.error("Fetch error:", error));
@@ -128,7 +128,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     setSocket(socketInstance);
 
     socketInstance.on("messageToClient", (payload) => {
-      console.log("MESSAGE TO CLIENT: ", JSON.stringify(payload));
+      // console.log("MESSAGE TO CLIENT: ", JSON.stringify(payload));
 
       setChannelMessages((prevChannelMessages: any) => {
         const channelId = payload.channelId;

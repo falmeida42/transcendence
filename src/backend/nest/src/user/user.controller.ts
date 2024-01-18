@@ -241,7 +241,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('chatRooms')
   async getChatRooms(@GetMe('id') id: string) {
-    this.logger.debug("chat rooms get me id: ", id);
+    // this.logger.debug("chat rooms get me id: ", id);
     const ChatRooms = await this.userService.getChatRooms(id);
 
     return ChatRooms;

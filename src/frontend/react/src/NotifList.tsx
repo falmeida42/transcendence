@@ -39,7 +39,7 @@ const NotifList: React.FC<NotifListProps> = () => {
         return data as FriendRequest[];
       })
       .then((data) => {
-        console.log("FR Return: ", data);
+        // console.log("FR Return: ", data);
         const mappedRequests = data.map((request: any) => ({
           id: request.id,
           requestor_id: request.requestor.id,

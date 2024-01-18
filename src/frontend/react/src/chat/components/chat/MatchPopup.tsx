@@ -40,7 +40,7 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
       return;
     }
     //send invite to user: component <MatchInvite />
-    console.log("Sending invite to user: ", userToInvite.login);
+    // console.log("Sending invite to user: ", userToInvite.login);
     props.handleClose();
   };
 
@@ -72,7 +72,7 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
     })
     .then((data) => {
       if (data) {
-        console.log("Room info received ", JSON.stringify(data));
+        // console.log("Room info received ", JSON.stringify(data));
         setChatData(data);
       } else {
         console.log("No data received");
