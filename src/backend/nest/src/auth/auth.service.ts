@@ -25,10 +25,8 @@ export class AuthService {
 
       if (user) {
         const accessToken = await this.signAccessToken(Number(user.id));
-        // const refreshToken = await this.signRefreshToken(Number(user.id));
         return {
           accessToken: accessToken,
-          // refreshToken: refreshToken,
           user: user,
         };
       }
