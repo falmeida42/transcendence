@@ -21,7 +21,6 @@ import { JwtAuthGuard } from '../auth/guard';
 import * as bcrypt from '../utils';
 import { UserService } from './user.service';
 import { UserDto } from './dto';
-import { InputStringValidationPipe } from 'src/pipes';
 
 @Controller('user')
 export class UserController {
@@ -68,26 +67,25 @@ export class UserController {
 
   @UseGuards(TwoFAGuard)
   @Get('auth')
-  async getAuth(@GetMe('id') id: string, @Res() res: Response) {
-    try {
-      return await this.userService.is2FAEnabled(id);
-    } catch (error) {
-      this.logger.error(error);
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ message: error.message })
-        .send();
-    }
+  async getAuth(@GetMe() user: User) {
+    return (await this.findById(String(user.id))).twoFactorAuthEnabled;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('find/:id')
+  async findById(@Param('id') id: string) {
+    const User = await this.userService.getUserById(id);
+    return User;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('find/login/:login')
-  async findByLogin(@Param('login', InputStringValidationPipe) login: string) {
-    const user = await this.userService.getUserByLogin(login);
-    if (!user) {
+  async findByLogin(@Param('login') login: string) {
+    const User = await this.userService.getUserByLogin(login);
+    if (!User) {
       throw new NotFoundException('User not found.');
     }
-    return user;
+    return User;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -104,13 +102,8 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('not-friends')
-  async getNotFriends(@GetMe('id') id: string, @Res() res: Response) {
-    try {
-      return await this.userService.getNotFriends(id);
-    } catch (error) {
-      this.logger.error(error);
-      return res.status(HttpStatus.BAD_REQUEST).send();
-    }
+  async getNotFriends(@GetMe('id') id: string) {
+    return await this.userService.getNotFriends(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -123,8 +116,8 @@ export class UserController {
   @Post('create-friend-request')
   async addFriendRequest(
     @Req() req: Request,
-    @Body('requesterId', InputStringValidationPipe) requesterId: string,
-    @Body('requesteeId', InputStringValidationPipe) requesteeId: string,
+    @Body('requesterId') requesterId: string,
+    @Body('requesteeId') requesteeId: string,
     @Res() res: Response,
   ) {
     if (await this.userService.isBlocked(requesterId, requesteeId)) {
@@ -133,25 +126,18 @@ export class UserController {
         .json({ message: 'This user blocked you' })
         .send();
     }
-    try {
-      return await this.userService.addFriendRequest(requesterId, requesteeId);
-    } catch (error) {}
+    return await this.userService.addFriendRequest(requesterId, requesteeId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('handle-friend-request')
-  async handleFriendRequest(
-    @GetMe('id') id: string,
-    @Body('requesterId', InputStringValidationPipe) requesterId: string,
-    @Body('requestId', InputStringValidationPipe) requestId: string,
-    @Body('type', InputStringValidationPipe) type: string,
-  ) {
+  async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
     try {
       const result = await this.userService.handleFriendRequest(
-        requesterId,
+        body.requesterId,
         id,
-        requestId,
-        type,
+        body.requestId,
+        body.type,
       );
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
@@ -165,12 +151,10 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('block-user')
-  async blockUser(
-    @GetMe('id') id: string,
-    @Body('blockedId', InputStringValidationPipe) blockedId: string,
-  ) {
+  async blockUser(@GetMe('id') id: string, @Body() body: any) {
+    // this.logger.debug("ACCEPT FETCH BODY:");
     try {
-      const result = await this.userService.blockUser(id, blockedId);
+      const result = await this.userService.blockUser(id, body.blockedId);
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
       return {
@@ -189,7 +173,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('matches/:id')
-  async getMatches(@Param('id', InputStringValidationPipe) id: string) {
+  async getMatches(@Param('id') id: string) {
     try {
       let matches = [];
       const user = await this.prisma.user.findUnique({
@@ -224,7 +208,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('matches-wins/:id')
-  async getWins(@Param('id', InputStringValidationPipe) id: string) {
+  async getWins(@Param('id') id: string) {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
@@ -249,7 +233,7 @@ export class UserController {
   @Post('change-user/:username')
   async changeUsername(
     @GetMe() user: User,
-    @Param('username', InputStringValidationPipe) username: string,
+    @Param('username') username: string,
   ) {
     try {
       await this.prisma.user.update({
@@ -272,16 +256,13 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('chatRoom/:id')
-  async getChatRoomById(@Param('id', InputStringValidationPipe) id: string) {
+  async getChatRoomById(@Param('id') id: string) {
     return await this.userService.getChatRoomById(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('chatHistory/:id')
-  async getChatHistory(
-    @GetMe('id') userId: string,
-    @Param('id', InputStringValidationPipe) id: string,
-  ) {
+  async getChatHistory(@GetMe('id') userId: string, @Param('id') id: string) {
     return await this.userService.getChatHistory(userId, id);
   }
 
@@ -289,7 +270,7 @@ export class UserController {
   @Post('add-friend/:friendName')
   async addFriend(
     @GetMe('id') id: string,
-    @Param('friendName', InputStringValidationPipe) friendName: string,
+    @Param('friendName') friendName: string,
   ): Promise<string> {
     try {
       const user = await this.userService.getUserById(id);
@@ -317,7 +298,7 @@ export class UserController {
   @Post('add-room')
   async addRoom(
     @GetMe('id') id: string,
-    @Body('roomdata', InputStringValidationPipe) roomdata: any,
+    @Body('roomdata') roomdata: any,
   ): Promise<any> {
     if (roomdata) {
       roomdata.type = roomdata.type.toUpperCase();
@@ -339,10 +320,10 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
-    @Body('username', InputStringValidationPipe) username: string,
-    @Body('roomId', InputStringValidationPipe) roomId: string,
-    @Body('password', InputStringValidationPipe) password: string,
-    @Body('roomType', InputStringValidationPipe) roomType: string,
+    @Body('username') username: string,
+    @Body('roomId') roomId: string,
+    @Body('password') password: string,
+    @Body('roomType') roomType: string,
     @Res() res: Response,
   ) {
     if (await this.userService.isBanned(username, roomId)) {
@@ -360,7 +341,7 @@ export class UserController {
   @Post('leave-room')
   async leaveRoom(
     @GetMe('username') username: string,
-    @Body('roomId', InputStringValidationPipe) roomId: string,
+    @Body('roomId') roomId: string,
   ) {
     return await this.userService.leaveRoom(username, roomId);
   }
@@ -369,8 +350,8 @@ export class UserController {
   @Post('add-admin')
   async addAdmin(
     @GetMe('login') login: string,
-    @Body('chatId', InputStringValidationPipe) chatId: string,
-    @Body('userId', InputStringValidationPipe) userId: string,
+    @Body('chatId') chatId: string,
+    @Body('userId') userId: string,
     @Res() res: Response,
   ) {
     try {
@@ -391,7 +372,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('channelParticipants/:chatId')
   async getChannelParticipants(
-    @Param('chatId', InputStringValidationPipe) chatId: string,
+    @Param('chatId') chatId: string,
     @Res() res: Response,
   ) {
     try {
@@ -409,7 +390,7 @@ export class UserController {
   @Get('can-kick')
   async canKick(
     @GetMe() user: User,
-    @Query('roomId', InputStringValidationPipe) roomId: string,
+    @Query('roomId') roomId: string,
     @Res() res: Response,
   ) {
     try {
@@ -428,8 +409,8 @@ export class UserController {
   @Post('kick')
   async kickUser(
     @GetMe() user: User,
-    @Body('roomId', InputStringValidationPipe) roomId: string,
-    @Body('participantId', InputStringValidationPipe) kickedId: string,
+    @Body('roomId') roomId: string,
+    @Body('participantId') kickedId: string,
     @Res() res: Response,
   ) {
     try {
@@ -459,8 +440,8 @@ export class UserController {
   @Post('ban-user')
   async banUser(
     @GetMe() user: User,
-    @Body('roomId', InputStringValidationPipe) roomId: string,
-    @Body('participantId', InputStringValidationPipe) participantId: string,
+    @Body('roomId') roomId: string,
+    @Body('participantId') participantId: string,
     @Res() res: Response,
   ) {
     try {
@@ -492,21 +473,16 @@ export class UserController {
   @Post('update-room-privacy/:roomId')
   async updateRoomPrivacy(
     @Body('type') type: any,
-    @Body('password', InputStringValidationPipe) password: string,
-    @Param('roomId', InputStringValidationPipe) roomId: string,
-    @Res() res: Response,
+    @Body('password') password: any,
+    @Param('roomId') roomId: string,
   ) {
-    try {
-      if (type && password) {
-        const hashedPassword = await bcrypt.hashPassword(password);
-        await this.userService.updateChatRoomPrivacy(
-          roomId,
-          type,
-          hashedPassword,
-        );
-      }
-    } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({ error }).send();
+    if (type && password) {
+      const hashedPassword = await bcrypt.hashPassword(password);
+      await this.userService.updateChatRoomPrivacy(
+        roomId,
+        type,
+        hashedPassword,
+      );
     }
   }
 }
