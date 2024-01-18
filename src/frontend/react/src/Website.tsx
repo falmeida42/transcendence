@@ -11,6 +11,7 @@ import { ProfileProvider } from "./ProfileContext.tsx";
 import Chat from "./chat/Chat.tsx";
 import Home from "./realPong/components/Home.tsx";
 import { SocketProvider } from "./realPong/context/SocketContext.tsx";
+import { ChatProvider } from "./chat/context/ChatContext.tsx";
 
 function Website() {
   const { showHash } = useHashStore();
@@ -32,6 +33,8 @@ function Website() {
       <ApiDataProvider />
       <ProfileProvider>
         <SocketProvider>
+        <ChatProvider>
+
           <Bars />
           <Switch>
             <Route path="/Game">
@@ -55,6 +58,7 @@ function Website() {
               </div>
             </Route>
           </Switch>
+          </ChatProvider>
         </SocketProvider>
       </ProfileProvider>
     </div>

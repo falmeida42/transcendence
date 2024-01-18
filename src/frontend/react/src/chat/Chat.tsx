@@ -19,10 +19,8 @@ function Chat() {
   // console.log("Chat:", selectedChatData);
     return (
       <div className="container container_chat clearfix">
-        <ChatProvider>
           <ChatSidebar passSelectedChatData={passSelectedChatData}/>
           {selectedChatData.id !== "" && <ChatContent selectedChatData={selectedChatData} passSelectedChatData={passSelectedChatData}/>}
-        </ChatProvider>
       </div>
     );
 }

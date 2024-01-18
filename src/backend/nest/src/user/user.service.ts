@@ -583,7 +583,7 @@ export class UserService {
     }
   }
 
-  async joinRoom(
+  async joinInRoom(
     login: string,
     roomId: string,
     password: string,
@@ -611,7 +611,7 @@ export class UserService {
         return { success: false, message: 'Failed to join the chat room' };
       }
 
-      return {
+            return {
         success: true,
         message: 'User successfully joined the chat room',
       };

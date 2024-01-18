@@ -79,14 +79,13 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
   };
 
   const handleClickYes = () => {
-    console.log("ROOM TO JOIN", roomToJoin?.name);
     if (roomToJoin?.name === "") {
       setWarningText("This field is mandatory");
       toggleVisibility(true);
       return;
     }
-
-    fetch(`http://localhost:3000/user/join-room`, {
+    
+          fetch(`http://localhost:3000/user/join-room`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -100,6 +99,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       }),
     })
       .then(async (response) => {
+        console.log("some response received: ", response)
         if (!response.ok) {
           if (response.status == 403) {
             setWarningText("You were banned from this channel");
@@ -119,6 +119,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
             toggleVisibility(true);
             setInputPassword("");
           } else if (data.success === true) {
+            console.log("sucess handle close")
             handleClose();
           }
         } else {
