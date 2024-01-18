@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '../auth/guard';
 import * as bcrypt from '../utils';
 import { UserService } from './user.service';
 import { UserDto } from './dto';
+import { InputStringValidationPipe } from 'src/pipes';
 
 @Controller('user')
 export class UserController {
@@ -73,14 +74,14 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('find/:id')
-  async findById(@Param('id') id: string) {
+  async findById(@Param('id', InputStringValidationPipe) id: string) {
     const User = await this.userService.getUserById(id);
     return User;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('find/login/:login')
-  async findByLogin(@Param('login') login: string) {
+  async findByLogin(@Param('login', InputStringValidationPipe) login: string) {
     const User = await this.userService.getUserByLogin(login);
     if (!User) {
       throw new NotFoundException('User not found.');
@@ -116,8 +117,8 @@ export class UserController {
   @Post('create-friend-request')
   async addFriendRequest(
     @Req() req: Request,
-    @Body('requesterId') requesterId: string,
-    @Body('requesteeId') requesteeId: string,
+    @Body('requesterId', InputStringValidationPipe) requesterId: string,
+    @Body('requesteeId', InputStringValidationPipe) requesteeId: string,
     @Res() res: Response,
   ) {
     if (await this.userService.isBlocked(requesterId, requesteeId)) {
@@ -131,13 +132,18 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('handle-friend-request')
-  async handleFriendRequest(@GetMe('id') id: string, @Body() body: any) {
+  async handleFriendRequest(
+    @GetMe('id') id: string,
+    @Body('requesterId', InputStringValidationPipe) requesterId: string,
+    @Body('requestId', InputStringValidationPipe) requestId: string,
+    @Body('type', InputStringValidationPipe) type: string,
+  ) {
     try {
       const result = await this.userService.handleFriendRequest(
-        body.requesterId,
+        requesterId,
         id,
-        body.requestId,
-        body.type,
+        requestId,
+        type,
       );
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
@@ -151,10 +157,12 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('block-user')
-  async blockUser(@GetMe('id') id: string, @Body() body: any) {
-    // this.logger.debug("ACCEPT FETCH BODY:");
+  async blockUser(
+    @GetMe('id') id: string,
+    @Body('blockedId', InputStringValidationPipe) blockedId: string,
+  ) {
     try {
-      const result = await this.userService.blockUser(id, body.blockedId);
+      const result = await this.userService.blockUser(id, blockedId);
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
       return {
@@ -173,7 +181,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('matches/:id')
-  async getMatches(@Param('id') id: string) {
+  async getMatches(@Param('id', InputStringValidationPipe) id: string) {
     try {
       let matches = [];
       const user = await this.prisma.user.findUnique({
@@ -201,14 +209,14 @@ export class UserController {
 
       if (!matches) throw new Error('teste');
       return matches;
-    } catch (e) {
-      this.logger.error(e.message);
+    } catch (error) {
+      this.logger.error(error.message);
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('matches-wins/:id')
-  async getWins(@Param('id') id: string) {
+  async getWins(@Param('id', InputStringValidationPipe) id: string) {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
@@ -224,8 +232,8 @@ export class UserController {
       const lossesCount = user.losses.length;
 
       return { winsCount, lossesCount };
-    } catch (e) {
-      this.logger.error(e.message);
+    } catch (error) {
+      this.logger.error(error.message);
     }
   }
 
@@ -233,7 +241,7 @@ export class UserController {
   @Post('change-user/:username')
   async changeUsername(
     @GetMe() user: User,
-    @Param('username') username: string,
+    @Param('username', InputStringValidationPipe) username: string,
   ) {
     try {
       await this.prisma.user.update({
@@ -256,13 +264,16 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('chatRoom/:id')
-  async getChatRoomById(@Param('id') id: string) {
+  async getChatRoomById(@Param('id', InputStringValidationPipe) id: string) {
     return await this.userService.getChatRoomById(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('chatHistory/:id')
-  async getChatHistory(@GetMe('id') userId: string, @Param('id') id: string) {
+  async getChatHistory(
+    @GetMe('id') userId: string,
+    @Param('id', InputStringValidationPipe) id: string,
+  ) {
     return await this.userService.getChatHistory(userId, id);
   }
 
@@ -270,7 +281,7 @@ export class UserController {
   @Post('add-friend/:friendName')
   async addFriend(
     @GetMe('id') id: string,
-    @Param('friendName') friendName: string,
+    @Param('friendName', InputStringValidationPipe) friendName: string,
   ): Promise<string> {
     try {
       const user = await this.userService.getUserById(id);
@@ -320,10 +331,10 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
-    @Body('username') username: string,
-    @Body('roomId') roomId: string,
-    @Body('password') password: string,
-    @Body('roomType') roomType: string,
+    @Body('username', InputStringValidationPipe) username: string,
+    @Body('roomId', InputStringValidationPipe) roomId: string,
+    @Body('password', InputStringValidationPipe) password: string,
+    @Body('roomType', InputStringValidationPipe) roomType: string,
     @Res() res: Response,
   ) {
     if (await this.userService.isBanned(username, roomId)) {
@@ -341,7 +352,7 @@ export class UserController {
   @Post('leave-room')
   async leaveRoom(
     @GetMe('username') username: string,
-    @Body('roomId') roomId: string,
+    @Body('roomId', InputStringValidationPipe) roomId: string,
   ) {
     return await this.userService.leaveRoom(username, roomId);
   }
@@ -350,8 +361,8 @@ export class UserController {
   @Post('add-admin')
   async addAdmin(
     @GetMe('login') login: string,
-    @Body('chatId') chatId: string,
-    @Body('userId') userId: string,
+    @Body('chatId', InputStringValidationPipe) chatId: string,
+    @Body('userId', InputStringValidationPipe) userId: string,
     @Res() res: Response,
   ) {
     try {
@@ -372,7 +383,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('channelParticipants/:chatId')
   async getChannelParticipants(
-    @Param('chatId') chatId: string,
+    @Param('chatId', InputStringValidationPipe) chatId: string,
     @Res() res: Response,
   ) {
     try {
@@ -390,7 +401,7 @@ export class UserController {
   @Get('can-kick')
   async canKick(
     @GetMe() user: User,
-    @Query('roomId') roomId: string,
+    @Query('roomId', InputStringValidationPipe) roomId: string,
     @Res() res: Response,
   ) {
     try {
@@ -409,8 +420,8 @@ export class UserController {
   @Post('kick')
   async kickUser(
     @GetMe() user: User,
-    @Body('roomId') roomId: string,
-    @Body('participantId') kickedId: string,
+    @Body('roomId', InputStringValidationPipe) roomId: string,
+    @Body('participantId', InputStringValidationPipe) kickedId: string,
     @Res() res: Response,
   ) {
     try {
@@ -440,8 +451,8 @@ export class UserController {
   @Post('ban-user')
   async banUser(
     @GetMe() user: User,
-    @Body('roomId') roomId: string,
-    @Body('participantId') participantId: string,
+    @Body('roomId', InputStringValidationPipe) roomId: string,
+    @Body('participantId', InputStringValidationPipe) participantId: string,
     @Res() res: Response,
   ) {
     try {
@@ -473,8 +484,8 @@ export class UserController {
   @Post('update-room-privacy/:roomId')
   async updateRoomPrivacy(
     @Body('type') type: any,
-    @Body('password') password: any,
-    @Param('roomId') roomId: string,
+    @Body('password', InputStringValidationPipe) password: string,
+    @Param('roomId', InputStringValidationPipe) roomId: string,
   ) {
     if (type && password) {
       const hashedPassword = await bcrypt.hashPassword(password);
