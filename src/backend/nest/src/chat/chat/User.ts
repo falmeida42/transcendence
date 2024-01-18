@@ -1,12 +1,11 @@
 export enum UserStatus {
-    OFFLINE,
-    ONLINE,
-    GAME,
-
+  OFFLINE,
+  ONLINE,
+  GAME,
 }
 
 export interface UserInformation {
-    id: string,
-    username: string,
-    status: UserStatus
+  id: string;
+  username: string;
+  status: UserStatus;
 }
