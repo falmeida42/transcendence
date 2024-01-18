@@ -3,7 +3,7 @@ import {useState, useRef} from 'react';
 import "./Chat.scss"
 import ChatContent from './components/chat/ChatContent';
 import ChatSidebar from './components/sidebar/ChatSidebar';
-import { ChatContext, ChatProvider } from './context/ChatContext';
+import { ChatProvider } from './context/ChatContext';
 import { ChatData } from './components/sidebar/ChatInfo';
 
 
