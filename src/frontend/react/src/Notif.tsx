@@ -39,9 +39,6 @@ const Notif: React.FC<NotifProps> = (props) => {
           const data = await response.text();
           return data ? JSON.parse(data) : null;
         })
-        .then((data) => {
-          console.log("ACCEPTED:", JSON.stringify(data));
-        })
         .then(updateUserFriends)
         .catch((error) => console.error("Fetch error:", error));
     }

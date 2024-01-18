@@ -297,6 +297,7 @@ export class UserController {
     @Body('roomdata') roomdata: any,
   ): Promise<any> {
     if (roomdata) {
+      this.logger.debug(JSON.stringify(roomdata));
       roomdata.type = roomdata.type.toUpperCase();
       await this.userService.createRoom(id, roomdata);
     }

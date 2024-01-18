@@ -58,6 +58,7 @@ const NotifList: React.FC<NotifListProps> = () => {
       <ul className="request-list">
         {friendRequests.map((request: FriendRequest) => (
           <Notif
+            key={request.requestor_id}
             requestor_id={request.requestor_id}
             requestor_image={request.requestor_image}
             requestor_username={request.requestor_username}

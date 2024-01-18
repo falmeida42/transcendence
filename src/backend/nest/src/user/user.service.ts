@@ -537,8 +537,8 @@ export class UserService {
         type: roomData.type,
         password: hashedPassword,
         participants: {
-          connect: roomData.participants.map((login: string) => ({
-            login: login,
+          connect: roomData.participants.map((username: string) => ({
+            username,
           })),
         },
       },
