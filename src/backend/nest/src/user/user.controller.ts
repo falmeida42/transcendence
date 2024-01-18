@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpStatus,
   Logger,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -462,36 +465,87 @@ export class UserController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Post('mute-user')
-  // async muteUser(
-  //   @GetMe() user: User,
-  //   @Body('participantId') participantId: string,
-  //   @Body('roomId') roomId: string,
-  //   @Body('duration', ParseIntPipe) duration: number,
-  //   @Res() res: Response,
-  // ) {
-  //   if (duration < 1) {
-  //     throw new ForbiddenException('Mute duration must be greater than 0');
-  //   }
-  //   if (!roomId || !participantId) {
-  //     throw new ForbiddenException('Missing roomId or userId');
-  //   }
-  //   if (
-  //     (await this.userService.isOwner(participantId, roomId)) ||
-  //     (!(await this.userService.isOwner(user.id, roomId)) &&
-  //       !(await this.userService.isAdmin(user.id, roomId)))
-  //   )
-  //     return res.status(HttpStatus.FORBIDDEN).send();
-  //   if (
-  //     (await this.userService.isAdmin(user.id, roomId)) &&
-  //     (await this.userService.isAdmin(participantId, roomId))
-  //   )
-  //     return res.status(HttpStatus.FORBIDDEN).send();
+  @UseGuards(JwtAuthGuard)
+  @Post('mute-user')
+  async muteUser(
+    @GetMe() user: User,
+    @Body('participantId') participantId: string,
+    @Body('roomId') roomId: string,
+    @Body('duration', ParseIntPipe) duration: number,
+    @Res() res: Response,
+  ) {
+    if (duration < 1) {
+      throw new BadRequestException('Mute duration must be greater than 0');
+    }
 
-  //   await this.userService.muteUser(participantId, roomId, duration);
-  //   return res.status(HttpStatus.OK).send();
-  // }
+    if (!roomId || !participantId) {
+      throw new BadRequestException('Missing roomId or userId');
+    }
+
+    const test = await this.userService.getUserById(participantId);
+    if (!test) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (
+      (await this.userService.isOwner(participantId, roomId)) ||
+      (!(await this.userService.isOwner(user.id, roomId)) &&
+        !(await this.userService.isAdmin(user.id, roomId)))
+    )
+      throw new ForbiddenException('You are not Owner or Admin');
+    if (
+      (await this.userService.isAdmin(user.id, roomId)) &&
+      (await this.userService.isAdmin(participantId, roomId))
+    )
+      throw new ForbiddenException("You can't mute this user");
+    const userAlreadyMuted = await this.prisma.mutedIn.findFirst({
+      where: {
+        userId: participantId,
+        channelId: roomId,
+      },
+    });
+
+    if (userAlreadyMuted) {
+      throw new ForbiddenException('User already muted');
+    }
+    await this.userService.muteUser(participantId, roomId, duration);
+    return res.status(HttpStatus.OK).send();
+  }
+
+  @Get('check-mute/:userId/:roomId')
+  async checkUserMute(
+    @Param('userId') userId: string,
+    @Param('roomId') roomId: string,
+  ) {
+    const isMuted = await this.userService.isUserMutedInRoom(userId, roomId);
+    return isMuted;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('unmute-user')
+  async unmuteUser(
+    @GetMe() user: User,
+    @Body('participantId') participantId: string,
+    @Body('roomId') roomId: string,
+    @Res() res: Response,
+  ) {
+    if (!roomId || !participantId) {
+      throw new BadRequestException('Missing roomId or userId');
+    }
+
+    const test = await this.userService.getUserById(participantId);
+    if (!test) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (
+      !(await this.userService.isOwner(user.id, roomId)) &&
+      !(await this.userService.isAdmin(user.id, roomId))
+    )
+      throw new ForbiddenException('You are not Owner or Admin');
+    await this.userService.unmuteUser(participantId, roomId);
+    return res.status(HttpStatus.OK).send();
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('update-room-privacy/:roomId')

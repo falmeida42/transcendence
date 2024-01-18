@@ -107,9 +107,9 @@ model FriendRequest {
 }
 
 model MutedIn {
-  userId    String
-  channelId String
-  mutedAt   DateTime
+  userId         String
+  channelId      String
+  muteExpiration DateTime
 
   user    User     @relation(fields: [userId], references: [id])
   channel ChatRoom @relation(fields: [channelId], references: [id])

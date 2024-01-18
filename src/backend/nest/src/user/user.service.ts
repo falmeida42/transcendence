@@ -28,7 +28,9 @@ export class UserService {
 
   async getUserById(userId: string) {
     try {
-      return await this.prisma.user.findUnique({ where: { id: userId } });
+      return await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
     } catch (error) {
       this.logger.error(error);
       throw new Error(`Failed to return user with id ${userId}`);
@@ -806,21 +808,38 @@ export class UserService {
     });
   }
 
-  // async muteUser(id: string, roomId: string, duration: number) {
-  //   await this.getChatRoomById(roomId);
-  //   await this.getUserById(id);
+  async muteUser(id: string, roomId: string, duration: number) {
+    const muteExpiration = new Date();
+    muteExpiration.setMinutes(muteExpiration.getMinutes() + duration);
 
-  //   const muteExpiration = new Date();
-  //   muteExpiration.setMinutes(muteExpiration.getMinutes() + duration);
+    return await this.prisma.mutedIn.create({
+      data: {
+        channelId: roomId,
+        userId: id,
+        muteExpiration,
+      },
+    });
+  }
 
-  //   await this.prisma.roomMute.create({
-  //     data: {
-  //       chatRoomId: roomId,
-  //       userId: id,
-  //       muteExpiration,
-  //     },
-  //   });
-  // }
+  async isUserMutedInRoom(userId: string, roomId: string) {
+    const user = await this.prisma.mutedIn.findFirst({
+      where: {
+        userId,
+        channelId: roomId,
+      },
+    });
+    if (user && user.muteExpiration > new Date()) return true;
+    return false;
+  }
+
+  unmuteUser(participantId: string, roomId: string) {
+    return this.prisma.mutedIn.deleteMany({
+      where: {
+        userId: participantId,
+        channelId: roomId,
+      },
+    });
+  }
 
   async kickableUsers(user: User, roomId: string) {
     if (await this.isOwner(user.id, roomId)) {
