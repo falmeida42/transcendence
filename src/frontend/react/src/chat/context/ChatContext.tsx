@@ -47,6 +47,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     })
       .then(async (response) => {
         if (!response.ok) {
+          console.log("fatal errorrr")
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -63,6 +64,12 @@ function ChatProvider({ children }: ChatProviderProps) {
   };
 
   useEffect(() => {
+    tk = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+    if (tk === undefined) return;
+    
     if (channelSelected) {
       fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
         method: "GET",
@@ -100,6 +107,7 @@ function ChatProvider({ children }: ChatProviderProps) {
   }, [channelSelected]);
 
   useEffect(() => {
+    
     tk = document.cookie
       .split("; ")
       .find((row) => row.startsWith("token="))

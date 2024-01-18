@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useApi } from "../../../apiStore";
 import { test, tk, updateChatRooms } from "../../context/ChatContext";
+import { ProfileContext } from "../../../ProfileContext";
 
 interface CreateRoomPopupProps {
     isVisible: boolean;
@@ -15,10 +16,11 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
     const [inputPassword, setInputPassword] = useState("");
     const [inputPrivacy, setInputPrivacy] = useState<string>("");
     const [modal, setModal] = useState(1);
-    const {friends, login} = useApi();
+    const {login} = useApi();
     const [checkboxValues, setCheckboxValues] = useState<string[]>([login]);
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const [id] = useState(crypto.randomUUID().toString())
+    const { userFriends } = useContext(ProfileContext) ?? {}
 
     const toggleVisibility = (visibility: boolean) => {
         setIsVisibleWarning(visibility);
@@ -293,17 +295,17 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({ isVisible, handleClos
                             <ul
                             className="popup-input">
                                 { 
-                                    friends.map((friend : any) => (
+                                    userFriends.map((friend : any) => (
                                     <li>
                                         <label>
                                             <input 
                                             type="checkbox" 
                                             name="name" 
-                                            value={friend.login}
-                                            onChange={() => handleCheckboxChange(friend.login)}
+                                            value={friend.username}
+                                            onChange={() => handleCheckboxChange(friend.username)}
                                             />
-                                            <img src={friend.image}></img>
-                                                {friend.login}
+                                            <img src={friend.userImage}></img>
+                                                {friend.username}
                                         </label>
                                     </li>
                                     ))
