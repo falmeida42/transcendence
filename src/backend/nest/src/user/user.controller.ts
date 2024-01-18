@@ -51,11 +51,18 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('me')
-  async updateMe(@GetMe() user: User, @Body('userData') userData: UserDto) {
-    const updatedUser = await this.userService.updateUserById(
-      String(user.id),
-      userData,
-    );
+  async updateMe(
+    @GetMe('id') id: string,
+    @Body() userData: UserDto,
+    @Res() res: Response,
+  ) {
+    if (!userData) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Empty body' })
+        .send();
+    }
+    const updatedUser = await this.userService.updateUserById(id, userData);
     return updatedUser;
   }
 
@@ -258,7 +265,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('chatRooms')
   async getChatRooms(@GetMe('id') id: string) {
-    this.logger.debug("chat rooms get me id: ", id);
     const ChatRooms = await this.userService.getChatRooms(id);
 
     return ChatRooms;

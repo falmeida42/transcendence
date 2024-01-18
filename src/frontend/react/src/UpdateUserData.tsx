@@ -27,7 +27,7 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          
+
           body: JSON.stringify({
             username: props.username,
             image: props.image,
