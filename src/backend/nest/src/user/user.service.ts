@@ -12,7 +12,7 @@ import { UserDto } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   private readonly logger = new Logger('UserService');
 
@@ -51,7 +51,10 @@ export class UserService {
       }
     });
 
-    if (Object.keys(nonEmptyData).length === 0 || (Object.entries(nonEmptyData).toString().trim().length < 1)) {
+    if (
+      Object.keys(nonEmptyData).length === 0 ||
+      Object.entries(nonEmptyData).toString().trim().length < 1
+    ) {
       // If there are no non-empty values, return null or handle accordingly
       return null;
     }
@@ -60,10 +63,9 @@ export class UserService {
         where: { id: userId },
         data: nonEmptyData,
       });
-      if (user)
-        return user;
+      if (user) return user;
     } catch {
-      throw new ForbiddenException("Username not unique.");
+      throw new ForbiddenException('Username not unique.');
     }
   }
 
@@ -147,7 +149,7 @@ export class UserService {
     const list = await Promise.all(
       notFriends.map(async (notFriend) => {
         return (await this.isBlocked(userId, notFriend.id)) ? null : notFriend;
-      })
+      }),
     );
 
     const filteredList = list.filter((user) => user !== null);
@@ -225,25 +227,21 @@ export class UserService {
           },
         });
 
-     
         this.insertFriend(requesteeId, requesterId);
         this.insertFriend(requesterId, requesteeId);
-      
+
         // Create the chat room
         const chatRoom = await this.prisma.chatRoom.create({
           data: {
             id: crypto.randomUUID().toString(),
             name: requesterId + requesteeId,
-            image: "#",
-            type: "DIRECT_MESSAGE",
+            image: '#',
+            type: 'DIRECT_MESSAGE',
             owner: {
-              connect: { id: requesterId }
+              connect: { id: requesterId },
             },
             participants: {
-              connect: [
-                { id: requesterId },
-                { id: requesteeId },
-              ],
+              connect: [{ id: requesterId }, { id: requesteeId }],
             },
           },
         });
@@ -412,16 +410,16 @@ export class UserService {
         if (room.type === ('DIRECT_MESSAGE' as ChatType)) {
           //Find the other user in the direct message room
           const directUser = room.participants.find(
-            (user) => user.id !== userId
+            (user) => user.id !== userId,
           );
-          
+
           if (directUser) {
             return {
               ...room,
               name: directUser.login || 'User',
               image:
-              directUser.image ||
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiJuFZF4sFjZGf3JtXkRDHrtQXNjx3QSRI_NqN2pbWiCXddEPYQ89a0MH91XEp6IwICW8&usqp=CAU',
+                directUser.image ||
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiJuFZF4sFjZGf3JtXkRDHrtQXNjx3QSRI_NqN2pbWiCXddEPYQ89a0MH91XEp6IwICW8&usqp=CAU',
             };
           }
         }
@@ -480,9 +478,8 @@ export class UserService {
       where: { id: userId },
       include: {
         blockedUsers: true,
-      }
-    }
-    )
+      },
+    });
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -494,7 +491,6 @@ export class UserService {
               include: {
                 sender: true,
               },
-
             },
           },
         },
@@ -512,12 +508,10 @@ export class UserService {
       messages.map(async (message) => {
         this.logger.debug(message);
         return (await this.isBlocked(message.userId, userId)) ? null : message;
-      })
+      }),
     );
 
     const filteredList = list.filter((message) => message !== null);
-    this.logger.debug('list: ', list)
-    this.logger.debug('FILTERED list ', filteredList)
     return filteredList;
   }
 
@@ -782,7 +776,7 @@ export class UserService {
   }
 
   async banUser(id: string, roomId: string) {
-    await this.prisma.chatRoom.update({
+    const room = await this.prisma.chatRoom.update({
       where: { id: roomId },
       data: {
         participants: {
@@ -800,7 +794,7 @@ export class UserService {
       },
     });
 
-    await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { id },
       data: {
         bannedFrom: {
@@ -808,6 +802,8 @@ export class UserService {
         },
       },
     });
+
+    return room && user;
   }
 
   async kickableUsers(user: User, roomId: string) {
@@ -842,13 +838,15 @@ export class UserService {
   }
 
   async isBlocked(requesterId: string, requesteeId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: requesterId },
-      select: {
-        blockedBy: {
-          where: { id: requesteeId }
-        }
-      }
-    }).then((blocked) => blocked.blockedBy.length > 0)
+    return this.prisma.user
+      .findUnique({
+        where: { id: requesterId },
+        select: {
+          blockedBy: {
+            where: { id: requesteeId },
+          },
+        },
+      })
+      .then((blocked) => blocked.blockedBy.length > 0);
   }
 }
