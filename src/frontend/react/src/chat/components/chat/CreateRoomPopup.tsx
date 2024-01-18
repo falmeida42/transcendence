@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useApi } from "../../../apiStore";
 import { test } from "../../context/ChatContext";
 
@@ -17,13 +17,10 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
   const [inputPassword, setInputPassword] = useState("");
   const [inputPrivacy, setInputPrivacy] = useState<string>("");
   const [modal, setModal] = useState(1);
-  const { login } = useApi();
+  const { friends, login } = useApi();
   const [checkboxValues, setCheckboxValues] = useState<string[]>([login]);
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
   const [id] = useState(crypto.randomUUID().toString());
-  const [friends, setFriends] = useState([])
-
-
 
   const toggleVisibility = (visibility: boolean) => {
     setIsVisibleWarning(visibility);
@@ -143,14 +140,18 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
         toggleVisibility(true);
         return;
       }
-      const tk = document.cookie
+
+      const token = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("token="))
+        .find((row) => row.startsWith("token2fa="))
         ?.split("=")[1];
+
+      if (token === undefined) return;
+
       fetch(`http://localhost:3000/user/add-room`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${tk}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -165,7 +166,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
         }),
       })
         .then(
-          () => test()
+          () => test(id)
           // updateChatRooms
         )
         .catch();

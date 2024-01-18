@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import "./Profile.css";
+import { updateUserFriends } from "./ProfileContext";
 import { useApi } from "./apiStore";
 
 interface AddFriendPopupProps {
   isVisible: boolean;
   handleClose: () => void;
+  token: string;
 }
 
 interface User {
@@ -29,15 +31,11 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
   const { id, auth } = useApi();
 
   useEffect(() => {
-    const tk = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
     if (auth === false) return;
     fetch(`http://localhost:3000/user/not-friends`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${tk}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     })
@@ -50,7 +48,6 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
         return data ? JSON.parse(data) : null;
       })
       .then((data) => {
-        if (!data) return;
         const mappedUsers = data.map((user: any) => ({
           id: user.id,
           username: user.login,
@@ -59,8 +56,8 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
 
         setUsers([...mappedUsers]);
       })
-      .catch();
-  }, [auth]);
+      .catch((error) => console.error("Fetch error:", error));
+  }, [updateUserFriends]);
 
   const toggleVisibility = (visibility: boolean) => {
     setIsVisibleWarning(visibility);
@@ -82,14 +79,11 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
       toggleVisibility(true);
       return;
     }
-    const tk = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
+
     fetch(`http://localhost:3000/user/create-friend-request`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${tk}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

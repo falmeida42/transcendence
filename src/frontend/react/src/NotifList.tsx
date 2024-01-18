@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Notif from "./Notif";
 import { useApi } from "./apiStore";
 
@@ -11,21 +11,19 @@ interface FriendRequest {
   requestor_image: string;
 }
 
-let checkFriendRequests: () => void;
-
 const NotifList: React.FC<NotifListProps> = () => {
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const { setfriendreq, auth, setInfo, friendreq } = useApi();
 
   // console.log(token);
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("token="))
-    ?.split("=")[1];
-  if (token === undefined) return;
 
-  checkFriendRequests = () => {
-    console.log("Checking friend requests");
+  useEffect(() => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+    if (token === undefined) return;
+
     fetch(`http://localhost:3000/user/friend-requests`, {
       method: "GET",
       headers: {
@@ -53,15 +51,7 @@ const NotifList: React.FC<NotifListProps> = () => {
         setfriendreq(mappedRequests.length);
       })
       .catch((error) => console.error("Fetch error:", error));
-  };
-
-  //   useEffect(() => {
-  //     const token = document.cookie
-  //       .split("; ")
-  //       .find((row) => row.startsWith("token="))
-  //       ?.split("=")[1];
-  //     if (token === undefined) return;
-  //   }, [auth, setInfo, setfriendreq, friendreq]);
+  }, [auth, setInfo, setfriendreq, friendreq]);
 
   return (
     <div className="request-container">
@@ -78,7 +68,5 @@ const NotifList: React.FC<NotifListProps> = () => {
     </div>
   );
 };
-
-export { checkFriendRequests };
 
 export default NotifList;

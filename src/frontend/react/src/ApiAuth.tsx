@@ -8,8 +8,8 @@ interface UseAuthProps {
 
 const UseAuth = ({ code }: UseAuthProps) => {
   const [name, setName] = useState(code);
-  const [status, setStatus] = useState('SEND');
-  const {setauth, auth} = useApi();
+  const [status, setStatus] = useState("SEND");
+  const { setauth, auth } = useApi();
 
   const handleSendClick = async () => {
     try {
@@ -18,7 +18,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
         .split("; ")
         .find((row) => row.startsWith("token2fa="))
         ?.split("=")[1];
-      // console.log(token, "@");
+
       if (token === undefined) return;
 
       const UpResponse = await fetch(
@@ -35,23 +35,27 @@ const UseAuth = ({ code }: UseAuthProps) => {
       );
       if (!UpResponse.ok) {
         if (UpResponse.status === 401) {
-          navigate('/login');
+          navigate("/login");
         }
         setStatus("WRONG");
-        console.log('222');
-        navigate('/2fa');
+        console.log("222");
+        navigate("/2fa");
         return;
       }
-      document.cookie = `${'token2fa'}'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+      document.cookie = `${"token2fa"}'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
       setauth(true);
-      navigate('/');
+      navigate("/");
     } catch (error) {}
   };
 
   // useEffect(() => {},[auth]);
 
   return (
-    <div className="centered2-container"> <h2 style={{paddingBottom: `45px`, color: '#FFF'}}>Please insert your 2FA code.</h2>
+    <div className="centered2-container">
+      {" "}
+      <h2 style={{ paddingBottom: `45px`, color: "#FFF" }}>
+        Please insert your 2FA code.
+      </h2>
       <div className=".small-input.container">
         <input
           type="string"
@@ -63,7 +67,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
               handleSendClick();
             }
           }}
-          />
+        />
       </div>
       <div className="special-button" onClick={handleSendClick}>
         {status}
