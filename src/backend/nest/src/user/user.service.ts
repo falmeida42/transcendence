@@ -514,8 +514,6 @@ export class UserService {
     );
 
     const filteredList = list.filter((message) => message !== null);
-    // this.logger.debug('list: ', list);
-    // this.logger.debug('FILTERED list ', filteredList);
     return filteredList;
   }
 
@@ -548,7 +546,7 @@ export class UserService {
   async leaveRoom(login: string, roomId: string) {
     try {
       const updatedUser = await this.prisma.user.update({
-        where: { login: login },
+        where: { username: login },
         data: { chatRooms: { disconnect: { id: roomId } } },
       });
 
@@ -780,7 +778,7 @@ export class UserService {
   }
 
   async banUser(id: string, roomId: string) {
-    await this.prisma.chatRoom.update({
+    const room = await this.prisma.chatRoom.update({
       where: { id: roomId },
       data: {
         participants: {
@@ -798,7 +796,7 @@ export class UserService {
       },
     });
 
-    await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { id },
       data: {
         bannedFrom: {
@@ -806,6 +804,8 @@ export class UserService {
         },
       },
     });
+
+    return room && user;
   }
 
   async muteUser(id: string, roomId: string, duration: number) {
