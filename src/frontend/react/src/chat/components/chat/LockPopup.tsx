@@ -59,17 +59,53 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
     props.handleClose();
   };
 
-  const handleClickYes = () => {
-    if (inputPassword === "") {
-      toggleVisibility(true);
-      return;
-    }
-    const tk = document.cookie
+  const handleClickYes = (mode: string) => {
+    if (mode === "remove")
+    {
+      const tk = document.cookie
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
-    fetch(`http://localhost:3000/user/update-room-privacy/${props.channelId}`, {
-      method: "POST",
+      fetch(`http://localhost:3000/user/update-room-privacy/${props.channelId}`, {
+        method: "POST",
+        headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "PRIVATE",
+        password: "",
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+      })
+      .then((data) => {
+        if (data) {
+          console.log("Room updated", JSON.stringify(data));
+        } else {
+          console.log("No data received");
+        }
+      })
+      .then(updateChatRooms)
+      .catch((error) => console.error("Fetch error:", error));
+      
+      ////////////////////////////////// 
+    } else {
+      if (inputPassword === "") {
+        toggleVisibility(true);
+        return;
+      }
+      const tk = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1];
+        fetch(`http://localhost:3000/user/update-room-privacy/${props.channelId}`, {
+          method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,
         "Content-Type": "application/json",
@@ -95,11 +131,14 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
       })
       .then(updateChatRooms)
       .catch((error) => console.error("Fetch error:", error));
+      }
     props.handleClose();
-  };
+    };
+    
+    
 
-  const toggleVisibility = (visibility: boolean) => {
-    setIsVisibleWarning(visibility);
+    const toggleVisibility = (visibility: boolean) => {
+      setIsVisibleWarning(visibility);
   };
 
   const handleInputChangePassword = (
@@ -126,7 +165,7 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
               </div>
               <div>
                 <div className="modal-body">
-                  <p>Add a password to the chatroom:</p>
+                  <p>Change, add or remove the chatroom password:</p>
                   <input
                     className="password-input"
                     type="password"
@@ -147,9 +186,16 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
                   <button
                     type="button"
                     className="btn btn-clear"
-                    onClick={handleClickYes}
+                    onClick={() => handleClickYes("")}
                   >
                     Submit
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-clear"
+                    onClick={() => handleClickYes("remove")}
+                  >
+                    Remove pwd
                   </button>
                   <button
                     type="button"
