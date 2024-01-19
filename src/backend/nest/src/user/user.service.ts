@@ -28,7 +28,9 @@ export class UserService {
 
   async getUserById(userId: string) {
     try {
-      return await this.prisma.user.findUnique({ where: { id: userId } });
+      return await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
     } catch (error) {
       this.logger.error(error);
       throw new Error(`Failed to return user with id ${userId}`);
@@ -506,7 +508,7 @@ export class UserService {
 
     const list = await Promise.all(
       messages.map(async (message) => {
-        this.logger.debug(message);
+        // this.logger.debug(message);
         return (await this.isBlocked(message.userId, userId)) ? null : message;
       }),
     );
@@ -533,8 +535,8 @@ export class UserService {
         type: roomData.type,
         password: hashedPassword,
         participants: {
-          connect: roomData.participants.map((login: string) => ({
-            login: login,
+          connect: roomData.participants.map((username: string) => ({
+            username,
           })),
         },
       },
@@ -544,7 +546,7 @@ export class UserService {
   async leaveRoom(login: string, roomId: string) {
     try {
       const updatedUser = await this.prisma.user.update({
-        where: { login: login },
+        where: { username: login },
         data: { chatRooms: { disconnect: { id: roomId } } },
       });
 
@@ -605,7 +607,7 @@ export class UserService {
         return { success: false, message: 'Failed to join the chat room' };
       }
 
-            return {
+      return {
         success: true,
         message: 'User successfully joined the chat room',
       };
@@ -806,6 +808,39 @@ export class UserService {
     return room && user;
   }
 
+  async muteUser(id: string, roomId: string, duration: number) {
+    const muteExpiration = new Date();
+    muteExpiration.setMinutes(muteExpiration.getMinutes() + duration);
+
+    return await this.prisma.mutedIn.create({
+      data: {
+        channelId: roomId,
+        userId: id,
+        muteExpiration,
+      },
+    });
+  }
+
+  async isUserMutedInRoom(userId: string, roomId: string) {
+    const user = await this.prisma.mutedIn.findFirst({
+      where: {
+        userId,
+        channelId: roomId,
+      },
+    });
+    if (user && user.muteExpiration > new Date()) return true;
+    return false;
+  }
+
+  unmuteUser(participantId: string, roomId: string) {
+    return this.prisma.mutedIn.deleteMany({
+      where: {
+        userId: participantId,
+        channelId: roomId,
+      },
+    });
+  }
+
   async kickableUsers(user: User, roomId: string) {
     if (await this.isOwner(user.id, roomId)) {
       const room = await this.prisma.chatRoom.findUnique({
@@ -827,14 +862,15 @@ export class UserService {
   }
 
   async isBanned(username: string, roomId: string) {
-    return this.prisma.chatRoom
+    const bannedUsers = await this.prisma.chatRoom
       .findUnique({
         where: { id: roomId },
       })
       .bannedUsers({
         where: { username },
-      })
-      .then((bannedUsers) => bannedUsers.length > 0);
+      });
+    if (bannedUsers.length > 0) return true;
+    else return false;
   }
 
   async isBlocked(requesterId: string, requesteeId: string) {

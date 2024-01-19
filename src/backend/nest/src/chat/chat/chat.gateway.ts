@@ -86,7 +86,7 @@ export class ChatGateway
 
   @SubscribeMessage('joinAllRooms')
   async joinAllRooms(client: Socket, payload: any): Promise<void> {
-    this.logger.debug('payload: ', JSON.stringify(payload));
+    // this.logger.debug("payload: ", JSON.stringify(payload))
     const user = await this.userService.getChatRoomsByLogin(payload.username);
     if (user) {
       user.chatRooms.forEach((room) => {
@@ -97,7 +97,7 @@ export class ChatGateway
 
   @SubscribeMessage('messageToServer')
   async handleMessage(client: Socket, payload: any) {
-    this.logger.debug('sending message: ', JSON.stringify(payload));
+    // this.logger.debug("sending message: ", JSON.stringify(payload))
     const user = await this.userService.getUserByLogin(payload.sender);
     if (!user) {
       return 'user not found';
@@ -109,6 +109,14 @@ export class ChatGateway
       return 'channel not found';
     }
 
+    const is_muted = await this.userService.isUserMutedInRoom(
+      user.id,
+      payload.to,
+    );
+
+    if (is_muted) {
+      return 'user is muted';
+    }
     await this.userService.addMessage(user.id, channel.id, payload.message);
     this.io.to(payload.to).emit('messageToClient', {
       id: crypto.randomUUID(),

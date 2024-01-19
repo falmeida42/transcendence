@@ -5,6 +5,7 @@ interface User {
   id: string;
   image: string;
   username: string;
+  login: string;
 }
 
 interface Match {
@@ -15,6 +16,10 @@ interface Match {
   playerLosScore: number;
   createdAt: Date;
 }
+
+const handleNavigate = (friendId: string) => {
+  navigate(`/Profile/${friendId}`);
+};
 
 interface props {
   id: string;
@@ -77,11 +82,18 @@ const MatchHistory = ({ id }: props) => {
           {matchHistory.map((match: Match) => (
             <li key={match.id}>
               <span>
-                <img
-                  src={match.winner.image}
-                  className="img-responsive"
-                  alt="#"
-                ></img>
+                <a
+                  onClick={() => {
+                    handleNavigate(match.winner.login);
+                  }}
+                >
+                  <img
+                    src={match.winner.image}
+                    className="img-responsive"
+                    title={`See the ${match.winner.login} profile`}
+                    alt="#"
+                  ></img>
+                </a>
               </span>
               <span>
                 {match.winner.id === id ? (

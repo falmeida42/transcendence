@@ -44,20 +44,9 @@ const RealPong = (props: props) => {
         </button>
       )}
       {status === "PLAY" && (
-        <div>
-          <button className="pauseButton" onClick={() => pauseGame()}>
-            Pause
-          </button>
-          <button
-            className="pauseButton"
-            onClick={() => {
-              clearRoom();
-              props.setPage(3);
-            }}
-          >
-            Leave
-          </button>
-        </div>
+        <button className="pauseButton" onClick={() => pauseGame()}>
+          Pause
+        </button>
       )}
       {status === "PAUSE" && (
         <button className="pauseButton" onClick={() => gameLoaded()}>
@@ -112,7 +101,6 @@ const RealPong = (props: props) => {
         <Rect
           x={"0"}
           y={"0"}
-          STOP
           width={gameConfig.width.toString()}
           height={gameConfig.height.toString()}
           style={{ fill: "url(#image)" }}

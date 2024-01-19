@@ -113,4 +113,12 @@ export class AuthService {
       secret: this.config.get('JWT_2FA_SECRET'),
     });
   }
+
+  // #TODO take This off on the final version
+  generateToken(user: any) {
+    const payload = { sub: user.id };
+    return this.jwtService.sign(payload, {
+      secret: this.config.get('JWT_SECRET'),
+    });
+  }
 }

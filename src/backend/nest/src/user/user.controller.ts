@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpStatus,
   Logger,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -16,12 +19,12 @@ import { User } from '@prisma/client';
 import { Response } from 'express';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
 import { GetMe } from 'src/decorators';
+import { InputStringValidationPipe } from 'src/pipes';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guard';
 import * as bcrypt from '../utils';
-import { UserService } from './user.service';
 import { UserDto } from './dto';
-import { InputStringValidationPipe } from 'src/pipes';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -328,7 +331,6 @@ export class UserController {
     }
   }
 
-
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
@@ -365,7 +367,6 @@ export class UserController {
     }
   }
 
-
   @UseGuards(JwtAuthGuard)
   @Post('leave-room')
   async leaveRoom(
@@ -384,13 +385,13 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      this.logger.debug('adding room', login);
+      // this.logger.debug('adding room', login);
       await this.userService.addAdminToChat(login, chatId, userId);
       return res
         .status(HttpStatus.OK)
         .json({ message: 'User added as admin successfully' });
     } catch (error) {
-      this.logger.debug('Error received from add admin', error);
+      // this.logger.debug('Error received from add admin', error);
       return res
         .status(HttpStatus.FORBIDDEN)
         .json({ message: error.message })
@@ -496,6 +497,91 @@ export class UserController {
       this.logger.error(error);
       res.status(error.status).json({ message: error.message }).send();
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('mute-user')
+  async muteUser(
+    @GetMe() user: User,
+    @Body('participantId') participantId: string,
+    @Body('roomId') roomId: string,
+    @Body('duration', ParseIntPipe) duration: number,
+    @Res() res: Response,
+  ) {
+    if (duration < 1) {
+      throw new BadRequestException('Mute duration must be greater than 0');
+    }
+
+    if (!roomId || !participantId) {
+      throw new BadRequestException('Missing roomId or userId');
+    }
+
+    const test = await this.userService.getUserById(participantId);
+    if (!test) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (
+      (await this.userService.isOwner(participantId, roomId)) ||
+      (!(await this.userService.isOwner(user.id, roomId)) &&
+        !(await this.userService.isAdmin(user.id, roomId)))
+    )
+      throw new ForbiddenException('You are not Owner or Admin');
+    if (
+      (await this.userService.isAdmin(user.id, roomId)) &&
+      (await this.userService.isAdmin(participantId, roomId))
+    )
+      throw new ForbiddenException("You can't mute this user");
+    const userAlreadyMuted = await this.prisma.mutedIn.findFirst({
+      where: {
+        userId: participantId,
+        channelId: roomId,
+      },
+    });
+
+    if (userAlreadyMuted) {
+      throw new ForbiddenException('User already muted');
+    }
+    await this.userService.muteUser(participantId, roomId, duration);
+    return res.status(HttpStatus.OK).send();
+  }
+
+  @Get('check-mute/:userId/:roomId')
+  async checkUserMute(
+    @Param('userId') userId: string,
+    @Param('roomId') roomId: string,
+  ) {
+    const isMuted = await this.userService.isUserMutedInRoom(userId, roomId);
+    if (!isMuted) {
+      await this.userService.unmuteUser(userId, roomId);
+    }
+    return isMuted;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('unmute-user')
+  async unmuteUser(
+    @GetMe() user: User,
+    @Body('participantId') participantId: string,
+    @Body('roomId') roomId: string,
+    @Res() res: Response,
+  ) {
+    if (!roomId || !participantId) {
+      throw new BadRequestException('Missing roomId or userId');
+    }
+
+    const test = await this.userService.getUserById(participantId);
+    if (!test) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (
+      !(await this.userService.isOwner(user.id, roomId)) &&
+      !(await this.userService.isAdmin(user.id, roomId))
+    )
+      throw new ForbiddenException('You are not Owner or Admin');
+    await this.userService.unmuteUser(participantId, roomId);
+    return res.status(HttpStatus.OK).send();
   }
 
   @UseGuards(JwtAuthGuard)

@@ -18,13 +18,11 @@ interface ChatProviderProps {
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
-export let tk: string | undefined;
-
 let updateChatRooms: () => void;
 
 let socketInstance: Socket<DefaultEventsMap, DefaultEventsMap>;
 
-let test: (id: string) => void;
+let test: () => void;
 
 function ChatProvider({ children }: ChatProviderProps) {
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
@@ -36,8 +34,10 @@ function ChatProvider({ children }: ChatProviderProps) {
   const { login } = useApi();
 
   updateChatRooms = () => {
-    console.log("entrei");
-
+    const tk = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
     fetch(`http://localhost:3000/user/chatRooms`, {
       method: "GET",
       headers: {
@@ -47,7 +47,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     })
       .then(async (response) => {
         if (!response.ok) {
-          console.log("fatal errorrr")
+          // console.log("fatal errorrr");
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -57,19 +57,17 @@ function ChatProvider({ children }: ChatProviderProps) {
         if (data) {
           setChatRooms(data);
         } else {
-          console.log("No data received teste");
+          console.log("No data received");
         }
       })
       .catch((error) => console.error("Fetch error:", error));
   };
 
   useEffect(() => {
-    tk = document.cookie
+    const tk = document.cookie
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
-    if (tk === undefined) return;
-    
     if (channelSelected) {
       fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
         method: "GET",
@@ -107,13 +105,6 @@ function ChatProvider({ children }: ChatProviderProps) {
   }, [channelSelected]);
 
   useEffect(() => {
-    
-    tk = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
-    if (tk === undefined) return;
-
     socketInstance = io("http://localhost:3000/chat", {
       withCredentials: true,
     }).connect();
@@ -137,7 +128,7 @@ function ChatProvider({ children }: ChatProviderProps) {
     setSocket(socketInstance);
 
     socketInstance.on("messageToClient", (payload) => {
-      console.log("MESSAGE TO CLIENT: ", JSON.stringify(payload));
+      // console.log("MESSAGE TO CLIENT: ", JSON.stringify(payload));
 
       setChannelMessages((prevChannelMessages: any) => {
         const channelId = payload.channelId;
