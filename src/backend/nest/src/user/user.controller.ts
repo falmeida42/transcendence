@@ -314,6 +314,7 @@ export class UserController {
     }
   }
 
+
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
@@ -321,18 +322,35 @@ export class UserController {
     @Body('roomId') roomId: string,
     @Body('password') password: string,
     @Body('roomType') roomType: string,
-    // @Res() res: Response,
+    @Res() res: Response,
+    @Req() req: Request,
   ) {
-    // if (await this.userService.isBanned(username, roomId)) {
-    //   return res.status(HttpStatus.FORBIDDEN).send();
-    // }
-    return await this.userService.joinRoom(
+    console.log('received token:', req.headers['authorization']);
+
+    if (await this.userService.isBanned(username, roomId)) {
+      return res.status(HttpStatus.FORBIDDEN).send();
+    }
+
+    const joinResponse = await this.userService.joinInRoom(
       username,
       roomId,
       password,
       roomType,
     );
+
+    if (joinResponse.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: joinResponse.message,
+      });
+    } else {
+      return res.status(HttpStatus.OK).json({
+        success: false,
+        message: joinResponse.message,
+      });
+    }
   }
+
 
   @UseGuards(JwtAuthGuard)
   @Post('leave-room')

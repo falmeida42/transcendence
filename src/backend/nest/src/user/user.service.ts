@@ -581,7 +581,7 @@ export class UserService {
     }
   }
 
-  async joinRoom(
+  async joinInRoom(
     login: string,
     roomId: string,
     password: string,
