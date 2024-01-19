@@ -580,7 +580,7 @@ export class UserController {
   @Post('update-room-privacy/:roomId')
   async updateRoomPrivacy(
     @Body('type') type: any,
-    @Body('password', InputStringValidationPipe) password: string,
+    @Body('password') password: string,
     @Param('roomId', InputStringValidationPipe) roomId: string,
   ) {
     if (type && password) {
@@ -590,6 +590,10 @@ export class UserController {
         type,
         hashedPassword,
       );
+    }
+    else
+    {
+      await this.userService.updateChatRoomPrivacy(roomId, type, "");
     }
   }
 }
