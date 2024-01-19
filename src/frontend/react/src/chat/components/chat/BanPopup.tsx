@@ -133,7 +133,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
                     <p>Select a user to kick out of the chatroom:</p>
                     <ul className="popup-input">
                       {chatData?.map((data: Participant) => (
-                        <li>
+                        <li key={data.id}>
                           <label>
                             <input
                               type="radio"

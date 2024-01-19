@@ -103,7 +103,7 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
                     {chatData?.participants.map(
                       (data) =>
                         login !== data.login && (
-                          <li>
+                          <li key={data.id}>
                             <label>
                               <input
                                 type="radio"

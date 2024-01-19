@@ -57,6 +57,9 @@ const LeaveChannelPopUp: React.FC<LeaveChannelProps> = (
             status: 0,
           });
         }
+      })
+      .catch(() => {
+        console.log("cu");
       });
 
     props.handleClose();

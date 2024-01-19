@@ -348,7 +348,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
                     <p>Please select at least another participant:</p>
                     <ul className="popup-input">
                       {userFriends.map((friend: any) => (
-                        <li>
+                        <li key={friend.username}>
                           <label>
                             <input
                               type="checkbox"

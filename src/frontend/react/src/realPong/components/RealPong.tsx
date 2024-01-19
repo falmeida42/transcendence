@@ -101,7 +101,6 @@ const RealPong = (props: props) => {
         <Rect
           x={"0"}
           y={"0"}
-          STOP
           width={gameConfig.width.toString()}
           height={gameConfig.height.toString()}
           style={{ fill: "url(#image)" }}

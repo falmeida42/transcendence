@@ -19,12 +19,12 @@ import { User } from '@prisma/client';
 import { Response } from 'express';
 import { TwoFAGuard } from 'src/auth/guard/2FA.guard';
 import { GetMe } from 'src/decorators';
+import { InputStringValidationPipe } from 'src/pipes';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guard';
 import * as bcrypt from '../utils';
-import { UserService } from './user.service';
 import { UserDto } from './dto';
-import { InputStringValidationPipe } from 'src/pipes';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -315,7 +315,6 @@ export class UserController {
     @Body('roomdata') roomdata: any,
   ): Promise<any> {
     if (roomdata) {
-      this.logger.debug(JSON.stringify(roomdata));
       roomdata.type = roomdata.type.toUpperCase();
       await this.userService.createRoom(id, roomdata);
     }
@@ -331,7 +330,6 @@ export class UserController {
       return { error: error, message: 'Could not get joinable rooms' };
     }
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
@@ -368,7 +366,6 @@ export class UserController {
       });
     }
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Post('leave-room')
@@ -555,6 +552,9 @@ export class UserController {
     @Param('roomId') roomId: string,
   ) {
     const isMuted = await this.userService.isUserMutedInRoom(userId, roomId);
+    if (!isMuted) {
+      await this.userService.unmuteUser(userId, roomId);
+    }
     return isMuted;
   }
 

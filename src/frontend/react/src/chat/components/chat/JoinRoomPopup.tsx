@@ -107,7 +107,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       }),
     })
       .then(async (response) => {
-        console.log("some response received: ", response)
+        console.log("some response received: ", response);
         if (!response.ok) {
           if (response.status == 403) {
             setWarningText("You were banned from this channel");
@@ -127,7 +127,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
             toggleVisibility(true);
             setInputPassword("");
           } else if (data.success === true) {
-            console.log("sucess handle close")
+            console.log("sucess handle close");
             handleClose();
           }
         } else {

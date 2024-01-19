@@ -109,6 +109,14 @@ export class ChatGateway
       return 'channel not found';
     }
 
+    const is_muted = await this.userService.isUserMutedInRoom(
+      user.id,
+      payload.to,
+    );
+
+    if (is_muted) {
+      return 'user is muted';
+    }
     await this.userService.addMessage(user.id, channel.id, payload.message);
     this.io.to(payload.to).emit('messageToClient', {
       id: crypto.randomUUID(),

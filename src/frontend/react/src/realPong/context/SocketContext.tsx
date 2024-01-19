@@ -126,7 +126,7 @@ const SocketProvider = (props: any) => {
 
 // Helper Functions
 const createRoom = (againstAi: boolean) => {
-  socket.emit("CreateRoom", { againstAi });
+  socket.emit("CreateRoomAgainstAi", { againstAi });
 };
 
 const gameLoaded = () => {
@@ -153,6 +153,10 @@ const joinRoomSpec = (roomId: string) => {
   socket.emit("JoinRoomSpec", { roomId });
 };
 
+const leaveRoom = () => {
+  socket.emit("LeaveRoom");
+};
+
 export {
   SocketContext,
   SocketProvider,
@@ -162,6 +166,7 @@ export {
   joinQueue,
   joinRoomSpec,
   leaveQueue,
+  leaveRoom,
   pauseGame,
   sendKey,
   set_name,

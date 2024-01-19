@@ -131,27 +131,27 @@ const FriendProfile = ({ login }: props) => {
         </nav>
         <div className="tab-content" id="nav-tabContent">
           <MatchHistory id={id} />
-          <div
-            className="tab-pane fade"
-            id="project_worked"
-            role="tabpanel"
-            aria-labelledby="nav-home-tab"
-          >
-            <div className="msg_list_main">
-              <ul className="msg_list">
+          {/* <div
+            // className="tab-pane fade"
+            // id="project_worked"
+            // role="tabpanel"
+            // aria-labelledby="nav-home-tab"
+    // > */}
+          {/* <div className="msg_list_main"> 
+              {/* <ul className="msg_list">
                 {/* {
-										userFriends.map((friend: User) => (
-											<li>
-												<span><img src={friend.userImage} className="img-responsive" alt="#"></img></span>
-												<span>
-													<span className="name_user">{friend.username}</span>
-												</span>
-											</li>
-										))
-									} */}
-              </ul>
-            </div>
-          </div>
+										// userFriends.map((friend: User) => (
+											// <li>
+												// <span><img src={friend.userImage} className="img-responsive" alt="#"></img></span>
+												// <span>
+													// <span className="name_user">{friend.username}</span>
+												// </span>
+											// </li>
+										// ))
+									 } */}
+          {/* </ul> */}
+          {/* </div> */}
+          {/* </div>  */}
         </div>
       </div>
     </div>

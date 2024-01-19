@@ -5,13 +5,14 @@ import {
   createRoom,
   joinQueue,
   leaveQueue,
+  leaveRoom,
   set_name,
 } from "../context/SocketContext";
 import "../game.css";
 import RealPong from "./RealPong";
 
 const Home = () => {
-  const { isConnected, room, username, onQueue, rooms } =
+  const { isConnected, room, username, onQueue, rooms, match } =
     useContext(SocketContext);
   const [page, setPage] = useState<number>(0);
   const [name, setName] = useState<string>("");
@@ -38,10 +39,16 @@ const Home = () => {
         setPage(3);
         return;
       }
+
+      if (!match) {
+        setPage(4);
+        return;
+      }
+
       setPage(5);
     };
     changePage();
-  }, [isConnected, room, username, onQueue, rooms, user]);
+  }, [isConnected, room, username, onQueue, rooms, user, match]);
 
   if (page === 0) {
     return (
@@ -92,7 +99,19 @@ const Home = () => {
         <div className="game-buttons">
           <button onClick={() => createRoom(true)}>Play against AI</button>
           <button onClick={() => joinQueue()}>Play a random</button>
+          <button onClick={() => createRoom(false)}>
+            Play against a friend
+          </button>
         </div>
+      </div>
+    );
+  }
+
+  if (page === 4) {
+    return (
+      <div className="home">
+        <button onClick={() => leaveRoom()}>Leave Room</button>
+        <h1 style={{ color: "#FFF" }}>Wating for the friend to join...</h1>
       </div>
     );
   }
