@@ -56,17 +56,9 @@ export class UserController {
   @Post('me')
   async updateMe(
     @GetMe('id') id: string,
-    @Body() userData: UserDto,
-    @Res() res: Response,
+    @Body() userData: any,
   ) {
-    if (!userData) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ message: 'Empty body' })
-        .send();
-    }
-    const updatedUser = await this.userService.updateUserById(id, userData);
-    return updatedUser;
+    return await this.userService.updateUserById(id, userData);
   }
 
   @UseGuards(TwoFAGuard)
