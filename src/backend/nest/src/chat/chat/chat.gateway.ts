@@ -1,6 +1,6 @@
 // chat.gateway.ts
 
-import { Logger } from '@nestjs/common';
+import { Body, Logger } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayConnection,
@@ -85,13 +85,37 @@ export class ChatGateway
   }
 
   @SubscribeMessage('joinAllRooms')
-  async joinAllRooms(client: Socket, payload: any): Promise<void> {
+  async joinAllRooms(
+    client: Socket,
+    @Body('username') username?: string,
+  ): Promise<void> {
     // this.logger.debug("payload: ", JSON.stringify(payload))
-    const user = await this.userService.getChatRoomsByLogin(payload.username);
+    const user = await this.userService.getChatRoomsByLogin(username);
     if (user) {
       user.chatRooms.forEach((room) => {
         client.join(room.id);
       });
+    }
+  }
+
+  @SubscribeMessage('kickFromRoom')
+  async kickFromRoom(
+    client: Socket,
+    @Body('id') id?: string,
+    @Body('roomId') roomId?: string,
+  ): Promise<void> {
+    const userKicked = await this.userService.getUserById(id);
+    if (!userKicked) {
+      return;
+    }
+    const existingUserIndex = this.users.findIndex(
+      (user) => user.id === userKicked.id,
+    );
+
+    if (existingUserIndex !== -1) {
+      this.users[existingUserIndex].emit('closeRoom');
+      this.users[existingUserIndex].leave(roomId);
+      this.io.emit('UpdateRooms');
     }
   }
 

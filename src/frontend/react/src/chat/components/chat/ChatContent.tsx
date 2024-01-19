@@ -122,7 +122,7 @@ const ChatContent = (props: ChatContentProps) => {
 
     fetchData();
     // console.log("IsOwner: ", userIsOwner, "IsAdmin: ", userIsAdmin);
-  }, [props.selectedChatData.id]);
+  }, [id, props.selectedChatData.id]);
 
   return (
     <div id="chat" className="chat">

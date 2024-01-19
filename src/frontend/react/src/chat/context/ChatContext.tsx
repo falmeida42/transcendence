@@ -10,6 +10,8 @@ interface ChatContextProps {
   usersOnline: any;
   setChannelSelected: React.Dispatch<React.SetStateAction<string>>;
   channelMessagesSelected: MessageData[];
+  closeWindow: boolean;
+  setCloseWindow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface ChatProviderProps {
@@ -22,7 +24,8 @@ let updateChatRooms: () => void;
 
 let socketInstance: Socket<DefaultEventsMap, DefaultEventsMap>;
 
-let test: () => void;
+let test: (id?: string) => void;
+let kick: (usernameId: string, roomId: string) => void;
 
 function ChatProvider({ children }: ChatProviderProps) {
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
@@ -30,6 +33,7 @@ function ChatProvider({ children }: ChatProviderProps) {
   const [usersOnline, setUsersOnline] = useState([]);
   const [channelSelected, setChannelSelected] = useState("");
   const [channelMessages, setChannelMessages] = useState([]);
+  const [closeWindow, setCloseWindow] = useState(false);
 
   const { login } = useApi();
 
@@ -163,10 +167,19 @@ function ChatProvider({ children }: ChatProviderProps) {
       });
     });
 
-    test = () => {
+    socketInstance.on("closeRoom", () => {
+      setCloseWindow(true);
+    });
+
+    test = (id?: string) => {
       socketInstance.emit("AddChannel");
       socketInstance.emit("joinAllRooms", { username: login });
     };
+
+    kick = (usernameId: string, roomId: string) => {
+      socketInstance.emit("kickFromRoom", { id: usernameId, roomId: roomId });
+    };
+
     return () => {
       socketInstance.disconnect();
     };
@@ -178,6 +191,8 @@ function ChatProvider({ children }: ChatProviderProps) {
     usersOnline: usersOnline,
     setChannelSelected: setChannelSelected,
     channelMessagesSelected: channelMessages[channelSelected] ?? [],
+    closeWindow: closeWindow,
+    setCloseWindow: setCloseWindow,
   };
 
   return (
@@ -185,4 +200,4 @@ function ChatProvider({ children }: ChatProviderProps) {
   );
 }
 
-export { ChatContext, ChatProvider, test, updateChatRooms };
+export { ChatContext, ChatProvider, kick, test, updateChatRooms };
