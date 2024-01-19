@@ -100,7 +100,7 @@ export class AuthService {
   async is2FAActive(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new ForbiddenException('User is not in database. id: ', id);
+      return false;
     }
     return user.twoFactorAuthEnabled;
   }
