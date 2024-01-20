@@ -319,6 +319,36 @@ export class UserService {
           },
         },
       });
+
+      const toRemove = await this.prisma.chatRoom.findFirst({
+        where: {
+          AND: [
+            { type: 'DIRECT_MESSAGE' },
+            {
+              participants: {
+                some: { id: id },
+              },
+            },
+            {
+              participants: {
+                some: { id: blockedId },
+              },
+            },
+          ],
+        },
+      });
+
+      this.logger.debug('Removed DM: ', toRemove);
+
+      await this.prisma.message.deleteMany({
+        where: { chat_id: toRemove.id },
+      });
+
+      await this.prisma.chatRoom.delete({
+        where: {
+          id: toRemove.id,
+        },
+      });
     } catch (error) {
       throw new Error('Error blocking user');
     }
