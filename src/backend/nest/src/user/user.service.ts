@@ -632,11 +632,24 @@ export class UserService {
         },
       },
     });
+    const privateRooms = await this.prisma.chatRoom.findMany({
+      where: {
+        type: 'PRIVATE',
+        participants: {
+          none: {
+            id: userId,
+          },
+        },
+      },
+    });
+    const filteredRooms = rooms.filter((room) => {
+      return !privateRooms.some((privates) => privates.id === room.id);
+    });
     if (!rooms) {
       this.logger.error('No rooms for user id: ', userId);
       throw new NotFoundException('Could not get joinable rooms');
     }
-    return rooms;
+    return filteredRooms;
   }
 
   async addMessage(userId: string, chatId: string, content: string) {

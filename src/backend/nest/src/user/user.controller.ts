@@ -370,13 +370,11 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      // this.logger.debug('adding room', login);
       await this.userService.addAdminToChat(login, chatId, userId);
       return res
         .status(HttpStatus.OK)
         .json({ message: 'User added as admin successfully' });
     } catch (error) {
-      // this.logger.debug('Error received from add admin', error);
       return res
         .status(HttpStatus.FORBIDDEN)
         .json({ message: error.message })
@@ -461,8 +459,13 @@ export class UserController {
   ) {
     try {
       if (await this.userService.isOwner(user.id, roomId)) {
-        await this.userService.banUser(participantId, roomId);
-        return res.status(HttpStatus.OK).send();
+        if (await this.userService.banUser(participantId, roomId)) {
+          return res.status(HttpStatus.OK).send();
+        }
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'Failed to update' })
+          .send();
       } else if (await this.userService.isAdmin(user.id, roomId)) {
         if (
           (await this.userService.isOwner(participantId, roomId)) ||
