@@ -95,15 +95,17 @@ export class AuthController {
         // generate 2FA secret
         const secret = this.authService.generate2FASecret();
         // update user data
-        await this.userService.set2FASecret(String(user.id), secret);
+        await this.userService.set2FASecret(user.id, secret);
       } catch (error) {
         console.error(error);
         return res.status(HttpStatus.NOT_IMPLEMENTED).send(error);
       }
     }
 
+    const User2 = await this.userService.getUserById(user.id);
     // generate key uri
-    const otpAuthURL = await this.authService.generate2FAKeyURI(user);
+    this.logger.debug(user);
+    const otpAuthURL = await this.authService.generate2FAKeyURI(User2);
 
     // generate QR code
     return res.json(await this.authService.generateQrCodeURL(otpAuthURL));

@@ -23,18 +23,10 @@ function Profile() {
     user,
     first_name,
     last_name,
-    login,
     email,
     image,
-    twofa,
-    auth,
     failToUpdate,
-    setUsername,
-    setImage,
   } = useApi();
-  //   const {isLoading, serverError, apiData} = getHookers(`/user/matches/${id}`)
-
-  // console.log(isLoading);
 
   /////////////// Username update /////////////////
 
@@ -43,21 +35,32 @@ function Profile() {
   const [finalText, setfinalText] = useState<string | undefined>(undefined);
   const [finalImage, setfinalImage] = useState<string | undefined>(undefined);
 
+  const checkCookie = () => {
+    const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    ?.split('=')[1];
+    if (token === undefined) handleNavigate('00000000');
+    return;
+  }
+
   const handleEditClick = () => {
+    checkCookie();
     setIsEditing(true);
   };
 
   const handleSubmitClick = () => {
+    checkCookie();
     if (textValue) {
       setfinalText(textValue);
       if (!failToUpdate) {
-        // setUsername(textValue);
         setIsEditing(false);
       }
     }
   };
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    checkCookie();
     setTextValue(event.target.value);
   };
 
@@ -67,10 +70,12 @@ function Profile() {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(image);
 
   const handleEditClickImage = () => {
+    checkCookie();
     setIsEditingImage(true);
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    checkCookie();
     const file = event.target.files && event.target.files[0];
 
     if (file) {
@@ -83,12 +88,12 @@ function Profile() {
   };
 
   const handleSubmitClickImage = () => {
+    checkCookie();
     if (selectedImage) {
       setfinalImage(selectedImage);
       if (!failToUpdate) {
         setIsEditingImage(false);
       }
-      // setImage(selectedImage);}
     }
   };
 
@@ -99,11 +104,12 @@ function Profile() {
   };
 
   const { userFriends } = useContext(ProfileContext) ?? {};
-  const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
   const [isVisible2FA, setIsVisible2FA] = useState(false);
   const [isVisibleBlock, setIsVisibleBlock] = useState(false);
+  const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 
   const handleClickAddFriend = () => {
+    checkCookie();
     if (isVisible2FA) {
       setIsVisible2FA(!isVisible2FA);
     }
@@ -114,6 +120,7 @@ function Profile() {
   };
 
   const handleClick2FA = () => {
+    checkCookie();
     if (isVisibleBlock) {
       setIsVisibleBlock(!isVisibleBlock);
     }
@@ -124,6 +131,7 @@ function Profile() {
   };
 
   const handleClickBlock = () => {
+    checkCookie();
     if (isVisibleAddFriend) {
       setIsVisibleAddFriend(!isVisibleAddFriend);
     }
@@ -133,28 +141,19 @@ function Profile() {
     setIsVisibleBlock(!isVisibleBlock);
   };
 
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("token="))
-    ?.split("=")[1];
-  if (token === undefined) return;
-
   return (
     <div className="container-fluid profile_container">
       <AddFriendPopup
         isVisible={isVisibleAddFriend}
         handleClose={handleClickAddFriend}
-        token={token}
       />
       <TwoFaPopup
         isVisible={isVisible2FA}
         handleClose={handleClick2FA}
-        token={token}
       />
       <BlockPopup
         isVisible={isVisibleBlock}
         handleClose={handleClickBlock}
-        token={token}
       />
       <div className="profile_contant flex-item">
         <div className="form-group">

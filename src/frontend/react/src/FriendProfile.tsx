@@ -3,6 +3,7 @@ import { navigate } from "wouter/use-location";
 import MatchHistory from "./MatchHistory";
 import "./Profile.css";
 import ScoreBar from "./ScoreBar";
+import Friendfriend from "./FriendFriend";
 
 // interface User {
 // 	id: string,
@@ -126,7 +127,7 @@ const FriendProfile = ({ login }: props) => {
             >
               Match History
             </a>
-            {/* <a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a> */}
+            <a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a>
           </div>
         </nav>
         <div className="tab-content" id="nav-tabContent">
@@ -137,20 +138,7 @@ const FriendProfile = ({ login }: props) => {
             role="tabpanel"
             aria-labelledby="nav-home-tab"
           >
-            <div className="msg_list_main">
-              <ul className="msg_list">
-                {/* {
-										userFriends.map((friend: User) => (
-											<li>
-												<span><img src={friend.userImage} className="img-responsive" alt="#"></img></span>
-												<span>
-													<span className="name_user">{friend.username}</span>
-												</span>
-											</li>
-										))
-									} */}
-              </ul>
-            </div>
+            <Friendfriend id={id}/>
           </div>
         </div>
       </div>
