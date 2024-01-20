@@ -119,7 +119,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Kick User</h5>
+                <h5 className="modal-title">Ban User</h5>
                 <button
                   type="button"
                   className="close"
@@ -128,10 +128,10 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
                   <span>&times;</span>
                 </button>
               </div>
-              {!kickError && (
+              {!kickError && chatData?.length !== 0 && (
                 <div>
                   <div className="modal-body">
-                    <p>Select a user to kick out of the chatroom:</p>
+                    <p>Select a user to ban permanently from the chatroom:</p>
                     <ul className="popup-input">
                       {chatData?.map((data: Participant) => (
                         <li key={data.id}>
@@ -169,6 +169,11 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
                     </button>
                   </div>
                 </div>
+              )}
+              {chatData?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible participants to ban
+                </p>
               )}
             </div>
           </div>

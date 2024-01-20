@@ -32,10 +32,7 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
   };
 
   const handleClickYes = async () => {
-    // console.log("handle yes: ", userToInvite);
-    // console.log("handle yes: ", props.channelId);
-    // console.log("handle yes: ", userToInvite.id);
-    // console.log("handle yes: ", userToInvite.login);
+
     if (userToInvite.login === "") {
       toggleVisibility(true);
       return;

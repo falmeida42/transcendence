@@ -96,8 +96,9 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
                   <span>&times;</span>
                 </button>
               </div>
+                { chatData?.participants.length !== 1 && (
               <div>
-                <div className="modal-body">
+                  <div className="modal-body">
                   <p>Select a user to challenge to a match of Pong:</p>
                   <ul className="popup-input">
                     {chatData?.participants.map(
@@ -110,38 +111,43 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
                                 value="public"
                                 name="group"
                                 onChange={() => handleRadioChange(data)}
-                              />
+                                />
                               <img src={data.image}></img>
                               {data.login}
                             </label>
                           </li>
-                        )
-                    )}
+                        ))}
                   </ul>
                   {isVisibleWarning && (
                     <p style={{ color: "red" }}>{warningText}</p>
-                  )}
-                </div>
-                <div className="modal-footer">
+                    )}
+                    </div>
+                    <div className="modal-footer">
                   <button
                     type="button"
                     className="btn btn-clear"
                     onClick={handleClickYes}
-                  >
+                    >
                     Send Invite
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
                     onClick={handleClickClose}
-                  >
+                    >
                     Cancel
                   </button>
                 </div>
-              </div>
+              </div>  
+                )}
             </div>
           </div>
         </div>
+      )}
+      {chatData?.participants.length === 1 && (
+          <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible participants to invite
+          </p>
       )}
     </div>
   );
