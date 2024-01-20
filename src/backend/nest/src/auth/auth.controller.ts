@@ -103,8 +103,7 @@ export class AuthController {
     }
 
     const User2 = await this.userService.getUserById(user.id);
-    // generate key uri
-    this.logger.debug(user);
+
     const otpAuthURL = await this.authService.generate2FAKeyURI(User2);
 
     // generate QR code
