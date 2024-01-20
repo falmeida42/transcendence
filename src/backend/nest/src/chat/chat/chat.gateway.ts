@@ -129,7 +129,12 @@ export class ChatGateway
 
   @SubscribeMessage('messageToServer')
   async handleMessage(client: Socket, payload: any) {
-    const user = await this.userService.getUserByLogin(payload.sender);
+
+    this.logger.debug("message: ", JSON.stringify(payload))
+    if (!payload || !payload.senderId) {
+      return 
+    }
+    const user = await this.userService.getUserById(payload.senderId);
     if (!user) {
       return 'user not found';
     }
@@ -169,6 +174,7 @@ export class ChatGateway
       id: crypto.randomUUID(),
       channelId: payload.to,
       message: payload.message,
+      senderId: payload.senderId,
       sender: payload.sender,
       senderImage: payload.senderImage,
     });
