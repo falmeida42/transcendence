@@ -94,7 +94,7 @@ function ProfileProvider({ children }: ProfileProviderProps) {
             userImage: friend.image,
         }));
         
-        setBlockableUsers([...mappedBlockableUsers]);
+        setBlockableUsers(mappedBlockableUsers);
     })
     .catch((error) => console.error("Fetch error:", error));
 

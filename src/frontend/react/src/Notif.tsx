@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { updateUserFriends } from "./ProfileContext";
+import { updateBlockableUsers, updateUserFriends } from "./ProfileContext";
 import { test } from "./chat/context/ChatContext";
 import { navigate } from "wouter/use-location";
 
@@ -46,7 +46,10 @@ const Notif: React.FC<NotifProps> = (props) => {
         })
         .then(() => {
           updateUserFriends();
+        }).then(() => {
           test();
+        }).then(() => {
+          updateBlockableUsers();
         })
         .catch((error) => console.error("Fetch error:", error));
     }
