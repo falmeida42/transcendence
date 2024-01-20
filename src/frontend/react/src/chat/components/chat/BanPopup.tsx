@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { test } from "../../context/ChatContext";
 
 interface BanPopupProps {
   isVisible: boolean;
@@ -57,7 +58,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
       }),
     })
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then(() => test(userToInvite.id))
       .catch((error) => {
         console.error("Error: ", error);
         setKickError(true);
@@ -133,7 +134,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
                     <p>Select a user to kick out of the chatroom:</p>
                     <ul className="popup-input">
                       {chatData?.map((data: Participant) => (
-                        <li>
+                        <li key={data.id}>
                           <label>
                             <input
                               type="radio"

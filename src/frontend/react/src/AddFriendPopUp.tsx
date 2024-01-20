@@ -54,11 +54,10 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
         return data ? JSON.parse(data) : null;
       })
       .then((data) => {
-        if (!data)
-          return;
+        if (!data) return;
         const mappedUsers = data.map((user: any) => ({
           id: user.id,
-          username: user.login,
+          username: user.username,
           userImage: user.image,
         }));
 
@@ -120,7 +119,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
           console.log("No data received");
         }
       })
-      .catch((error) => console.error("Fetch error:", error));
+      .catch((error) => console.log("Fetch error:", error));
     handleClickClose();
   };
 

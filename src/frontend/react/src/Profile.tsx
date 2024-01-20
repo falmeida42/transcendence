@@ -52,9 +52,12 @@ function Profile() {
   const handleSubmitClick = () => {
     checkCookie();
     if (textValue) {
-      setfinalText(textValue);
-      if (!failToUpdate) {
-        setIsEditing(false);
+      const trimmedText = textValue.trim();
+      if (trimmedText) {
+        setfinalText(trimmedText);
+        if (!failToUpdate) {
+          setIsEditing(false);
+        }
       }
     }
   };

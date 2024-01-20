@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
+import { test } from "../../context/ChatContext";
 
 interface AdminPopupProps {
   isVisible: boolean;
@@ -58,6 +59,7 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
     })
       .then((data) => {
         console.log("Admin added: ", JSON.stringify(data));
+        test();
         // Handle success, e.g., update component state
         // You may also want to display a success message to the user
       })

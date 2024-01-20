@@ -70,7 +70,7 @@ export class GamerGateway
     this.players[client.id].name = name;
   }
 
-  @SubscribeMessage('CreateRoom')
+  @SubscribeMessage('CreateRoomAgainstAi')
   createRoomAgainstAi(
     @ConnectedSocket() client: Socket,
     @MessageBody('againstAi') againstAi: boolean,
@@ -80,22 +80,20 @@ export class GamerGateway
     }`;
     client.join(roomId);
 
-    this.rooms[client.id] = {
-      id: client.id,
+    this.rooms[roomId] = {
+      id: roomId,
       name: roomId,
       player1: this.players[client.id].socket,
       player2: 'AI',
       againstAi,
-      spectators: [],
     };
-    this.players[client.id].room = client.id;
+    this.players[client.id].room = roomId;
     this.match[this.players[client.id].room] = this.createMatch(
       client.id,
       againstAi,
     );
-    if (againstAi) this.runGame(this.players[client.id].room, againstAi);
-
-    client.emit('RoomCreated', this.rooms[client.id]);
+    this.runGame(this.players[client.id].room, againstAi);
+    client.emit('RoomCreated', this.rooms[roomId]);
   }
 
   @SubscribeMessage('GameLoaded')
@@ -187,6 +185,28 @@ export class GamerGateway
         client.id === match.player1.id
           ? `${match.player1.name} paused the game`
           : `${match.player2.name} paused the game`;
+    }
+  }
+
+  @SubscribeMessage('LeaveRoom')
+  leaveRoomEvent(@ConnectedSocket() client: Socket) {
+    const player = this.players[client.id];
+    const roomId = player && player.room;
+
+    const room = this.rooms[roomId];
+
+    if (room) {
+      player.room = undefined;
+
+      const playerNumber = 'player' + (client.id === room.player1 ? 1 : 2);
+      room[playerNumber] = undefined;
+
+      delete this.rooms[roomId];
+    }
+
+    if (roomId) {
+      client.leave(roomId);
+      client.emit('GameOver');
     }
   }
 
@@ -498,7 +518,6 @@ export class GamerGateway
       player1: socket1.id,
       player2: socket2.id,
       againstAi: false,
-      spectators: [],
     };
 
     player1.room = roomId;

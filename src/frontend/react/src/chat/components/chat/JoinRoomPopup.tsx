@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
-import { updateChatRooms } from "../../context/ChatContext";
+import { test, updateChatRooms } from "../../context/ChatContext";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -52,11 +52,11 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       })
       .then((data) => {
         if (data) {
-          console.log("Rooms received ", JSON.stringify(data));
           setChannels(data);
         } else {
           console.log("No data received");
         }
+        test();
       })
       .catch((error) => console.error("Fetch error:", error));
   }, []);
@@ -82,7 +82,6 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
   };
 
   const handleClickYes = () => {
-    console.log("ROOM TO JOIN", roomToJoin?.name);
     if (roomToJoin?.name === "") {
       setWarningText("This field is mandatory");
       toggleVisibility(true);
@@ -101,13 +100,14 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: login,
+        login: login,
         roomId: roomToJoin.id,
         password: inputPassword,
         roomType: roomToJoin.type,
       }),
     })
       .then(async (response) => {
+        console.log("some response received: ", response);
         if (!response.ok) {
           if (response.status == 403) {
             setWarningText("You were banned from this channel");
@@ -127,6 +127,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
             toggleVisibility(true);
             setInputPassword("");
           } else if (data.success === true) {
+            console.log("sucess handle close");
             handleClose();
           }
         } else {

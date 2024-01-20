@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { updateUserFriends } from "./ProfileContext";
+import { test } from "./chat/context/ChatContext";
 
 interface NotifProps {
   requestor_image: string;
@@ -39,10 +40,10 @@ const Notif: React.FC<NotifProps> = (props) => {
           const data = await response.text();
           return data ? JSON.parse(data) : null;
         })
-        .then((data) => {
-          console.log("ACCEPTED:", JSON.stringify(data));
+        .then(() => {
+          updateUserFriends();
+          test();
         })
-        .then(updateUserFriends)
         .catch((error) => console.error("Fetch error:", error));
     }
     setIsVisible(!isVisible);

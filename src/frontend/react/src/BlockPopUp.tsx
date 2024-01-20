@@ -82,6 +82,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
                 }
             })
             .then(updateBlockableUsers)
+            .then(updateUserFriends)
             .catch((error) => console.error("Fetch error:", error));
             handleClickClose()
     };

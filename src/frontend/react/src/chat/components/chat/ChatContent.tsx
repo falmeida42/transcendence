@@ -31,6 +31,7 @@ const ChatContent = (props: ChatContentProps) => {
   const { id } = useApi();
   const [userIsAdmin, setUserIsAdmin] = useState(true);
   const [userIsOwner, setUserIsOwner] = useState(true);
+  const [isDirectMessage, setIsDirectMessage] = useState(false);
 
   const handleMouseEnter = (label: string) => {
     setIsHovered(label);
@@ -80,11 +81,13 @@ const ChatContent = (props: ChatContentProps) => {
     participants: Participant[];
     admins: Admin[];
     owner: User;
+    type: string;
   }
 
   useEffect(() => {
     setUserIsOwner(true);
     setUserIsAdmin(true);
+    setIsDirectMessage(false);
 
     const fetchData = async () => {
       try {
@@ -111,6 +114,7 @@ const ChatContent = (props: ChatContentProps) => {
         // console.log("Room info received ", JSON.stringify(data));
         setChatData(data);
         if (data.owner.id !== id) setUserIsOwner(false);
+        if (data.type === "DIRECT_MESSAGE") setIsDirectMessage(true);
         const isAdmin = data.admins.some((admin) => admin.id === id);
         if (!isAdmin) {
           setUserIsAdmin(false);
@@ -122,7 +126,7 @@ const ChatContent = (props: ChatContentProps) => {
 
     fetchData();
     // console.log("IsOwner: ", userIsOwner, "IsAdmin: ", userIsAdmin);
-  }, [props.selectedChatData.id]);
+  }, [id, props.selectedChatData.id]);
 
   return (
     <div id="chat" className="chat">
@@ -181,19 +185,21 @@ const ChatContent = (props: ChatContentProps) => {
           <div className="chat-with">
             Chat with {props.selectedChatData.name}
           </div>
-          <i
+        {!isDirectMessage && ( 
+         <i
             onClick={handleClickLeave}
             onMouseEnter={() => handleMouseEnter("leave chatroom")}
             onMouseLeave={() => handleMouseLeave()}
             className="fa fa-sign-out fa-lg clickable"
           ></i>
+          )}
           <i
             onClick={handleClickMatch}
             onMouseEnter={() => handleMouseEnter("invite user to match")}
             onMouseLeave={() => handleMouseLeave()}
             className="fa fa-gamepad fa-lg clickable"
           ></i>
-          {(userIsAdmin || userIsOwner) && (
+          {(userIsAdmin || userIsOwner) && !isDirectMessage && (
             <i
               onClick={handleClickKick}
               onMouseEnter={() => handleMouseEnter("kick user")}
@@ -201,7 +207,7 @@ const ChatContent = (props: ChatContentProps) => {
               className="fa fa-user-times fa-lg clickable"
             ></i>
           )}
-          {(userIsAdmin || userIsOwner) && (
+          {(userIsAdmin || userIsOwner) && !isDirectMessage && (
             <i
               onClick={handleClickMute}
               onMouseEnter={() => handleMouseEnter("mute user")}
@@ -209,7 +215,7 @@ const ChatContent = (props: ChatContentProps) => {
               className="fa fa-microphone-slash fa-lg clickable"
             ></i>
           )}
-          {(userIsAdmin || userIsOwner) && (
+          {(userIsAdmin || userIsOwner) && !isDirectMessage && (
             <i
               onClick={handleClickBan}
               onMouseEnter={() => handleMouseEnter("ban user")}
@@ -217,7 +223,7 @@ const ChatContent = (props: ChatContentProps) => {
               className="fa fa-ban fa-lg clickable"
             ></i>
           )}
-          {userIsOwner && (
+          {userIsOwner && !isDirectMessage && (
             <i
               onClick={handleClickLock}
               onMouseEnter={() => handleMouseEnter("set password")}
@@ -225,7 +231,7 @@ const ChatContent = (props: ChatContentProps) => {
               className="fa fa-lock fa-lg clickable"
             ></i>
           )}
-          {userIsOwner && (
+          {userIsOwner && !isDirectMessage && (
             <i
               onClick={handleClickAdmin}
               onMouseEnter={() => handleMouseEnter("appoint admin")}

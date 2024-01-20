@@ -15,25 +15,21 @@ interface ChatInfoProps {
 }
 
 const ChatInfo = (chatInfoProps: ChatInfoProps) => {
-
   const { setChannelSelected } = useContext(ChatContext) ?? {};
 
-
-  const onlineStatus =
-    (() => {
-      switch (chatInfoProps.data.status) {
-        case 1:
-          return "online";
-        case 3:
-          return "in-game";
-        default:
-          return "offline";
-      }
-    })();
+  const onlineStatus = (() => {
+    switch (chatInfoProps.data.status) {
+      case 1:
+        return "online";
+      case 2:
+        return "in-game";
+      default:
+        return "offline";
+    }
+  })();
 
   const handleClick = () => {
-    if (setChannelSelected)
-      setChannelSelected(chatInfoProps.data.id)
+    if (setChannelSelected) setChannelSelected(chatInfoProps.data.id);
     chatInfoProps.passSelectedChatData(chatInfoProps.data);
   };
 

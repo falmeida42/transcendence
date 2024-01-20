@@ -18,8 +18,8 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
   const [inputPassword, setInputPassword] = useState("");
   const [inputPrivacy, setInputPrivacy] = useState<string>("");
   const [modal, setModal] = useState(1);
-  const { login } = useApi();
-  const [checkboxValues, setCheckboxValues] = useState<string[]>([login]);
+  const { user } = useApi();
+  const [checkboxValues, setCheckboxValues] = useState<string[]>([user]);
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
   const [id] = useState(crypto.randomUUID().toString());
   const { userFriends } = useContext(ProfileContext) ?? {};
@@ -138,7 +138,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
         return;
       }
     } else if (modal === 4) {
-      if (checkboxValues.length === 0) {
+      if (checkboxValues.length === 1) {
         toggleVisibility(true);
         return;
       }
@@ -348,7 +348,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
                     <p>Please select at least another participant:</p>
                     <ul className="popup-input">
                       {userFriends.map((friend: any) => (
-                        <li>
+                        <li key={friend.username}>
                           <label>
                             <input
                               type="checkbox"

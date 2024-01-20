@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { kick, test } from "../../context/ChatContext";
 
 interface KickPopupProps {
   isVisible: boolean;
@@ -57,7 +58,10 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
       }),
     })
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then(() => test(userToInvite.id))
+      .then(() => {
+        kick(userToInvite.id, props.channelId);
+      })
       .catch((error) => {
         console.error("Error: ", error);
         setKickError(true);
@@ -132,7 +136,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
                     <p>Select a user to kick out of the chatroom:</p>
                     <ul className="popup-input">
                       {chatData?.map((data: Participant) => (
-                        <li>
+                        <li key={data.id}>
                           <label>
                             <input
                               type="radio"

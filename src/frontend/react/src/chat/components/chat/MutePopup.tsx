@@ -40,6 +40,38 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
       return;
     }
     //send to backend
+    const tk = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+
+    console.log(props.channelId);
+
+    fetch(`http://localhost:3000/user/mute-user`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${tk}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        roomId: props.channelId,
+        participantId: userToInvite.id,
+        duration: "1",
+      }),
+    })
+      .then(async (response) => {
+        const data = await response.text();
+        return data ? JSON.parse(data) : null;
+      })
+      .then((data) => {
+        if (!data) {
+          console.log("No data received");
+        }
+        console.log(data);
+      })
+      .catch(() => {
+        console.log("cu");
+      });
     props.handleClose();
   };
 
@@ -55,6 +87,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
     .split("; ")
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
+
   fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
     method: "GET",
     headers: {
@@ -101,7 +134,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
                     {chatData?.participants.map(
                       (data) =>
                         login !== data.login && (
-                          <li>
+                          <li key={data.id}>
                             <label>
                               <input
                                 type="radio"
