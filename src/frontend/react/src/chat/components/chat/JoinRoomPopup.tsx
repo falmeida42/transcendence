@@ -135,6 +135,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
         }
       })
       .then(updateChatRooms)
+      .then(() => test())
       .catch((error) => {
         console.error("Error:", error);
       });
