@@ -196,12 +196,14 @@ const ChatContent = (props: ChatContentProps) => {
               className="fa fa-sign-out fa-lg clickable"
             ></i>
           )}
+          { isDirectMessage && (           
           <i
             onClick={handleClickMatch}
             onMouseEnter={() => handleMouseEnter("invite user to match")}
             onMouseLeave={() => handleMouseLeave()}
             className="fa fa-gamepad fa-lg clickable"
           ></i>
+          )}
           {(userIsAdmin || userIsOwner) && !isDirectMessage && (
             <i
               onClick={handleClickKick}
