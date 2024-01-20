@@ -164,6 +164,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   <span>&times;</span>
                 </button>
               </div>
+              {channels.length !== 0 && (
               <div>
                 <div className="modal-body">
                   <p>Select a room from the list:</p>
@@ -176,7 +177,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                             value="public"
                             name="group"
                             onChange={() => handleRadioChange(channel)}
-                          />
+                            />
                           <img src={channel.image}></img>
                           {channel.name}
                         </label>
@@ -195,7 +196,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                           value={inputPassword}
                           onChange={handleInputChangePassword}
                           placeholder={placeholder}
-                        />
+                          />
                       </label>
                     )}
                   </ul>
@@ -208,18 +209,24 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                     type="button"
                     className="btn btn-clear"
                     onClick={handleClickYes}
-                  >
+                    >
                     Submit
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
                     onClick={handleClickClose}
-                  >
+                    >
                     Cancel
                   </button>
                 </div>
               </div>
+                )}
+                {channels?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible rooms to join
+                </p>
+              )}
             </div>
           </div>
         </div>
