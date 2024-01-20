@@ -12,12 +12,16 @@ interface MessageProps {
 }
 
 const Message = (messageProps: MessageProps) => {
-  const { user } = useApi();
+  const { user, id } = useApi();
   const { socket } = useContext(ChatContext) ?? {};
 
   const handleClickAccept = (myUsername: string, messageUsername: string) => {
     if (myUsername === messageUsername) return;
-    console.log("accept");
+    console.log("accept", id, "sender", messageProps.senderId);
+    socket.emit("enterGame", {
+      player1Id: id,
+      player2Id: messageProps.senderId,
+    });
   };
   const handleClickDecline = (myUsername: string, messageUsername: string) => {
     if (myUsername === messageUsername) return;
@@ -41,7 +45,7 @@ const Message = (messageProps: MessageProps) => {
         {messageProps.type && (
           <>
             <button
-              onClick={handleClickAccept}
+              onClick={() => handleClickAccept(user, messageProps.username)}
               className="btn btn-success"
               style={{ marginLeft: "10px" }}
             >

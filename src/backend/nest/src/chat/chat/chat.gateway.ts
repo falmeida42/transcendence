@@ -249,4 +249,30 @@ export class ChatGateway
     await this.userService.deleteMessage(messageId);
     this.io.emit('cu');
   }
+
+  @SubscribeMessage('enterGame')
+  enterGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('player1Id') player1: string,
+    @MessageBody('player2Id') player2: string,
+  ) {
+    if (!player1 || !player2) return;
+    this.logger.debug('p1', player1, 'p2', player2);
+
+    const existingPlayer1Index = this.users.findIndex(
+      (user) => user.userId === player1,
+    );
+
+    const existingPlayer2Index = this.users.findIndex(
+      (user) => user.userId === player2,
+    );
+
+    if (existingPlayer1Index === -1 || existingPlayer2Index === -1) {
+      return;
+    }
+    this.io
+      .to(this.users[existingPlayer1Index].id)
+      .to(this.users[existingPlayer2Index].id)
+      .emit('joinGame');
+  }
 }
