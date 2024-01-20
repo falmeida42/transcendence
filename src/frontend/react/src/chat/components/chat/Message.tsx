@@ -10,17 +10,17 @@ interface MessageProps {
 
 const Message = (messageProps : MessageProps) => {
     
-    const { login } = useApi()
+    const { user } = useApi()
 
     
     
     return (
         <div>
-            <div className={`${messageProps.username === login ? "float-right" : ""}`}>
+            <div className={`${messageProps.username === user ? "float-right" : ""}`}>
                 <img src={messageProps.image} />
                 <p>{messageProps.username}</p>
             </div>
-            <div className={`message ${messageProps.username === login ? "other-message float-right" : "my-message "}`}>
+            <div className={`message ${messageProps.username === user ? "other-message float-right" : "my-message "}`}>
                 
                 {messageProps.text}     
             </div>

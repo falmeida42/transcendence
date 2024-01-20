@@ -101,7 +101,7 @@ function ChatProvider({ children }: ChatProviderProps) {
               ...prevChannelMessages,
               [channelSelected]: data.map((message: any) => ({
                 id: message.id,
-                username: message.sender.login,
+                username: message.sender.username,
                 userImage: message.sender.image,
                 message: message.content,
               })),
