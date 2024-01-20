@@ -236,7 +236,7 @@ export class UserService {
         this.insertFriend(requesterId, requesteeId);
 
         // Create the chat room
-        const chatRoom = await this.prisma.chatRoom.create({
+        await this.prisma.chatRoom.create({
           data: {
             id: crypto.randomUUID().toString(),
             name: requesterId + requesteeId,
@@ -250,6 +250,18 @@ export class UserService {
             },
           },
         });
+        // unblock user if blocked
+        await this.prisma.user.update({
+          where: {
+            id: requesterId,
+          },
+          data: {
+            blockedUsers: {
+              disconnect: { id: requesteeId },
+            },
+          },
+        });
+
         return { message: 'Friend request accepted', friendRequest };
       } else {
         const friendRequest = await this.prisma.friendRequest.update({
