@@ -53,10 +53,9 @@ function ChatProvider({ children }: ChatProviderProps) {
     })
       .then(async (response) => {
         if (!response.ok) {
-          // if (response.status === 401) {
-          //   navigate("/login");
-          // }
-          // console.log("fatal errorrr");
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();

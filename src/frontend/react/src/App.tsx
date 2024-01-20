@@ -59,7 +59,7 @@ function App() {
         )}
         </Route>
       <Route>
-        <Website />
+        {auth && <Website />}
       </Route>
     </Switch>
   );
