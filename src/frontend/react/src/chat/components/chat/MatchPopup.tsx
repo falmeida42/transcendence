@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
+import { navigate } from "wouter/use-location";
 
 interface MatchPopupProps {
   isVisible: boolean;
@@ -65,6 +66,9 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
   })
     .then(async (response) => {
       if (!response.ok) {
+        if (response.status === 401) {
+          navigate("/login");
+        }
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.text();

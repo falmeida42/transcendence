@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { test } from "../../context/ChatContext";
+import { navigate } from "wouter/use-location";
 
 interface BanPopupProps {
   isVisible: boolean;
@@ -92,6 +93,9 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();

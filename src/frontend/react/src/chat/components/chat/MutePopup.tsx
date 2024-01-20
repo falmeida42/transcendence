@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
+import { navigate } from "wouter/use-location";
 
 interface MutePopupProps {
   isVisible: boolean;
@@ -97,6 +98,9 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
   })
     .then(async (response) => {
       if (!response.ok) {
+        if (response.status === 401) {
+          navigate("/login");
+        }
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.text();

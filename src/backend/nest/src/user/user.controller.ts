@@ -60,7 +60,7 @@ export class UserController {
   @UseGuards(TwoFAGuard)
   @Get('auth')
   async getAuth(@GetMe() user: User) {
-    return (await this.findById(String(user.id))).twoFactorAuthEnabled;
+    return (await this.findById(user.id)).twoFactorAuthEnabled;
   }
 
   @UseGuards(JwtAuthGuard)
