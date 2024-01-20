@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { updateUserFriends } from "./ProfileContext";
+import { updateBlockableUsers, updateUserFriends } from "./ProfileContext";
 import { test } from "./chat/context/ChatContext";
+import { navigate } from "wouter/use-location";
 
 interface NotifProps {
   requestor_image: string;
@@ -35,6 +36,9 @@ const Notif: React.FC<NotifProps> = (props) => {
       })
         .then(async (response) => {
           if (!response.ok) {
+            if (response.status === 401) {
+              navigate("/login");
+            }
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           const data = await response.text();
@@ -42,7 +46,10 @@ const Notif: React.FC<NotifProps> = (props) => {
         })
         .then(() => {
           updateUserFriends();
+        }).then(() => {
           test();
+        }).then(() => {
+          updateBlockableUsers();
         })
         .catch((error) => console.error("Fetch error:", error));
     }
@@ -65,6 +72,9 @@ const Notif: React.FC<NotifProps> = (props) => {
       })
         .then(async (response) => {
           if (!response.ok) {
+            if (response.status === 401) {
+              navigate("/login");
+            }
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           const data = await response.text();

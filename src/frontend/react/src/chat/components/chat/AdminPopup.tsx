@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
 import { test } from "../../context/ChatContext";
+import { navigate } from "wouter/use-location";
 
 interface AdminPopupProps {
   isVisible: boolean;
@@ -32,10 +33,7 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
   };
 
   const handleClickYes = async () => {
-    // console.log("handle yes: ", userToInvite);
-    // console.log("handle yes: ", props.channelId);
-    // console.log("handle yes: ", userToInvite.id);
-    // console.log("handle yes: ", userToInvite.login);
+
     if (userToInvite.login === "") {
       toggleVisibility(true);
       return;
@@ -95,6 +93,9 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
   })
     .then(async (response) => {
       if (!response.ok) {
+        if (response.status === 401) {
+          navigate("/login");
+        }
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.text();

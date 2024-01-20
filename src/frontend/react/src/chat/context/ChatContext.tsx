@@ -3,6 +3,7 @@ import React, { ReactNode, createContext, useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import { useApi } from "../../apiStore";
 import { MessageData } from "../components/chat/Messages";
+import { navigate } from "wouter/use-location";
 
 interface ChatContextProps {
   socket: SocketIoReference.Socket | null;
@@ -52,6 +53,9 @@ function ChatProvider({ children }: ChatProviderProps) {
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           // console.log("fatal errorrr");
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -83,6 +87,9 @@ function ChatProvider({ children }: ChatProviderProps) {
       })
         .then(async (response) => {
           if (!response.ok) {
+            if (response.status === 401) {
+              navigate("/login");
+            }
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           const data = await response.text();
@@ -94,7 +101,7 @@ function ChatProvider({ children }: ChatProviderProps) {
               ...prevChannelMessages,
               [channelSelected]: data.map((message: any) => ({
                 id: message.id,
-                username: message.sender.login,
+                username: message.sender.username,
                 userImage: message.sender.image,
                 message: message.content,
               })),

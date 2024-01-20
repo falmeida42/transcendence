@@ -192,7 +192,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
                   <span>&times;</span>
                 </button>
               </div>
-              {modal === 1 && (
+              {modal === 1 && userFriends.length !== 0 && (
                 <div>
                   <div className="modal-body">
                     <p>Please insert a name:</p>
@@ -229,6 +229,11 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
                     </button>
                   </div>
                 </div>
+              )}
+              {modal === 1 && userFriends.length === 0 &&(
+                <p style={{ color: "red", padding: "25px" }}>
+                You need to have at least 1 friend to create a chat room.
+              </p>
               )}
               {modal === 2 && (
                 <div>

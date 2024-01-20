@@ -1,12 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useApi } from "./apiStore";
 import "./Profile.css"
 import { ProfileContext, updateBlockableUsers, updateUserFriends } from "./ProfileContext";
+import { navigate } from "wouter/use-location";
+import { test } from "./chat/context/ChatContext";
 
 interface BlockPopupProps {
     isVisible: boolean;
     handleClose: () => void;
-    token: string;
   }
   
   interface User {
@@ -15,12 +16,12 @@ interface BlockPopupProps {
 	userImage: string
 }
 
-const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }) => {
+const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
 
     const [userToBlock, setUserToBlock] = useState<User>({id: "", username: "", userImage: ""});
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
-    const { id } = useApi();
+    const { auth } = useApi();
     const { blockableUsers } = useContext(ProfileContext) ?? {};
  
     const toggleVisibility = (visibility: boolean) => {
@@ -46,7 +47,11 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
             toggleVisibility(true);
             return;
         }
-
+        const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
+        if (auth === false || token === undefined) return;
         // console.log("BLOCK REQUEST: DATA PASSED TO THE BACKEND", id, userToBlock.id);
         fetch(`http://localhost:3000/user/block-user`, {
                 method: "POST",
@@ -62,6 +67,9 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
             })
             .then(async (response) => {
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        navigate("/login");
+                    }
                 throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.text();
@@ -76,6 +84,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
             })
             .then(updateBlockableUsers)
             .then(updateUserFriends)
+            .then(() => test())
             .catch((error) => console.error("Fetch error:", error));
             handleClickClose()
     };
@@ -98,7 +107,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose, token }
                             <ul
                             className="popup-input"
                             >
-                               {blockableUsers.map((user) => (
+                               {blockableUsers.map((user : User) => (
                                 <li key={user.id}>
                                     <label>
                                     <input 

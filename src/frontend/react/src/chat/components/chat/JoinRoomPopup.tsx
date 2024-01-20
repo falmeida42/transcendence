@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
 import { test, updateChatRooms } from "../../context/ChatContext";
+import { navigate } from "wouter/use-location";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -45,6 +46,9 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -109,6 +113,9 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       .then(async (response) => {
         console.log("some response received: ", response);
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           if (response.status == 403) {
             setWarningText("You were banned from this channel");
             toggleVisibility(true);
@@ -135,6 +142,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
         }
       })
       .then(updateChatRooms)
+      .then(() => test())
       .catch((error) => {
         console.error("Error:", error);
       });
@@ -156,6 +164,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   <span>&times;</span>
                 </button>
               </div>
+              {channels.length !== 0 && (
               <div>
                 <div className="modal-body">
                   <p>Select a room from the list:</p>
@@ -168,7 +177,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                             value="public"
                             name="group"
                             onChange={() => handleRadioChange(channel)}
-                          />
+                            />
                           <img src={channel.image}></img>
                           {channel.name}
                         </label>
@@ -187,7 +196,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                           value={inputPassword}
                           onChange={handleInputChangePassword}
                           placeholder={placeholder}
-                        />
+                          />
                       </label>
                     )}
                   </ul>
@@ -200,18 +209,24 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                     type="button"
                     className="btn btn-clear"
                     onClick={handleClickYes}
-                  >
+                    >
                     Submit
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
                     onClick={handleClickClose}
-                  >
+                    >
                     Cancel
                   </button>
                 </div>
               </div>
+                )}
+                {channels?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible rooms to join
+                </p>
+              )}
             </div>
           </div>
         </div>

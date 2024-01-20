@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { kick, test } from "../../context/ChatContext";
+import { navigate } from "wouter/use-location";
 
 interface KickPopupProps {
   isVisible: boolean;
@@ -94,6 +95,9 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -130,7 +134,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
                   <span>&times;</span>
                 </button>
               </div>
-              {!kickError && (
+              {!kickError && chatData?.length !== 0 && (
                 <div>
                   <div className="modal-body">
                     <p>Select a user to kick out of the chatroom:</p>
@@ -171,6 +175,11 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
                     </button>
                   </div>
                 </div>
+              )}
+              {chatData?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible participants to kick
+                </p>
               )}
             </div>
           </div>
