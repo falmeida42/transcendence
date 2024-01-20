@@ -23,7 +23,6 @@ import { InputStringValidationPipe } from 'src/pipes';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guard';
 import * as bcrypt from '../utils';
-import { UserDto } from './dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -54,10 +53,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('me')
-  async updateMe(
-    @GetMe('id') id: string,
-    @Body() userData: any,
-  ) {
+  async updateMe(@GetMe('id') id: string, @Body() userData: any) {
     return await this.userService.updateUserById(id, userData);
   }
 
@@ -326,21 +322,18 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
-    @Body('username', InputStringValidationPipe) username: string,
+    @Body('login', InputStringValidationPipe) login: string,
     @Body('roomId', InputStringValidationPipe) roomId: string,
     @Body('password', InputStringValidationPipe) password: string,
     @Body('roomType', InputStringValidationPipe) roomType: string,
     @Res() res: Response,
-    @Req() req: Request,
   ) {
-    console.log('received token:', req.headers['authorization']);
-
-    if (await this.userService.isBanned(username, roomId)) {
+    if (await this.userService.isBanned(login, roomId)) {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
 
     const joinResponse = await this.userService.joinInRoom(
-      username,
+      login,
       roomId,
       password,
       roomType,
@@ -590,10 +583,8 @@ export class UserController {
         type,
         hashedPassword,
       );
-    }
-    else
-    {
-      await this.userService.updateChatRoomPrivacy(roomId, type, "");
+    } else {
+      await this.userService.updateChatRoomPrivacy(roomId, type, '');
     }
   }
 }

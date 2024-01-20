@@ -861,13 +861,13 @@ export class UserService {
     }
   }
 
-  async isBanned(username: string, roomId: string) {
+  async isBanned(login: string, roomId: string) {
     const bannedUsers = await this.prisma.chatRoom
       .findUnique({
         where: { id: roomId },
       })
       .bannedUsers({
-        where: { username },
+        where: { login },
       });
     if (bannedUsers.length > 0) return true;
     else return false;

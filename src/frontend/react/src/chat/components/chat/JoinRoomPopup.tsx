@@ -100,7 +100,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: login,
+        login: login,
         roomId: roomToJoin.id,
         password: inputPassword,
         roomType: roomToJoin.type,
