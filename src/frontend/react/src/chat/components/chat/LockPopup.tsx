@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useApi } from "../../../apiStore";
 import { updateChatRooms } from "../../context/ChatContext";
+import { navigate } from "wouter/use-location";
 
 interface LockPopupProps {
   isVisible: boolean;
@@ -40,6 +41,9 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
   })
     .then(async (response) => {
       if (!response.ok) {
+        if (response.status === 401) {
+          navigate("/login");
+        }
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.text();
@@ -79,6 +83,9 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -117,6 +124,9 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
