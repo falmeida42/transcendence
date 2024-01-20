@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Body, Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -188,26 +188,76 @@ export class GamerGateway
     }
   }
 
-  @SubscribeMessage('LeaveRoom')
-  leaveRoomEvent(@ConnectedSocket() client: Socket) {
+  // @SubscribeMessage('LeaveRoom')
+  // leaveRoomEvent(@ConnectedSocket() client: Socket) {
+  //   const player = this.players[client.id];
+  //   const roomId = player && player.room;
+
+  //   const room = this.rooms[roomId];
+
+  //   if (room) {
+  //     player.room = undefined;
+
+  //     const playerNumber = 'player' + (client.id === room.player1 ? 1 : 2);
+  //     room[playerNumber] = undefined;
+
+  //     delete this.rooms[roomId];
+  //   }
+
+  //   if (roomId) {
+  //     client.leave(roomId);
+  //     client.emit('GameOver');
+  //   }
+  // }
+
+  createRoomFromInvite(socket1: Socket, socket2: Socket) {
+    const player1 = this.players[socket1.id];
+    const player2 = this.players[socket2.id];
+    const roomId = player1.name + ' vs ' + player2.name;
+
+    player1.onQueue = false;
+    player2.onQueue = false;
+    socket1.join(roomId);
+    socket2.join(roomId);
+
+    this.rooms[roomId] = {
+      id: roomId,
+      name: roomId,
+      player1: socket1.id,
+      player2: socket2.id,
+      againstAi: false,
+    };
+
+    player1.room = roomId;
+    player2.room = roomId;
+
+    this.match[roomId] = this.createMatch(socket1.id, false, socket2.id);
+
+    socket1.emit('RoomCreated', this.rooms[roomId]);
+    socket2.emit('RoomCreated', this.rooms[roomId]);
+    this.runGame(roomId, false);
+  }
+
+  @SubscribeMessage('CreateRoom')
+  createRoom(
+    @ConnectedSocket() client: Socket,
+    @Body('player2name') player2name: string,
+  ) {
     const player = this.players[client.id];
-    const roomId = player && player.room;
+    const roomId = player.name;
+    client.join(roomId);
 
-    const room = this.rooms[roomId];
+    this.rooms[roomId] = {
+      id: roomId,
+      name: roomId,
+      player1: client.id,
+      player2: undefined,
+      againstAi: false,
+      player2waiting: player2name,
+    };
 
-    if (room) {
-      player.room = undefined;
-
-      const playerNumber = 'player' + (client.id === room.player1 ? 1 : 2);
-      room[playerNumber] = undefined;
-
-      delete this.rooms[roomId];
-    }
-
-    if (roomId) {
-      client.leave(roomId);
-      client.emit('GameOver');
-    }
+    this.players[roomId].room = roomId;
+    client.emit('RoomCreated', this.rooms[roomId]);
   }
 
   removePlayer(playerId: string) {
