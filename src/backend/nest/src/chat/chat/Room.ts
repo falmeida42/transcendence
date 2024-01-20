@@ -1,5 +1,4 @@
-
 export interface Room {
-    name: string,
-    image: string
+  name: string;
+  image: string;
 }

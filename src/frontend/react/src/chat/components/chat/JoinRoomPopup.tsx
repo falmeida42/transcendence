@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
-import { test, tk, updateChatRooms } from "../../context/ChatContext";
+import { test, updateChatRooms } from "../../context/ChatContext";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -31,12 +31,15 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
     type: string;
   }
 
-  console.log("token:", tk);
   useEffect(() => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
     fetch(`http://localhost:3000/user/joinable-rooms`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${tk}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     })
@@ -49,11 +52,11 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       })
       .then((data) => {
         if (data) {
-          console.log("Rooms received ", JSON.stringify(data));
           setChannels(data);
         } else {
           console.log("No data received");
         }
+        test();
       })
       .catch((error) => console.error("Fetch error:", error));
   }, []);
@@ -79,27 +82,32 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
   };
 
   const handleClickYes = () => {
-    console.log("ROOM TO JOIN", roomToJoin?.name);
     if (roomToJoin?.name === "") {
       setWarningText("This field is mandatory");
       toggleVisibility(true);
       return;
     }
 
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+
     fetch(`http://localhost:3000/user/join-room`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${tk}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: login,
+        login: login,
         roomId: roomToJoin.id,
         password: inputPassword,
         roomType: roomToJoin.type,
       }),
     })
       .then(async (response) => {
+        console.log("some response received: ", response);
         if (!response.ok) {
           if (response.status == 403) {
             setWarningText("You were banned from this channel");
@@ -119,6 +127,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
             toggleVisibility(true);
             setInputPassword("");
           } else if (data.success === true) {
+            console.log("sucess handle close");
             handleClose();
           }
         } else {
@@ -152,7 +161,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   <p>Select a room from the list:</p>
                   <ul className="popup-input" style={{ padding: "4px 0" }}>
                     {channels.map((channel) => (
-                      <li>
+                      <li key={channel.id}>
                         <label>
                           <input
                             type="radio"

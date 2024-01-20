@@ -6,7 +6,6 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
-import { UserDto } from 'src/user/dto';
 
 @Injectable()
 export class AuthService {
@@ -26,10 +25,8 @@ export class AuthService {
 
       if (user) {
         const accessToken = await this.signAccessToken(Number(user.id));
-        // const refreshToken = await this.signRefreshToken(Number(user.id));
         return {
           accessToken: accessToken,
-          // refreshToken: refreshToken,
           user: user,
         };
       }
@@ -50,10 +47,8 @@ export class AuthService {
 
       if (newUser) {
         const accessToken = await this.signAccessToken(Number(newUser.id));
-        // const refreshToken = await this.signRefreshToken(Number(user.id));
         return {
           accessToken: accessToken,
-          // refreshToken: refreshToken,
           user: user,
         };
       }
@@ -67,11 +62,10 @@ export class AuthService {
     const payload = { sub: userId };
 
     return await this.jwtService.signAsync(payload, {
-      expiresIn: '20m',
+      expiresIn: '2h',
       secret: this.config.get('JWT_SECRET'),
     });
   }
-
 
   generate2FASecret() {
     return authenticator.generateSecret();
@@ -104,13 +98,11 @@ export class AuthService {
   }
 
   async is2FAActive(id: string) {
-    try {
-      const user = await this.prisma.user.findUnique({ where: { id } });
-      if (!user) {
-        throw new ForbiddenException('User is not in database. id: ', id);
-      }
-      return user.twoFactorAuthEnabled;
-    } catch {}
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      return false;
+    }
+    return user.twoFactorAuthEnabled;
   }
 
   async sign2FAToken(id: string): Promise<string> {
@@ -119,6 +111,14 @@ export class AuthService {
     return this.jwtService.signAsync(payload, {
       expiresIn: '10m',
       secret: this.config.get('JWT_2FA_SECRET'),
+    });
+  }
+
+  // #TODO take This off on the final version
+  generateToken(user: any) {
+    const payload = { sub: user.id };
+    return this.jwtService.sign(payload, {
+      secret: this.config.get('JWT_SECRET'),
     });
   }
 }

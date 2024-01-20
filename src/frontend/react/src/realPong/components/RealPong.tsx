@@ -1,5 +1,7 @@
 import { useContext, useEffect } from "react";
 import SVG, { Circle, Line, Rect } from "react-svg-draw";
+import { useApi } from "../../apiStore";
+import { updateStatus } from "../../chat/context/ChatContext";
 import {
   SocketContext,
   clearRoom,
@@ -15,6 +17,7 @@ interface props {
 const RealPong = (props: props) => {
   const { match } = useContext(SocketContext);
   const { gameConfig, ball, player1, player2, status, message } = match!;
+  const { id } = useApi();
   // const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -30,11 +33,12 @@ const RealPong = (props: props) => {
     document.addEventListener("keydown", sendKeyEvent);
     document.addEventListener("keyup", sendKeyEvent);
 
+    updateStatus(id, 2);
     return () => {
       document.removeEventListener("keydown", sendKeyEvent);
       document.removeEventListener("keyup", sendKeyEvent);
     };
-  }, [status]);
+  }, [id]);
 
   return (
     <div className="gamePage">
@@ -44,20 +48,9 @@ const RealPong = (props: props) => {
         </button>
       )}
       {status === "PLAY" && (
-        <div>
-          <button className="pauseButton" onClick={() => pauseGame()}>
-            Pause
-          </button>
-          <button
-            className="pauseButton"
-            onClick={() => {
-              clearRoom();
-              props.setPage(3);
-            }}
-          >
-            Leave
-          </button>
-        </div>
+        <button className="pauseButton" onClick={() => pauseGame()}>
+          Pause
+        </button>
       )}
       {status === "PAUSE" && (
         <button className="pauseButton" onClick={() => gameLoaded()}>
@@ -69,6 +62,7 @@ const RealPong = (props: props) => {
           className="pauseButton"
           onClick={() => {
             clearRoom();
+            updateStatus(id, 1);
             props.setPage(3);
           }}
         >
@@ -112,7 +106,6 @@ const RealPong = (props: props) => {
         <Rect
           x={"0"}
           y={"0"}
-          STOP
           width={gameConfig.width.toString()}
           height={gameConfig.height.toString()}
           style={{ fill: "url(#image)" }}

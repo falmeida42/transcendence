@@ -1,4 +1,8 @@
-import { ExecutionContext, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
@@ -8,7 +12,7 @@ export class FTGuard extends AuthGuard('42') {
       return (await super.canActivate(context)) as boolean;
     } catch (error) {
       console.error(error);
-        throw new UnauthorizedException("fuckyou 42");
+      throw new UnauthorizedException('fuckyou 42');
     }
   }
 }

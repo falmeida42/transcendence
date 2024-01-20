@@ -28,7 +28,12 @@ export class UserService {
 
   async getUserById(userId: string) {
     try {
-      return await this.prisma.user.findUnique({ where: { id: userId } });
+      return await this.prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          chatRooms: true,
+        },
+      });
     } catch (error) {
       this.logger.error(error);
       throw new Error(`Failed to return user with id ${userId}`);
@@ -51,7 +56,10 @@ export class UserService {
       }
     });
 
-    if (Object.keys(nonEmptyData).length === 0 || (Object.entries(nonEmptyData).toString().trim().length < 1)) {
+    if (
+      Object.keys(nonEmptyData).length === 0 ||
+      Object.entries(nonEmptyData).toString().trim().length < 1
+    ) {
       // If there are no non-empty values, return null or handle accordingly
       return null;
     }
@@ -60,10 +68,9 @@ export class UserService {
         where: { id: userId },
         data: nonEmptyData,
       });
-      if (user)
-        return user;
+      if (user) return user;
     } catch {
-      throw new ForbiddenException("Username not unique.");
+      throw new ForbiddenException('Username not unique.');
     }
   }
 
@@ -144,7 +151,15 @@ export class UserService {
       },
     });
 
-    return notFriends || null;
+    const list = await Promise.all(
+      notFriends.map(async (notFriend) => {
+        return (await this.isBlocked(userId, notFriend.id)) ? null : notFriend;
+      }),
+    );
+
+    const filteredList = list.filter((user) => user !== null);
+
+    return filteredList.length > 0 ? filteredList : null;
   }
 
   async addFriendRequest(
@@ -217,28 +232,24 @@ export class UserService {
           },
         });
 
-        // await this.prisma.user.update({
-        //   where: {
-        //     id: requesteeId,
-        //   },
-        //   data: {
-        //     friends: {
-        //       connect: { id: requesterId },
-        //     },
-        //   },
-        // });
         this.insertFriend(requesteeId, requesterId);
         this.insertFriend(requesterId, requesteeId);
-        // await this.prisma.user.update({
-        //   where: {
-        //     id: requesterId,
-        //   },
-        //   data: {
-        //     friends: {
-        //       connect: { id: requesteeId },
-        //     },
-        //   },
-        // });
+
+        // Create the chat room
+        const chatRoom = await this.prisma.chatRoom.create({
+          data: {
+            id: crypto.randomUUID().toString(),
+            name: requesterId + requesteeId,
+            image: '#',
+            type: 'DIRECT_MESSAGE',
+            owner: {
+              connect: { id: requesterId },
+            },
+            participants: {
+              connect: [{ id: requesterId }, { id: requesteeId }],
+            },
+          },
+        });
         return { message: 'Friend request accepted', friendRequest };
       } else {
         const friendRequest = await this.prisma.friendRequest.update({
@@ -290,7 +301,21 @@ export class UserService {
         },
         data: {
           blockedBy: {
-            connect: { id: id },
+            connect: { id },
+          },
+          friends: {
+            disconnect: { id },
+          },
+        },
+      });
+
+      await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          friends: {
+            disconnect: { id: blockedId },
           },
         },
       });
@@ -393,13 +418,15 @@ export class UserService {
             (user) => user.id !== userId,
           );
 
-          return {
-            ...room,
-            name: directUser.login || 'User',
-            image:
-              directUser.image ||
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiJuFZF4sFjZGf3JtXkRDHrtQXNjx3QSRI_NqN2pbWiCXddEPYQ89a0MH91XEp6IwICW8&usqp=CAU',
-          };
+          if (directUser) {
+            return {
+              ...room,
+              name: directUser.login || 'User',
+              image:
+                directUser.image ||
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiJuFZF4sFjZGf3JtXkRDHrtQXNjx3QSRI_NqN2pbWiCXddEPYQ89a0MH91XEp6IwICW8&usqp=CAU',
+            };
+          }
         }
 
         // Return other room types unchanged
@@ -452,6 +479,13 @@ export class UserService {
   }
 
   async getChatHistory(userId: string, chatId: string) {
+    const blocked = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        blockedUsers: true,
+      },
+    });
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -475,7 +509,15 @@ export class UserService {
     // Extract messages from the chat room
     const messages = user?.chatRooms[0]?.messages || [];
 
-    return messages;
+    const list = await Promise.all(
+      messages.map(async (message) => {
+        // this.logger.debug(message);
+        return (await this.isBlocked(message.userId, userId)) ? null : message;
+      }),
+    );
+
+    const filteredList = list.filter((message) => message !== null);
+    return filteredList;
   }
 
   async insertFriend(userId: string, friend: any) {
@@ -496,8 +538,8 @@ export class UserService {
         type: roomData.type,
         password: hashedPassword,
         participants: {
-          connect: roomData.participants.map((login: string) => ({
-            login: login,
+          connect: roomData.participants.map((username: string) => ({
+            username,
           })),
         },
       },
@@ -507,7 +549,7 @@ export class UserService {
   async leaveRoom(login: string, roomId: string) {
     try {
       const updatedUser = await this.prisma.user.update({
-        where: { login: login },
+        where: { username: login },
         data: { chatRooms: { disconnect: { id: roomId } } },
       });
 
@@ -524,6 +566,10 @@ export class UserService {
 
       if (chatRoom?.participants.length === 0) {
         // If the chat room is empty, delete it
+
+        await this.prisma.message.deleteMany({
+          where: { chat_id: roomId },
+        });
         await this.prisma.chatRoom.delete({
           where: { id: roomId },
         });
@@ -540,7 +586,7 @@ export class UserService {
     }
   }
 
-  async joinRoom(
+  async joinInRoom(
     login: string,
     roomId: string,
     password: string,
@@ -589,11 +635,24 @@ export class UserService {
         },
       },
     });
+    const privateRooms = await this.prisma.chatRoom.findMany({
+      where: {
+        type: 'PRIVATE',
+        participants: {
+          none: {
+            id: userId,
+          },
+        },
+      },
+    });
+    const filteredRooms = rooms.filter((room) => {
+      return !privateRooms.some((privates) => privates.id === room.id);
+    });
     if (!rooms) {
       this.logger.error('No rooms for user id: ', userId);
       throw new NotFoundException('Could not get joinable rooms');
     }
-    return rooms;
+    return filteredRooms;
   }
 
   async addMessage(userId: string, chatId: string, content: string) {
@@ -739,7 +798,7 @@ export class UserService {
   }
 
   async banUser(id: string, roomId: string) {
-    await this.prisma.chatRoom.update({
+    const room = await this.prisma.chatRoom.update({
       where: { id: roomId },
       data: {
         participants: {
@@ -757,12 +816,69 @@ export class UserService {
       },
     });
 
-    await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { id },
       data: {
         bannedFrom: {
-          connect: { id },
+          connect: { id: roomId },
         },
+      },
+    });
+
+    return room && user;
+  }
+
+  async muteUser(id: string, roomId: string, duration: number) {
+    const muteExpiration = new Date();
+    muteExpiration.setMinutes(muteExpiration.getMinutes() + duration);
+
+    return await this.prisma.mutedIn.create({
+      data: {
+        channelId: roomId,
+        userId: id,
+        muteExpiration,
+      },
+    });
+  }
+
+  async isUserMutedInRoom(userId: string, roomId: string) {
+    const user = await this.prisma.mutedIn.findFirst({
+      where: {
+        userId,
+        channelId: roomId,
+      },
+    });
+    if (user && user.muteExpiration > new Date()) return true;
+    return false;
+  }
+
+  async isUserInRoom(userId: string, roomId: string) {
+    if (!roomId || !userId) {
+      throw new NotFoundException('Could not find user with id');
+    }
+
+    const chatRoom = await this.getChatRoomById(roomId);
+
+    if (!chatRoom) {
+      throw new NotFoundException('No chatRoom with that id');
+    }
+
+    const isUserInRoom = chatRoom.participants.filter(
+      (participant) => participant.id === userId,
+    );
+
+    if (isUserInRoom.length === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  unmuteUser(participantId: string, roomId: string) {
+    return this.prisma.mutedIn.deleteMany({
+      where: {
+        userId: participantId,
+        channelId: roomId,
       },
     });
   }
@@ -787,14 +903,28 @@ export class UserService {
     }
   }
 
-  async isBanned(username: string, roomId: string) {
-    return this.prisma.chatRoom
+  async isBanned(login: string, roomId: string) {
+    const bannedUsers = await this.prisma.chatRoom
       .findUnique({
         where: { id: roomId },
       })
       .bannedUsers({
-        where: { username },
+        where: { login },
+      });
+    if (bannedUsers.length > 0) return true;
+    else return false;
+  }
+
+  async isBlocked(requesterId: string, requesteeId: string) {
+    return this.prisma.user
+      .findUnique({
+        where: { id: requesterId },
+        select: {
+          blockedBy: {
+            where: { id: requesteeId },
+          },
+        },
       })
-      .then((bannedUsers) => bannedUsers.length > 0);
+      .then((blocked) => blocked.blockedBy.length > 0);
   }
 }

@@ -19,7 +19,7 @@ import { TwoFAStrategy } from './strategy/2fa.strategy';
     }),
     JwtModule.register({
       secret: process.env.JWT_2FA_SECRET,
-      signOptions: { expiresIn: '5m' },
+      signOptions: { expiresIn: '10m' },
     }),
     PrismaModule,
     UserModule,
