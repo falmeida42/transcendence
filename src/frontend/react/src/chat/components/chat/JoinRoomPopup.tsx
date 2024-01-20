@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
-import { updateChatRooms } from "../../context/ChatContext";
+import { test, updateChatRooms } from "../../context/ChatContext";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -56,6 +56,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
         } else {
           console.log("No data received");
         }
+        test();
       })
       .catch((error) => console.error("Fetch error:", error));
   }, []);

@@ -138,7 +138,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
         return;
       }
     } else if (modal === 4) {
-      if (checkboxValues.length === 0) {
+      if (checkboxValues.length === 1) {
         toggleVisibility(true);
         return;
       }

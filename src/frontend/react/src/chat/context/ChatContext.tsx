@@ -10,6 +10,8 @@ interface ChatContextProps {
   usersOnline: any;
   setChannelSelected: React.Dispatch<React.SetStateAction<string>>;
   channelMessagesSelected: MessageData[];
+  closeWindow: boolean;
+  setCloseWindow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface ChatProviderProps {
@@ -22,7 +24,9 @@ let updateChatRooms: () => void;
 
 let socketInstance: Socket<DefaultEventsMap, DefaultEventsMap>;
 
-let test: () => void;
+let test: (id?: string) => void;
+let kick: (usernameId: string, roomId: string) => void;
+let updateStatus: (id: string, status: number) => void;
 
 function ChatProvider({ children }: ChatProviderProps) {
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
@@ -30,8 +34,9 @@ function ChatProvider({ children }: ChatProviderProps) {
   const [usersOnline, setUsersOnline] = useState([]);
   const [channelSelected, setChannelSelected] = useState("");
   const [channelMessages, setChannelMessages] = useState([]);
+  const [closeWindow, setCloseWindow] = useState(false);
 
-  const { login } = useApi();
+  const { id } = useApi();
 
   updateChatRooms = () => {
     const tk = document.cookie
@@ -111,7 +116,7 @@ function ChatProvider({ children }: ChatProviderProps) {
 
     socketInstance.on("connect", () => {
       socketInstance.emit("userConnected", {
-        username: login,
+        id: id,
         socketId: socketInstance.id,
       });
     });
@@ -122,7 +127,7 @@ function ChatProvider({ children }: ChatProviderProps) {
 
     socketInstance.on("UpdateRooms", () => {
       updateChatRooms();
-      socketInstance.emit("joinAllRooms", { username: login });
+      socketInstance.emit("joinAllRooms", { id: id });
     });
 
     setSocket(socketInstance);
@@ -163,14 +168,27 @@ function ChatProvider({ children }: ChatProviderProps) {
       });
     });
 
+    socketInstance.on("closeRoom", () => {
+      setCloseWindow(true);
+    });
+
     test = () => {
       socketInstance.emit("AddChannel");
-      socketInstance.emit("joinAllRooms", { username: login });
+      socketInstance.emit("joinAllRooms", { id: id });
     };
+
+    kick = (usernameId: string, roomId: string) => {
+      socketInstance.emit("kickFromRoom", { id: usernameId, roomId: roomId });
+    };
+
+    updateStatus = (id: string, status: number) => {
+      socketInstance.emit("updateStatus", { id: id, status: status });
+    };
+
     return () => {
       socketInstance.disconnect();
     };
-  }, [login]);
+  }, [id]);
 
   const contextValue: ChatContextProps = {
     socket: socket,
@@ -178,6 +196,8 @@ function ChatProvider({ children }: ChatProviderProps) {
     usersOnline: usersOnline,
     setChannelSelected: setChannelSelected,
     channelMessagesSelected: channelMessages[channelSelected] ?? [],
+    closeWindow: closeWindow,
+    setCloseWindow: setCloseWindow,
   };
 
   return (
@@ -185,4 +205,4 @@ function ChatProvider({ children }: ChatProviderProps) {
   );
 }
 
-export { ChatContext, ChatProvider, test, updateChatRooms };
+export { ChatContext, ChatProvider, kick, test, updateChatRooms, updateStatus };

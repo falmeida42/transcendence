@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { test } from "../../context/ChatContext";
 
 interface BanPopupProps {
   isVisible: boolean;
@@ -57,7 +58,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
       }),
     })
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then(() => test(userToInvite.id))
       .catch((error) => {
         console.error("Error: ", error);
         setKickError(true);

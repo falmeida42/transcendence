@@ -483,7 +483,10 @@ export class UserController {
       }
     } catch (error) {
       this.logger.error(error);
-      res.status(error.status).json({ message: error.message }).send();
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: error.message })
+        .send();
     }
   }
 
