@@ -4,7 +4,7 @@ import AddFriendPopup from "./AddFriendPopUp";
 import BlockPopup from "./BlockPopUp";
 import MatchHistory from "./MatchHistory";
 import "./Profile.css";
-import { ProfileContext } from "./ProfileContext";
+import { ProfileContext, updateBlockableUsers, updateUserFriends } from "./ProfileContext";
 import ScoreBar from "./ScoreBar";
 import TwoFaPopup from "./TwoFAPopup";
 import useUpdateUserData from "./UpdateUserData";
@@ -112,6 +112,7 @@ function Profile() {
   const [isVisibleAddFriend, setIsVisibleAddFriend] = useState(false);
 
   const handleClickAddFriend = () => {
+    updateUserFriends()
     checkCookie();
     if (isVisible2FA) {
       setIsVisible2FA(!isVisible2FA);
@@ -134,6 +135,7 @@ function Profile() {
   };
 
   const handleClickBlock = () => {
+    updateBlockableUsers()
     checkCookie();
     if (isVisibleAddFriend) {
       setIsVisibleAddFriend(!isVisibleAddFriend);
@@ -317,6 +319,7 @@ function Profile() {
               href="#project_worked"
               role="tab"
               aria-selected="false"
+              onClick={updateUserFriends}
             >
               Friend List
             </a>

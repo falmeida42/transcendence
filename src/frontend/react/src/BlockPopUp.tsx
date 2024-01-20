@@ -1,8 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useApi } from "./apiStore";
 import "./Profile.css"
 import { ProfileContext, updateBlockableUsers, updateUserFriends } from "./ProfileContext";
 import { navigate } from "wouter/use-location";
+import { test } from "./chat/context/ChatContext";
 
 interface BlockPopupProps {
     isVisible: boolean;
@@ -20,7 +21,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
     const [userToBlock, setUserToBlock] = useState<User>({id: "", username: "", userImage: ""});
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
-    const { id, auth } = useApi();
+    const { auth } = useApi();
     const { blockableUsers } = useContext(ProfileContext) ?? {};
  
     const toggleVisibility = (visibility: boolean) => {
@@ -83,6 +84,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
             })
             .then(updateBlockableUsers)
             .then(updateUserFriends)
+            .then(() => test())
             .catch((error) => console.error("Fetch error:", error));
             handleClickClose()
     };
@@ -105,7 +107,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
                             <ul
                             className="popup-input"
                             >
-                               {blockableUsers.map((user) => (
+                               {blockableUsers.map((user : User) => (
                                 <li key={user.id}>
                                     <label>
                                     <input 
