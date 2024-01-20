@@ -51,7 +51,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
         if (!data) return;
         const mappedUsers = data.map((user: any) => ({
           id: user.id,
-          username: user.login,
+          username: user.username,
           userImage: user.image,
         }));
 
