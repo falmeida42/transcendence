@@ -48,8 +48,9 @@ function Profile() {
   };
 
   const handleSubmitClick = () => {
-    if (textValue) {
-      setfinalText(textValue);
+    const trimmedText = textValue.trim();
+    if (trimmedText) {
+      setfinalText(trimmedText);
       if (!failToUpdate) {
         // setUsername(textValue);
         setIsEditing(false);

@@ -566,12 +566,10 @@ export class UserService {
 
       if (chatRoom?.participants.length === 0) {
         // If the chat room is empty, delete it
-        await this.prisma.message.deleteMany({
-          where: {
-            chat_id: roomId,
-          },
-        });
 
+        await this.prisma.message.deleteMany({
+          where: { chat_id: roomId },
+        });
         await this.prisma.chatRoom.delete({
           where: { id: roomId },
         });
@@ -637,11 +635,24 @@ export class UserService {
         },
       },
     });
+    const privateRooms = await this.prisma.chatRoom.findMany({
+      where: {
+        type: 'PRIVATE',
+        participants: {
+          none: {
+            id: userId,
+          },
+        },
+      },
+    });
+    const filteredRooms = rooms.filter((room) => {
+      return !privateRooms.some((privates) => privates.id === room.id);
+    });
     if (!rooms) {
       this.logger.error('No rooms for user id: ', userId);
       throw new NotFoundException('Could not get joinable rooms');
     }
-    return rooms;
+    return filteredRooms;
   }
 
   async addMessage(userId: string, chatId: string, content: string) {
@@ -809,7 +820,7 @@ export class UserService {
       where: { id },
       data: {
         bannedFrom: {
-          connect: { id },
+          connect: { id: roomId },
         },
       },
     });
@@ -892,13 +903,13 @@ export class UserService {
     }
   }
 
-  async isBanned(username: string, roomId: string) {
+  async isBanned(login: string, roomId: string) {
     const bannedUsers = await this.prisma.chatRoom
       .findUnique({
         where: { id: roomId },
       })
       .bannedUsers({
-        where: { username },
+        where: { login },
       });
     if (bannedUsers.length > 0) return true;
     else return false;

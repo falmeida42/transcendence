@@ -322,19 +322,18 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('join-room')
   async joinRoom(
-    @Body('username', InputStringValidationPipe) username: string,
+    @Body('login', InputStringValidationPipe) login: string,
     @Body('roomId', InputStringValidationPipe) roomId: string,
     @Body('password', InputStringValidationPipe) password: string,
     @Body('roomType', InputStringValidationPipe) roomType: string,
     @Res() res: Response,
-    @Req() req: Request,
   ) {
-    if (await this.userService.isBanned(username, roomId)) {
+    if (await this.userService.isBanned(login, roomId)) {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
 
     const joinResponse = await this.userService.joinInRoom(
-      username,
+      login,
       roomId,
       password,
       roomType,
@@ -371,13 +370,11 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      // this.logger.debug('adding room', login);
       await this.userService.addAdminToChat(login, chatId, userId);
       return res
         .status(HttpStatus.OK)
         .json({ message: 'User added as admin successfully' });
     } catch (error) {
-      // this.logger.debug('Error received from add admin', error);
       return res
         .status(HttpStatus.FORBIDDEN)
         .json({ message: error.message })
@@ -462,8 +459,13 @@ export class UserController {
   ) {
     try {
       if (await this.userService.isOwner(user.id, roomId)) {
-        await this.userService.banUser(participantId, roomId);
-        return res.status(HttpStatus.OK).send();
+        if (await this.userService.banUser(participantId, roomId)) {
+          return res.status(HttpStatus.OK).send();
+        }
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'Failed to update' })
+          .send();
       } else if (await this.userService.isAdmin(user.id, roomId)) {
         if (
           (await this.userService.isOwner(participantId, roomId)) ||

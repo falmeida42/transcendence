@@ -115,7 +115,6 @@ function ChatProvider({ children }: ChatProviderProps) {
     }).connect();
 
     socketInstance.on("connect", () => {
-      console.log("user connected", id, socketInstance.id);
       socketInstance.emit("userConnected", {
         id: id,
         socketId: socketInstance.id,
@@ -123,7 +122,6 @@ function ChatProvider({ children }: ChatProviderProps) {
     });
 
     socketInstance.on("getUsersConnected", (data) => {
-      console.log("data -> ", JSON.stringify(data));
       setUsersOnline(data);
     });
 
@@ -184,7 +182,6 @@ function ChatProvider({ children }: ChatProviderProps) {
     };
 
     updateStatus = (id: string, status: number) => {
-      console.log(`id=${id}, chamei`);
       socketInstance.emit("updateStatus", { id: id, status: status });
     };
 

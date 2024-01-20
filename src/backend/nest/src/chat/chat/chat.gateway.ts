@@ -129,7 +129,6 @@ export class ChatGateway
 
   @SubscribeMessage('messageToServer')
   async handleMessage(client: Socket, payload: any) {
-    // this.logger.debug("sending message: ", JSON.stringify(payload))
     const user = await this.userService.getUserByLogin(payload.sender);
     if (!user) {
       return 'user not found';
@@ -157,6 +156,12 @@ export class ChatGateway
 
     if (!is_participant) {
       return 'user is not in chatRoom';
+    }
+
+    const is_banned = await this.userService.isBanned(user.login, channel.id);
+
+    if (is_banned) {
+      return 'user banned';
     }
 
     await this.userService.addMessage(user.id, channel.id, payload.message);
