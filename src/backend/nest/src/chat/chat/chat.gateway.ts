@@ -2,6 +2,7 @@
 
 import { Body, Logger } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -86,11 +87,11 @@ export class ChatGateway
 
   @SubscribeMessage('joinAllRooms')
   async joinAllRooms(
-    client: Socket,
-    @Body('username') username?: string,
+    @ConnectedSocket() client: Socket,
+    @Body('username') username: string,
   ): Promise<void> {
-    // this.logger.debug("payload: ", JSON.stringify(payload))
     const user = await this.userService.getChatRoomsByLogin(username);
+
     if (user) {
       user.chatRooms.forEach((room) => {
         client.join(room.id);

@@ -563,6 +563,12 @@ export class UserService {
 
       if (chatRoom?.participants.length === 0) {
         // If the chat room is empty, delete it
+        await this.prisma.message.deleteMany({
+          where: {
+            chat_id: roomId,
+          },
+        });
+
         await this.prisma.chatRoom.delete({
           where: { id: roomId },
         });
