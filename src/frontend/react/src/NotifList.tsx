@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Notif from "./Notif";
 import { useApi } from "./apiStore";
+import { navigate } from "wouter/use-location";
 
 interface NotifListProps {}
 
@@ -33,6 +34,9 @@ const NotifList: React.FC<NotifListProps> = () => {
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();

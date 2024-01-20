@@ -107,6 +107,9 @@ const ChatContent = (props: ChatContentProps) => {
         );
 
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 

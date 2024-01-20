@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../apiStore";
 import { test, updateChatRooms } from "../../context/ChatContext";
+import { navigate } from "wouter/use-location";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -45,6 +46,9 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -109,6 +113,9 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       .then(async (response) => {
         console.log("some response received: ", response);
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           if (response.status == 403) {
             setWarningText("You were banned from this channel");
             toggleVisibility(true);
