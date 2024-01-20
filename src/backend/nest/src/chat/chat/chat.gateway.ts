@@ -15,9 +15,11 @@ import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
 import { UserStatus } from './User';
 
+const ip = process.env.PUBLIC_IP;
+
 @WebSocketGateway({
   namespace: '/chat',
-  cors: { origin: 'http://localhost:5173', credentials: true },
+  cors: { origin: `http://${ip}:5173`, credentials: true },
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect

@@ -17,9 +17,11 @@ import Queue from './utils/Queue';
 import { Room } from './utils/Room';
 import { gameConfig } from './utils/gameConfig';
 
+const ip = process.env.PUBLIC_IP;
+
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: { origin: 'http://localhost:5173', credentials: true },
+  cors: { origin: `http://${ip}:5173`, credentials: true },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect

@@ -56,7 +56,7 @@ export class AuthController {
         res
           .cookie('token2fa', token, {
             expires: new Date(Date.now() + 2 * 60 * 1000),
-            domain: 'localhost',
+            domain: process.env.PUBLIC_IP,
             path: '/',
             sameSite: 'none',
             secure: true,
@@ -74,7 +74,7 @@ export class AuthController {
     res
       .cookie('token', data.accessToken, {
         expires: new Date(Date.now() + 14 * 60 * 1000),
-        domain: 'localhost',
+        domain: process.env.PUBLIC_IP,
         path: '/',
         sameSite: 'none',
         secure: true,
@@ -190,7 +190,7 @@ export class AuthController {
     res
       .cookie('token', tokenPerm, {
         expires: new Date(Date.now() + 14 * 60 * 1000),
-        domain: 'localhost',
+        domain: process.env.PUBLIC_IP,
         path: '/',
         sameSite: 'none',
         secure: true,
@@ -215,7 +215,7 @@ export class AuthController {
     return res
       .cookie('token', token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        domain: 'localhost',
+        domain: process.env.PUBLIC_IP,
         path: '/',
         sameSite: 'none',
         secure: true,
@@ -239,7 +239,7 @@ export class AuthController {
     return res
       .cookie('token', token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        domain: 'localhost',
+        domain: process.env.PUBLIC_IP,
         path: '/',
         sameSite: 'none',
         secure: true,
