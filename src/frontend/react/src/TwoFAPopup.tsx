@@ -8,11 +8,10 @@ import Usetwofa from './Apiturnon';
 interface TwoFaPopupProps {
     isVisible: boolean;
     handleClose: () => void;
-    token: string;
 }
 
 
-const TwoFaPopup: React.FC<TwoFaPopupProps> = ({ isVisible, handleClose, token }) => {
+const TwoFaPopup: React.FC<TwoFaPopupProps> = ({ isVisible, handleClose }) => {
     const [warningText, setWarningText] = useState("This field is mandatory");
     const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
     const { id, login, twofa } = useApi();

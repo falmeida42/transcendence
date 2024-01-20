@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import "./Profile.css";
 import { updateUserFriends } from "./ProfileContext";
 import { useApi } from "./apiStore";
+import { navigate } from "wouter/use-location";
 
 interface AddFriendPopupProps {
   isVisible: boolean;
   handleClose: () => void;
-  token: string;
 }
 
 interface User {
@@ -18,7 +18,6 @@ interface User {
 const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
   isVisible,
   handleClose,
-  token,
 }) => {
   const [userToAdd, setUserToAdd] = useState<User>({
     id: "",
@@ -31,7 +30,11 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
   const { id, auth } = useApi();
 
   useEffect(() => {
-    if (auth === false) return;
+    const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    ?.split('=')[1];
+    if (auth === false || token === undefined) return;
     fetch(`http://localhost:3000/user/not-friends`, {
       method: "GET",
       headers: {
@@ -41,6 +44,9 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
     })
       .then(async (response) => {
         if (!response.ok) {
+          if (response.status === 401) {
+            navigate("/login");
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -80,7 +86,11 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
       toggleVisibility(true);
       return;
     }
-
+    const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    ?.split('=')[1];
+    if (auth === false || token === undefined) return;
     fetch(`http://localhost:3000/user/create-friend-request`, {
       method: "POST",
       headers: {
@@ -94,8 +104,10 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
     })
       .then(async (response) => {
         if (!response.ok) {
-          // throw new Error(`HTTP error! Status: ${response.status}`);
-          return console.log("fetch error");
+          if (response.status === 401) {
+            navigate("/login");
+          }
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
         return data ? JSON.parse(data) : null;
