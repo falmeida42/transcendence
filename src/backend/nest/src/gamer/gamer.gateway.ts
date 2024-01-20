@@ -1,4 +1,4 @@
-import { Body, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -19,7 +19,7 @@ import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: { origin: 'http://localhost:5173', credentials: true },
+  cors: { origin: '*' },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -66,8 +66,10 @@ export class GamerGateway
   handleLogin(
     @ConnectedSocket() client: Socket,
     @MessageBody('name') name: string,
+    @MessageBody('username') username: string,
   ) {
     this.players[client.id].name = name;
+    this.players[client.id].username = username;
   }
 
   @SubscribeMessage('CreateRoomAgainstAi')
@@ -253,7 +255,7 @@ export class GamerGateway
       player1: client.id,
       player2: undefined,
       againstAi: false,
-      player2waiting: player2name,
+      user: player2name,
     };
 
     this.players[roomId].room = roomId;
@@ -308,6 +310,7 @@ export class GamerGateway
       player1: {
         id: player1Id,
         name: this.players[player1Id].name,
+        username: this.players[player1Id].username,
         ready: false,
         x: 5,
         y: gameConfig.height / 2 - 50,
@@ -318,9 +321,8 @@ export class GamerGateway
       },
       player2: {
         id: againstAi ? 'AI' : player2Id,
-        name: againstAi
-          ? 'Artificial Intelligence'
-          : this.players[player2Id].name,
+        name: againstAi ? 'AI' : this.players[player2Id].name,
+        username: againstAi ? 'AI' : this.players[player2Id].username,
         ready: false,
         x: gameConfig.width - 20,
         y: gameConfig.height / 2 - 50,
@@ -511,14 +513,16 @@ export class GamerGateway
 
   async saveMatchOnDatabase(match: Match) {
     try {
+      this.logger.debug(match.player1.name);
+      this.logger.debug(match.player2.name);
       const user1Id = await this.prisma.user.findUniqueOrThrow({
         where: {
-          username: match.player1.name,
+          login: match.player1.name,
         },
       });
       const user2Id = await this.prisma.user.findUniqueOrThrow({
         where: {
-          username: match.player2.name,
+          login: match.player2.name,
         },
       });
       const winnerScore =

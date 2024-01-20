@@ -13,6 +13,7 @@ type action = {
 type state = {
   isConnected: boolean;
   username?: string;
+  login?: string;
   room?: Room;
   match?: Match;
   onQueue: boolean;
@@ -25,6 +26,7 @@ const initialState: state = {
   room: undefined,
   match: undefined,
   username: "",
+  login: "",
   onQueue: false,
   socketId: "",
 };
@@ -42,7 +44,7 @@ const disconnect = () => {
   socket.disconnect();
 };
 
-let set_name: (name: string) => void;
+let set_name: (name: string, username: string) => void;
 let clearRoom: () => void;
 
 const SocketContext = React.createContext(initialState);
@@ -55,7 +57,12 @@ const SocketProvider = (props: any) => {
       case "DISCONNECTED":
         return { ...state, isConnected: action.payload };
       case "NAME_SET":
-        return { ...state, username: action.payload, match: undefined };
+        return {
+          ...state,
+          username: action.payload.username,
+          login: action.payload.login,
+          match: undefined,
+        };
       case "ROOM_CREATED":
         return { ...state, room: action.payload };
       case "MATCH_REFRESH":
@@ -74,9 +81,11 @@ const SocketProvider = (props: any) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // const { login, user } = useApi();
   useEffect(() => {
     socket.on("connect", () => {
       dispatch({ type: "CONNECTED", payload: true });
+      // set_name(login, user);
     });
 
     socket.on("disconnect", () => {
@@ -103,10 +112,10 @@ const SocketProvider = (props: any) => {
       dispatch({ type: "SET_WINNER", payload: undefined });
     });
 
-    set_name = (name: string) => {
+    set_name = (name: string, username: string) => {
       if (!name.trim()) return;
-      dispatch({ type: "NAME_SET", payload: name });
-      socket.emit("Login", { name: name.trim() });
+      dispatch({ type: "NAME_SET", payload: { name, username } });
+      socket.emit("Login", { name: name.trim(), username: username });
     };
 
     clearRoom = () => {
@@ -115,6 +124,7 @@ const SocketProvider = (props: any) => {
 
     socket.connect();
     return () => disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -139,7 +139,7 @@ const RealPong = (props: props) => {
             fontSize: "30px",
           }}
         >
-          {match?.score1 + " " + match?.player1.name}
+          {match?.score1 + " " + match?.player1.username}
         </text>
         <text
           x={(gameConfig.width / 2 + 20).toString()}
@@ -149,7 +149,7 @@ const RealPong = (props: props) => {
             fontSize: "30px",
           }}
         >
-          {match?.score2 + " " + match?.player2.name}
+          {match?.score2 + " " + match?.player2.username}
         </text>
         {ball && (
           <Circle
