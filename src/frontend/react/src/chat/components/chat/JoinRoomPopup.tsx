@@ -52,7 +52,6 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       })
       .then((data) => {
         if (data) {
-          console.log("Rooms received ", JSON.stringify(data));
           setChannels(data);
         } else {
           console.log("No data received");
