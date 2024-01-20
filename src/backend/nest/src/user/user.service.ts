@@ -165,7 +165,7 @@ export class UserService {
   async addFriendRequest(
     requesterId: string,
     requesteeId: string,
-  ): Promise<{ message: string; friendRequest?: any }> {
+  ): Promise<{ message: string; friendRequest?: string }> {
     try {
       // Check if both users exist
       const requestor = await this.prisma.user.findUnique({
@@ -236,7 +236,7 @@ export class UserService {
         this.insertFriend(requesterId, requesteeId);
 
         // Create the chat room
-        const chatRoom = await this.prisma.chatRoom.create({
+        await this.prisma.chatRoom.create({
           data: {
             id: crypto.randomUUID().toString(),
             name: requesterId + requesteeId,
@@ -250,6 +250,18 @@ export class UserService {
             },
           },
         });
+        // unblock user if blocked
+        await this.prisma.user.update({
+          where: {
+            id: requesterId,
+          },
+          data: {
+            blockedUsers: {
+              disconnect: { id: requesteeId },
+            },
+          },
+        });
+
         return { message: 'Friend request accepted', friendRequest };
       } else {
         const friendRequest = await this.prisma.friendRequest.update({
@@ -317,6 +329,36 @@ export class UserService {
           friends: {
             disconnect: { id: blockedId },
           },
+        },
+      });
+
+      const toRemove = await this.prisma.chatRoom.findFirst({
+        where: {
+          AND: [
+            { type: 'DIRECT_MESSAGE' },
+            {
+              participants: {
+                some: { id: id },
+              },
+            },
+            {
+              participants: {
+                some: { id: blockedId },
+              },
+            },
+          ],
+        },
+      });
+
+      this.logger.debug('Removed DM: ', toRemove);
+
+      await this.prisma.message.deleteMany({
+        where: { chat_id: toRemove.id },
+      });
+
+      await this.prisma.chatRoom.delete({
+        where: {
+          id: toRemove.id,
         },
       });
     } catch (error) {
@@ -520,10 +562,10 @@ export class UserService {
     return filteredList;
   }
 
-  async insertFriend(userId: string, friend: any) {
+  async insertFriend(userId: string, friendId: string) {
     return await this.prisma.user.update({
       where: { id: userId },
-      data: { friends: { connect: { id: friend } } },
+      data: { friends: { connect: { id: friendId } } },
     });
   }
 
