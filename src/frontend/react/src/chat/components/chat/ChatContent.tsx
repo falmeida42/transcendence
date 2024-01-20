@@ -188,13 +188,13 @@ const ChatContent = (props: ChatContentProps) => {
           <div className="chat-with">
             Chat with {props.selectedChatData.name}
           </div>
-        {!isDirectMessage && ( 
-         <i
-            onClick={handleClickLeave}
-            onMouseEnter={() => handleMouseEnter("leave chatroom")}
-            onMouseLeave={() => handleMouseLeave()}
-            className="fa fa-sign-out fa-lg clickable"
-          ></i>
+          {!isDirectMessage && (
+            <i
+              onClick={handleClickLeave}
+              onMouseEnter={() => handleMouseEnter("leave chatroom")}
+              onMouseLeave={() => handleMouseLeave()}
+              className="fa fa-sign-out fa-lg clickable"
+            ></i>
           )}
           <i
             onClick={handleClickMatch}

@@ -7,6 +7,7 @@ export interface MessageData {
   username: string;
   userImage: string;
   message: string;
+  type: boolean;
 }
 
 interface MessagesProps {
@@ -30,9 +31,12 @@ const Messages = (props: MessagesProps) => {
       {channelMessagesSelected?.map((message: any) => (
         <Message
           key={message.id}
+          id={message.id}
           username={message.username}
           text={message.message}
           image={message.userImage}
+          type={message.type}
+          senderId={message.sender}
         />
       ))}
     </div>

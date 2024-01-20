@@ -129,10 +129,9 @@ export class ChatGateway
 
   @SubscribeMessage('messageToServer')
   async handleMessage(client: Socket, payload: any) {
-
-    this.logger.debug("message: ", JSON.stringify(payload))
+    this.logger.debug('message: ', JSON.stringify(payload));
     if (!payload || !payload.senderId) {
-      return 
+      return;
     }
     const user = await this.userService.getUserById(payload.senderId);
     if (!user) {
@@ -169,14 +168,20 @@ export class ChatGateway
       return 'user banned';
     }
 
-    await this.userService.addMessage(user.id, channel.id, payload.message);
+    const res = await this.userService.addMessage(
+      user.id,
+      channel.id,
+      payload.message,
+      payload.type,
+    );
     this.io.to(payload.to).emit('messageToClient', {
-      id: crypto.randomUUID(),
+      id: res.id,
       channelId: payload.to,
       message: payload.message,
       senderId: payload.senderId,
       sender: payload.sender,
       senderImage: payload.senderImage,
+      type: payload.type,
     });
   }
 
@@ -232,5 +237,16 @@ export class ChatGateway
   @SubscribeMessage('inviteToGame')
   inviteToGame(client: Socket, @MessageBody('login') login: string) {
     this.io.emit('inviteToGame');
+  }
+
+  @SubscribeMessage('deleteMessage')
+  async deleteMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('messageId') messageId: string,
+  ) {
+    if (!messageId) return;
+    this.logger.debug(messageId);
+    await this.userService.deleteMessage(messageId);
+    this.io.emit('cu');
   }
 }

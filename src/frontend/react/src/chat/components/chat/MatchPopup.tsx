@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { useApi } from "../../../apiStore";
+import { useContext, useState } from "react";
 import { navigate } from "wouter/use-location";
+import { useApi } from "../../../apiStore";
+import { ChatContext } from "../../context/ChatContext";
 
 interface MatchPopupProps {
   isVisible: boolean;
@@ -18,7 +19,8 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
   });
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
   const [warningText, setWarningText] = useState("This field is mandatory");
-  const { login } = useApi();
+  const { user, id, image, login } = useApi();
+  const { socket } = useContext(ChatContext) ?? {};
 
   interface Participant {
     id: string;
@@ -40,6 +42,14 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
       toggleVisibility(true);
       return;
     }
+    socket.emit("messageToServer", {
+      to: props.channelId,
+      message: "Let's play Pong!",
+      senderId: id,
+      sender: user,
+      senderImage: image,
+      type: true,
+    });
     //send invite to user: component <MatchInvite />
     // console.log("Sending invite to user: ", userToInvite.login);
     props.handleClose();
@@ -100,58 +110,59 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
                   <span>&times;</span>
                 </button>
               </div>
-                { chatData?.participants.length !== 1 && (
-              <div>
+              {chatData?.participants.length !== 1 && (
+                <div>
                   <div className="modal-body">
-                  <p>Select a user to challenge to a match of Pong:</p>
-                  <ul className="popup-input">
-                    {chatData?.participants.map(
-                      (data) =>
-                        login !== data.login && (
-                          <li key={data.id}>
-                            <label>
-                              <input
-                                type="radio"
-                                value="public"
-                                name="group"
-                                onChange={() => handleRadioChange(data)}
+                    <p>Select a user to challenge to a match of Pong:</p>
+                    <ul className="popup-input">
+                      {chatData?.participants.map(
+                        (data) =>
+                          login !== data.login && (
+                            <li key={data.id}>
+                              <label>
+                                <input
+                                  type="radio"
+                                  value="public"
+                                  name="group"
+                                  onChange={() => handleRadioChange(data)}
                                 />
-                              <img src={data.image}></img>
-                              {data.login}
-                            </label>
-                          </li>
-                        ))}
-                  </ul>
-                  {isVisibleWarning && (
-                    <p style={{ color: "red" }}>{warningText}</p>
+                                <img src={data.image}></img>
+                                {data.login}
+                              </label>
+                            </li>
+                          )
+                      )}
+                    </ul>
+                    {isVisibleWarning && (
+                      <p style={{ color: "red" }}>{warningText}</p>
                     )}
-                    </div>
-                    <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-clear"
-                    onClick={handleClickYes}
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-clear"
+                      onClick={handleClickYes}
                     >
-                    Send Invite
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleClickClose}
+                      Send Invite
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleClickClose}
                     >
-                    Cancel
-                  </button>
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>  
-                )}
+              )}
             </div>
           </div>
         </div>
       )}
       {chatData?.participants.length === 1 && (
-          <p style={{ color: "red", padding: "25px" }}>
-                  There are no eligible participants to invite
-          </p>
+        <p style={{ color: "red", padding: "25px" }}>
+          There are no eligible participants to invite
+        </p>
       )}
     </div>
   );

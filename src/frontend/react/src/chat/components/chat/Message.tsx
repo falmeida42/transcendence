@@ -1,31 +1,64 @@
+import { useContext } from "react";
 import { useApi } from "../../../apiStore";
-
+import { ChatContext } from "../../context/ChatContext";
 
 interface MessageProps {
-    username: string;
-    image: string
-    text: string;
+  id: string;
+  senderId: string;
+  username: string;
+  image: string;
+  text: string;
+  type: boolean;
 }
 
+const Message = (messageProps: MessageProps) => {
+  const { user } = useApi();
+  const { socket } = useContext(ChatContext) ?? {};
 
-const Message = (messageProps : MessageProps) => {
-    
-    const { user } = useApi()
+  const handleClickAccept = (myUsername: string, messageUsername: string) => {
+    if (myUsername === messageUsername) return;
+    console.log("accept");
+  };
+  const handleClickDecline = (myUsername: string, messageUsername: string) => {
+    if (myUsername === messageUsername) return;
+    socket.emit("deleteMessage", { messageId: messageProps.id });
+  };
 
-    
-    
-    return (
-        <div>
-            <div className={`${messageProps.username === user ? "float-right" : ""}`}>
-                <img src={messageProps.image} />
-                <p>{messageProps.username}</p>
-            </div>
-            <div className={`message ${messageProps.username === user ? "other-message float-right" : "my-message "}`}>
-                
-                {messageProps.text}     
-            </div>
-        </div>
-    )
-}
+  return (
+    <div>
+      <div className={`${messageProps.username === user ? "float-right" : ""}`}>
+        <img src={messageProps.image} />
+        <p>{messageProps.username}</p>
+      </div>
+      <div
+        className={`message ${
+          messageProps.username === user
+            ? "other-message float-right"
+            : "my-message "
+        }`}
+      >
+        {messageProps.text}
+        {messageProps.type && (
+          <>
+            <button
+              onClick={handleClickAccept}
+              className="btn btn-success"
+              style={{ marginLeft: "10px" }}
+            >
+              Accept
+            </button>
+            <button
+              onClick={() => handleClickDecline(user, messageProps.username)}
+              className="btn btn-danger"
+              style={{ marginLeft: "10px" }}
+            >
+              Decline
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
-export default Message
+export default Message;

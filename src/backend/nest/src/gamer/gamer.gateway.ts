@@ -243,7 +243,7 @@ export class GamerGateway
   @SubscribeMessage('CreateRoom')
   createRoom(
     @ConnectedSocket() client: Socket,
-    @Body('player2name') player2name: string,
+    @MessageBody('player2name') player2name: string,
   ) {
     const player = this.players[client.id];
     const roomId = player.name;
@@ -255,7 +255,7 @@ export class GamerGateway
       player1: client.id,
       player2: undefined,
       againstAi: false,
-      user: player2name,
+      user2name: player2name,
     };
 
     this.players[roomId].room = roomId;

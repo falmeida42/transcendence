@@ -81,6 +81,7 @@ model Message {
   sender_id      String
   sender         User     @relation(fields: [userId], references: [id])
   userId         String
+  invite         Boolean  @default(false)
 }
 
 model Match {
