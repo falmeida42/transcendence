@@ -93,6 +93,14 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('friends/:id')
+  async getFriendfriend(@Param('id') id: string) {
+    const user = await this.userService.getFriends(id);
+    if (user)
+      return user;
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('not-friends')
   async getNotFriends(@GetMe('id') id: string) {
     return await this.userService.getNotFriends(id);
