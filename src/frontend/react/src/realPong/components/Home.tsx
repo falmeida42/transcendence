@@ -99,9 +99,6 @@ const Home = () => {
         <div className="game-buttons">
           <button onClick={() => createRoom(true)}>Play against AI</button>
           <button onClick={() => joinQueue()}>Play a random</button>
-          <button onClick={() => createRoom(false)}>
-            Play against a friend
-          </button>
         </div>
       </div>
     );

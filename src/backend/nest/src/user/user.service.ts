@@ -30,6 +30,9 @@ export class UserService {
     try {
       return await this.prisma.user.findUnique({
         where: { id: userId },
+        include: {
+          chatRooms: true,
+        },
       });
     } catch (error) {
       this.logger.error(error);
@@ -836,6 +839,28 @@ export class UserService {
     });
     if (user && user.muteExpiration > new Date()) return true;
     return false;
+  }
+
+  async isUserInRoom(userId: string, roomId: string) {
+    if (!roomId || !userId) {
+      throw new NotFoundException('Could not find user with id');
+    }
+
+    const chatRoom = await this.getChatRoomById(roomId);
+
+    if (!chatRoom) {
+      throw new NotFoundException('No chatRoom with that id');
+    }
+
+    const isUserInRoom = chatRoom.participants.filter(
+      (participant) => participant.id === userId,
+    );
+
+    if (isUserInRoom.length === 0) {
+      return false;
+    }
+
+    return true;
   }
 
   unmuteUser(participantId: string, roomId: string) {
