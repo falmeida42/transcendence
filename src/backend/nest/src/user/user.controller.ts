@@ -114,7 +114,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('create-friend-request')
   async addFriendRequest(
-    @Req() req: Request,
     @Body('requesterId', InputStringValidationPipe) requesterId: string,
     @Body('requesteeId', InputStringValidationPipe) requesteeId: string,
     @Res() res: Response,

@@ -165,7 +165,7 @@ export class UserService {
   async addFriendRequest(
     requesterId: string,
     requesteeId: string,
-  ): Promise<{ message: string; friendRequest?: any }> {
+  ): Promise<{ message: string; friendRequest?: string }> {
     try {
       // Check if both users exist
       const requestor = await this.prisma.user.findUnique({
@@ -562,10 +562,10 @@ export class UserService {
     return filteredList;
   }
 
-  async insertFriend(userId: string, friend: any) {
+  async insertFriend(userId: string, friendId: string) {
     return await this.prisma.user.update({
       where: { id: userId },
-      data: { friends: { connect: { id: friend } } },
+      data: { friends: { connect: { id: friendId } } },
     });
   }
 
