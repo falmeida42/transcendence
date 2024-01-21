@@ -36,7 +36,7 @@ const Messages = (props: MessagesProps) => {
           text={message.message}
           image={message.userImage}
           type={message.type}
-          senderId={message.senderId}
+          senderId={message.username}
         />
       ))}
     </div>

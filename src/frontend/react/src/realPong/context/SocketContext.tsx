@@ -2,6 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useEffect, useReducer } from "react";
 import { io } from "socket.io-client";
+import { useApi } from "../../apiStore";
 import { Match } from "../types/Match";
 import { Room } from "../types/Room";
 
@@ -49,7 +50,13 @@ let clearRoom: () => void;
 
 const SocketContext = React.createContext(initialState);
 
+let name: string;
+let username: string;
+
 const SocketProvider = (props: any) => {
+  const { login, user } = useApi();
+  name = login;
+  username = user;
   const reducer = (state: state, action: action): state => {
     switch (action.type) {
       case "CONNECTED":
@@ -83,9 +90,8 @@ const SocketProvider = (props: any) => {
 
   // const { login, user } = useApi();
   useEffect(() => {
-    socket.on("connect", () => {
+    socket.on("connect", async () => {
       dispatch({ type: "CONNECTED", payload: true });
-      // set_name(login, user);
     });
 
     socket.on("disconnect", () => {
@@ -167,6 +173,11 @@ const leaveRoom = () => {
   socket.emit("LeaveRoom");
 };
 
+const joinRoomInvite = (roomId: string) => {
+  set_name(name, username);
+  socket.emit("joinRoom", { roomId: roomId });
+};
+
 export {
   SocketContext,
   SocketProvider,
@@ -174,6 +185,7 @@ export {
   createRoom,
   gameLoaded,
   joinQueue,
+  joinRoomInvite,
   joinRoomSpec,
   leaveQueue,
   leaveRoom,

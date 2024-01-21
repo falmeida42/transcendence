@@ -1,5 +1,7 @@
 import { useContext } from "react";
+import { navigate } from "wouter/use-location";
 import { useApi } from "../../../apiStore";
+import { joinRoomInvite } from "../../../realPong/context/SocketContext";
 import { ChatContext } from "../../context/ChatContext";
 
 interface MessageProps {
@@ -12,16 +14,19 @@ interface MessageProps {
 }
 
 const Message = (messageProps: MessageProps) => {
-  const { user, id } = useApi();
+  const { user } = useApi();
   const { socket } = useContext(ChatContext) ?? {};
 
   const handleClickAccept = (myUsername: string, messageUsername: string) => {
     if (myUsername === messageUsername) return;
-    console.log("accept", id, "sender", messageProps.senderId);
-    socket.emit("enterGame", {
-      player1Id: id,
-      player2Id: messageProps.senderId,
-    });
+    navigate("/Game");
+    joinRoomInvite(messageProps.senderId);
+    socket.emit("deleteMessage", { messageId: messageProps.id });
+    // socket.emit("enterGame", {
+    //   player1Id: id,
+    //   player2Id: messageProps.senderId,
+    // });
+    // socket.emit("deleteMessage", { messageId: messageProps.id });
   };
   const handleClickDecline = (myUsername: string, messageUsername: string) => {
     if (myUsername === messageUsername) return;

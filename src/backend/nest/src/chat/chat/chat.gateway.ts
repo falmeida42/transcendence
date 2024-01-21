@@ -17,7 +17,7 @@ import { UserStatus } from './User';
 
 @WebSocketGateway({
   namespace: '/chat',
-  cors: { origin: 'http://localhost:5173', credentials: true },
+  cors: { origin: '*' },
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -70,7 +70,7 @@ export class ChatGateway
       });
     }
 
-    console.log('user connected');
+    // console.log('user connected');
     if (existingUserIndex !== -1) {
       // User with the same username already exists, update the data
       this.users[existingUserIndex] = {
@@ -223,7 +223,7 @@ export class ChatGateway
         userStatus: status,
       };
 
-      console.log('user: ', JSON.stringify(this.users));
+      // console.log('user: ', JSON.stringify(this.users));
     }
 
     this.io.emit('getUsersConnected', this.users);

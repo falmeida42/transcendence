@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useApi } from "../../../apiStore";
 import { navigate } from "wouter/use-location";
+import { useApi } from "../../../apiStore";
 
 interface MutePopupProps {
   isVisible: boolean;
@@ -46,7 +46,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
 
-    console.log(props.channelId);
+    // console.log(props.channelId);
 
     fetch(`http://localhost:3000/user/mute-user`, {
       method: "POST",
@@ -68,7 +68,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
         if (!data) {
           console.log("No data received");
         }
-        console.log(data);
+        // console.log(data);
       })
       .catch(() => {
         console.log("cu");

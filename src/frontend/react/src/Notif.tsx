@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { navigate } from "wouter/use-location";
 import { updateBlockableUsers, updateUserFriends } from "./ProfileContext";
 import { test } from "./chat/context/ChatContext";
-import { navigate } from "wouter/use-location";
 
 interface NotifProps {
   requestor_image: string;
@@ -46,9 +46,11 @@ const Notif: React.FC<NotifProps> = (props) => {
         })
         .then(() => {
           updateUserFriends();
-        }).then(() => {
+        })
+        .then(() => {
           test();
-        }).then(() => {
+        })
+        .then(() => {
           updateBlockableUsers();
         })
         .catch((error) => console.error("Fetch error:", error));

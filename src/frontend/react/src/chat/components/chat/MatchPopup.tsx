@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { navigate } from "wouter/use-location";
 import { useApi } from "../../../apiStore";
+import { joinRoomInvite } from "../../../realPong/context/SocketContext";
 import { ChatContext } from "../../context/ChatContext";
 
 interface MatchPopupProps {
@@ -50,6 +51,8 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
       senderImage: image,
       type: true,
     });
+    navigate("/Game");
+    joinRoomInvite(user);
     //send invite to user: component <MatchInvite />
     // console.log("Sending invite to user: ", userToInvite.login);
     props.handleClose();

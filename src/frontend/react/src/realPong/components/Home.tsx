@@ -28,7 +28,6 @@ const Home = () => {
         set_name(login, user);
         setPage(2);
 
-        // setPage(1);
         return;
       }
       if (onQueue) {

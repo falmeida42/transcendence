@@ -32,11 +32,11 @@ const Chats = (chatsProps: ChatsProps) => {
       )[0];
 
       const userStatus = usersOnline.filter((user) => {
-        console.log("user.userId ", user.userId, "otherUser.id", otherUser.id);
+        // console.log("user.userId ", user.userId, "otherUser.id", otherUser.id);
         return user.userId === otherUser.id;
       })[0];
 
-      console.log("user status -> ", JSON.stringify(userStatus));
+      // console.log("user status -> ", JSON.stringify(userStatus));
       if (!userStatus) {
         rooms.push({
           id: room.id,
