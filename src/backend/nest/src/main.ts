@@ -17,7 +17,12 @@ async function bootstrap() {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://10.12.8.6:5173',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Authorization',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  });
 
   await app.listen(3000, '0.0.0.0');
 }

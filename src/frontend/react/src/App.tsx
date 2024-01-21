@@ -23,12 +23,16 @@ function App() {
 
   useEffect(() => {
     if (token && token2fa) {
+      console.debug("Both tokens");
       document.cookie = `${"token2fa"}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=10.12.8.6;`;
       navigate("/");
     } else if (token2fa) {
+      console.debug("Just 2fa token");
+
       <ApiData2faProvider />;
       navigate("/2fa");
     } else if (token) {
+      console.debug("Just normal token");
       navigate(location);
       if (auth === false) {
         setauth(true);

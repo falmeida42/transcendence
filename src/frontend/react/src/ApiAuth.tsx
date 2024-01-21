@@ -29,7 +29,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          // credentials: "include",
+          credentials: "include",
           body: JSON.stringify({ code: newUserData }),
         }
       );
@@ -49,7 +49,7 @@ const UseAuth = ({ code }: UseAuthProps) => {
     }
   };
 
-  // useEffect(() => {},[auth]);
+  // useEffect(() => {}, [auth]);
 
   return (
     <div className="centered2-container">
