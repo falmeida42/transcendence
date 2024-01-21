@@ -72,7 +72,6 @@ export class AuthController {
 
     // Execute login without 2FA
     const data = await this.authService.signup(dto);
-    this.logger.debug('CENA DE TEXTO ' + data);
     res
       .cookie('token', data.accessToken, {
         expires: new Date(Date.now() + 14 * 60 * 1000),
@@ -81,8 +80,7 @@ export class AuthController {
         // sameSite: 'none',
         // secure: true,
       })
-      .send();
-    // .redirect(`${process.env.FRONTEND_URL}`);
+      .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
@@ -101,7 +99,6 @@ export class AuthController {
       if (!user.twoFactorAuthSecret) {
         // generate 2FA secret
         const secret = this.authService.generate2FASecret();
-        this.logger.debug('GENERATING 2FA SECRET ', secret);
         // update user data
         await this.userService.set2FASecret(user.id, secret);
       }
@@ -184,7 +181,6 @@ export class AuthController {
     }
     const token = await this.authService.signAccessToken(Number(user.id));
 
-    this.logger.debug('ENTROU', token);
     if (!token) {
       this.logger.debug('token unauthorized');
       return res
@@ -192,7 +188,6 @@ export class AuthController {
         .json({ message: 'Bad token' })
         .send();
     }
-    this.logger.debug('ACCESS TOKEN ', token);
     // return (
     res
       .cookie('token', token, {
@@ -203,53 +198,5 @@ export class AuthController {
       .send();
     // .redirect(`${process.env.FRONTEND_URL}`);
     return;
-  }
-
-  @Get('dummy-user-token')
-  async getDummyUserToken(@Res() res: Response): Promise<any> {
-    // Assuming you have a dummy user in your database
-    const dummyUser = await this.prisma.user.findUnique({
-      where: { login: 'dummyUser' },
-    });
-
-    if (!dummyUser) {
-      throw new Error('Dummy user not found');
-    }
-
-    const token = this.authService.generateToken(dummyUser);
-    return res
-      .cookie('token', token, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        domain: '10.12.8.6',
-        path: '/',
-        // sameSite: 'none',
-        // secure: true,
-      })
-      .status(200)
-      .redirect(`${process.env.FRONTEND_URL}`);
-  }
-
-  @Get('dummy-user-token2')
-  async getDummyUser2Token(@Res() res: Response): Promise<any> {
-    // Assuming you have a dummy user in your database
-    const dummyUser = await this.prisma.user.findUnique({
-      where: { login: 'dummyUser2' },
-    });
-
-    if (!dummyUser) {
-      throw new Error('Dummy user not found');
-    }
-
-    const token = this.authService.generateToken(dummyUser);
-    return res
-      .cookie('token', token, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        domain: '10.12.8.6',
-        path: '/',
-        // sameSite: 'none',
-        // secure: true,
-      })
-      .status(200)
-      .redirect(`${process.env.FRONTEND_URL}`);
   }
 }
