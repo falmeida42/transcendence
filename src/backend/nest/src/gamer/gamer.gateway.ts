@@ -146,6 +146,7 @@ export class GamerGateway
     const player = this.players[socketId];
     const roomId = player.room;
     const room = this.rooms[roomId];
+    if (!room || !player) return;
     const playerNumber = 'player' + (socketId === room.player1 ? 1 : 2);
     const match = this.match[roomId];
 

@@ -87,12 +87,22 @@ const MatchHistory = ({ id }: props) => {
                     handleNavigate(match.winner.login);
                   }}
                 >
-                  <img
-                    src={match.winner.image}
-                    className="img-responsive"
-                    title={`See the ${match.winner.login} profile`}
-                    alt="#"
-                  ></img>
+                  {match.winner.login !== "AI" && (
+                    <img
+                      src={match.winner.image}
+                      className="img-responsive"
+                      title={`See the ${match.winner.login} profile`}
+                      alt="#"
+                    ></img>
+                  )}
+                  {match.winner.login === "AI" && (
+                    <img
+                      src={match.loser.image}
+                      className="img-responsive"
+                      title={`See the ${match.loser.login} profile`}
+                      alt="#"
+                    ></img>
+                  )}
                 </a>
               </span>
               <span>

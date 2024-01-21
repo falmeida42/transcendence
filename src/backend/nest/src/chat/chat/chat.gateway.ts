@@ -76,6 +76,7 @@ export class ChatGateway
       this.users[existingUserIndex] = {
         id: payload.socketId,
         userId: payload.id,
+        username: user.username,
         userStatus: UserStatus.ONLINE,
       };
     } else {
@@ -83,6 +84,7 @@ export class ChatGateway
       this.users.push({
         id: payload.socketId,
         userId: payload.id,
+        username: user.username,
         userStatus: UserStatus.ONLINE,
       });
     }
@@ -200,7 +202,6 @@ export class ChatGateway
 
   @SubscribeMessage('updateStatus')
   async updateStatus(@Body('id') id: string, @Body('status') status: number) {
-    this.logger.debug(`teu cu ${id}`);
     const userReceived = await this.userService.getUserById(id);
 
     if (!userReceived) {
@@ -216,8 +217,10 @@ export class ChatGateway
     );
 
     if (existingUserIndex !== -1) {
-      this.logger.debug(`Troslei`);
       // User with the same username already exists, update the data
+      if (status !== 1) {
+        await this.userService.deleteAllInvites(userReceived.id);
+      }
       this.users[existingUserIndex] = {
         ...this.users[existingUserIndex],
         userStatus: status,
