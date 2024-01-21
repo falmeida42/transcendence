@@ -619,7 +619,7 @@ export class UserService {
       this.logger.error('Error leaving room:', error.message || error);
       return {
         success: false,
-        message: 'Internal server error',
+        message: 'error',
         error: error.message,
       };
     }
@@ -659,7 +659,7 @@ export class UserService {
       };
     } catch (error) {
       this.logger.error('Error joining room:', error.message || error);
-      return { success: false, message: 'Internal server error' };
+      return { success: false, message: 'error' };
     }
   }
 

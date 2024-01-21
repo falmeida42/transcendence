@@ -108,46 +108,53 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
                   <span>&times;</span>
                 </button>
               </div>
-              <div>
-                <div className="modal-body">
-                  <p>Select a user from the list to block:</p>
-                  <ul className="popup-input">
-                    {blockableUsers.map((user: User) => (
-                      <li key={user.id}>
-                        <label>
-                          <input
-                            type="radio"
-                            value="public"
-                            name="group"
-                            onChange={() => handleRadioChange(user)}
-                          />
-                          <img src={user.userImage} alt={user.username} />
-                          {user.username}
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                  {isVisibleWarning && (
-                    <p style={{ color: "red" }}>{warningText}</p>
-                  )}
+              {blockableUsers?.length !== 0 && (
+                <div>
+                  <div className="modal-body">
+                    <p>Select a user from the list to block:</p>
+                    <ul className="popup-input">
+                      {blockableUsers.map((user: User) => (
+                        <li key={user.id}>
+                          <label>
+                            <input
+                              type="radio"
+                              value="public"
+                              name="group"
+                              onChange={() => handleRadioChange(user)}
+                            />
+                            <img src={user.userImage} alt={user.username} />
+                            {user.username}
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                    {isVisibleWarning && (
+                      <p style={{ color: "red" }}>{warningText}</p>
+                    )}
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-clear"
+                      onClick={handleClickYes}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleClickClose}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-clear"
-                    onClick={handleClickYes}
-                  >
-                    Submit
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleClickClose}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+              )}
+              {blockableUsers?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible users to block
+                </p>
+              )}
             </div>
           </div>
         </div>

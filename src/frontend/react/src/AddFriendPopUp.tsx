@@ -139,8 +139,9 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
                   <span>&times;</span>
                 </button>
               </div>
+              { users?.length !== 0 && (
               <div>
-                <div className="modal-body">
+                  <div className="modal-body">
                   <p>Select a user from the list:</p>
                   <ul className="popup-input">
                     {users.map((user) => (
@@ -151,7 +152,7 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
                             value="public"
                             name="group"
                             onChange={() => handleRadioChange(user)}
-                          />
+                            />
                           <img src={user.userImage} alt={user.username} />
                           {user.username}
                         </label>
@@ -167,18 +168,24 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
                     type="button"
                     className="btn btn-clear"
                     onClick={handleClickYes}
-                  >
+                    >
                     Submit
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
                     onClick={handleClickClose}
-                  >
+                    >
                     Cancel
                   </button>
                 </div>
               </div>
+              )}
+               {users?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible users to add as friend
+                </p>
+              )}             
             </div>
           </div>
         </div>

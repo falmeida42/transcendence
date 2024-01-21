@@ -144,7 +144,7 @@ export class UserController {
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
       return {
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        statusCode: HttpStatus.FORBIDDEN,
         message: 'Error accepting friend request',
         error,
       };
@@ -162,7 +162,7 @@ export class UserController {
       return { statusCode: HttpStatus.CREATED, ...result };
     } catch (error) {
       return {
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        statusCode: HttpStatus.FORBIDDEN,
         message: 'Error accepting friend request',
         error,
       };
