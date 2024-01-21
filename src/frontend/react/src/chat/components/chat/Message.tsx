@@ -18,14 +18,25 @@ interface MessageProps {
 
 const Message = (messageProps: MessageProps) => {
   const { user } = useApi();
-  const { socket } = useContext(ChatContext) ?? {};
+  const { socket, usersOnline } = useContext(ChatContext) ?? {};
 
   const handleClickAccept = (myUsername: string, messageUsername: string) => {
     if (myUsername === messageUsername) return;
+    const isUserOnline =
+      usersOnline.filter(
+        (useri) =>
+          useri.username === messageProps.senderId && useri.userStatus === 1
+      ).length !== 0;
+    if (!isUserOnline) {
+      declinedInvite(messageProps.senderId);
+      socket.emit("deleteMessage", { messageId: messageProps.id });
+      return;
+    }
     navigate("/Game");
     joinRoomInvite(messageProps.senderId);
     socket.emit("deleteMessage", { messageId: messageProps.id });
   };
+
   const handleClickDecline = (myUsername: string, messageUsername: string) => {
     if (myUsername === messageUsername) return;
     socket.emit("deleteMessage", { messageId: messageProps.id });
