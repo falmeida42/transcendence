@@ -1,6 +1,6 @@
-import React, { ReactNode, useEffect } from 'react';
-import { useApi } from './apiStore';
-import { navigate } from 'wouter/use-location';
+import { useEffect } from "react";
+import { navigate } from "wouter/use-location";
+import { useApi } from "./apiStore";
 
 interface UseUpdateUserDataProps {
   username?: string;
@@ -8,26 +8,25 @@ interface UseUpdateUserDataProps {
 }
 
 const useUpdateUserData = (props: UseUpdateUserDataProps) => {
-
-  const {setfailToUpdate, setImage, setUsername} = useApi();
+  const { setfailToUpdate, setImage, setUsername } = useApi();
   const token = document.cookie
-  .split('; ')
-  .find((row) => row.startsWith('token='))
-  ?.split('=')[1];
-  if (token === undefined){
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
+  if (token === undefined) {
     return;
   }
 
   useEffect(() => {
     const updateData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/user/me', {
-          method: 'POST',
+        const response = await fetch("http://10.12.8.6:3000/user/me", {
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          
+
           body: JSON.stringify({
             username: props.username,
             image: props.image,
@@ -35,24 +34,25 @@ const useUpdateUserData = (props: UseUpdateUserDataProps) => {
         });
         if (!response.ok) {
           if (response.status === 401) {
-            navigate('/login');
+            navigate("/login");
             return;
           }
           setfailToUpdate(true);
-        }
-        else {
+        } else {
           setfailToUpdate(false);
           if (props.image !== undefined) {
-            setImage(props.image);}
+            setImage(props.image);
+          }
           if (props.username !== undefined) {
-            setUsername(props.username);}
+            setUsername(props.username);
+          }
         }
       } catch {
         // console.error(error);
       }
     };
     updateData();
-}, [props.username, props.image]);
+  }, [props.username, props.image]);
 };
 
 export default useUpdateUserData;

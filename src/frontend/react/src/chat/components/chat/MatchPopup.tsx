@@ -51,8 +51,8 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
       senderImage: image,
       type: true,
     });
-    navigate("/Game");
     joinRoomInvite(user);
+    navigate("/Game");
     //send invite to user: component <MatchInvite />
     // console.log("Sending invite to user: ", userToInvite.login);
     props.handleClose();
@@ -70,7 +70,7 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
     .split("; ")
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
-  fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
+  fetch(`http://10.12.8.6:3000/user/chatRoom/${props.channelId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${tk}`,

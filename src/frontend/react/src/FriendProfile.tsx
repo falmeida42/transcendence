@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { navigate } from "wouter/use-location";
+import Friendfriend from "./FriendFriend";
 import MatchHistory from "./MatchHistory";
 import "./Profile.css";
 import ScoreBar from "./ScoreBar";
-import Friendfriend from "./FriendFriend";
 
 // interface User {
 // 	id: string,
@@ -37,7 +37,7 @@ const FriendProfile = ({ login }: props) => {
         if (token === undefined || login === undefined) return;
 
         const response = await fetch(
-          `http://localhost:3000/user/find/login/${login}`,
+          `http://10.12.8.6:3000/user/find/login/${login}`,
           {
             method: "GET",
             headers: {
@@ -127,18 +127,27 @@ const FriendProfile = ({ login }: props) => {
             >
               Match History
             </a>
-            <a className="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#project_worked" role="tab" aria-selected="false">Friend List</a>
+            <a
+              className="nav-item nav-link"
+              id="nav-profile-tab"
+              data-toggle="tab"
+              href="#project_worked"
+              role="tab"
+              aria-selected="false"
+            >
+              Friend List
+            </a>
           </div>
         </nav>
         <div className="tab-content" id="nav-tabContent">
-          <MatchHistory id={id} />
+          <MatchHistory id={id} prof={login}/>
           <div
             className="tab-pane fade"
             id="project_worked"
             role="tabpanel"
             aria-labelledby="nav-home-tab"
           >
-            <Friendfriend id={id}/>
+            <Friendfriend id={id} />
           </div>
         </div>
       </div>

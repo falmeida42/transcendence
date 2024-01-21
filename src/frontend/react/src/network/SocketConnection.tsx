@@ -8,7 +8,7 @@ export var currentRoom: string | null;
 export const Connection: React.FunctionComponent = () => {
   socketIoRef = useRef<SocketIoReference.Socket>();
   useEffect(() => {
-    socketIoRef.current = io("http://localhost:3000/chat", {}).connect();
+    socketIoRef.current = io("http://10.12.8.6:3000/chat", {}).connect();
 
     socketIoRef.current.on("connect", () => {
       // console.log('Client connected')

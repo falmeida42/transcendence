@@ -1,10 +1,10 @@
-import { createContext, ReactNode, useState, useEffect, useRef } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 import { navigate } from "wouter/use-location";
 import { useApi } from "./apiStore";
 
 interface ProfileContextProps {
-  userFriends: any,
-  blockableUsers: any
+  userFriends: any;
+  blockableUsers: any;
 }
 
 interface ProfileProviderProps {
@@ -12,163 +12,159 @@ interface ProfileProviderProps {
 }
 
 interface User {
-	id: string,
-	username: string,
-	userImage: string,
-  userLogin: string,
+  id: string;
+  username: string;
+  userImage: string;
+  userLogin: string;
 }
 
-const ProfileContext = createContext<ProfileContextProps | undefined>(undefined);
+const ProfileContext = createContext<ProfileContextProps | undefined>(
+  undefined
+);
 
 let updateUserFriends: () => void;
 let updateBlockableUsers: () => void;
 
 function ProfileProvider({ children }: ProfileProviderProps) {
-    
-    const [userFriends, setUserFriends] = useState<User[]>([])
-    const [blockableUsers, setBlockableUsers] = useState<User[]>([])
-    const {auth} = useApi();
-    
-    const tk = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
-  
+  const [userFriends, setUserFriends] = useState<User[]>([]);
+  const [blockableUsers, setBlockableUsers] = useState<User[]>([]);
+  const { auth } = useApi();
+
+  const tk = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
+
   updateUserFriends = () => {
     if (auth === false) return;
 
-    fetch(`http://localhost:3000/user/friends`, {
+    fetch(`http://10.12.8.6:3000/user/friends`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,
         "Content-Type": "application/json",
       },
     })
-    .then(async (response) => {
+      .then(async (response) => {
         if (!response.ok) {
           if (response.status === 401) {
-            navigate('/login');
+            navigate("/login");
           }
-            throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
         return data ? JSON.parse(data) : null;
-    })
-    .then((data) => {
+      })
+      .then((data) => {
         const mappedFriends = data.map((friend: any) => ({
-            id: friend.id,
-            username: friend.username,
-            userImage: friend.image,
-            userLogin: friend.login,
+          id: friend.id,
+          username: friend.username,
+          userImage: friend.image,
+          userLogin: friend.login,
         }));
-        
-        setUserFriends([...mappedFriends]);
-    })
-    .catch((error) => console.error("Fetch error:", error));
 
-  }
+        setUserFriends([...mappedFriends]);
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  };
 
   updateBlockableUsers = () => {
-
-    fetch(`http://localhost:3000/user/blockable-users`, {
+    fetch(`http://10.12.8.6:3000/user/blockable-users`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,
         "Content-Type": "application/json",
       },
     })
-    .then(async (response) => {
+      .then(async (response) => {
         if (!response.ok) {
           if (response.status === 401) {
-            navigate('/login');
+            navigate("/login");
           }
-            throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
         return data ? JSON.parse(data) : null;
-    })
-    .then((data) => {
+      })
+      .then((data) => {
         const mappedBlockableUsers = data.map((friend: any) => ({
-            id: friend.id,
-            username: friend.username,
-            userImage: friend.image,
+          id: friend.id,
+          username: friend.username,
+          userImage: friend.image,
         }));
-        
-        setBlockableUsers(mappedBlockableUsers);
-    })
-    .catch((error) => console.error("Fetch error:", error));
 
-  }
+        setBlockableUsers(mappedBlockableUsers);
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  };
 
   useEffect(() => {
     const tk = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
     if (auth === false || tk === undefined) return;
 
-    fetch(`http://localhost:3000/user/friends`, {
+    fetch(`http://10.12.8.6:3000/user/friends`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,
         "Content-Type": "application/json",
       },
     })
-    .then(async (response) => {
+      .then(async (response) => {
         if (!response.ok) {
           if (response.status === 401) {
-            navigate('/login');
+            navigate("/login");
           }
         }
         const data = await response.text();
         return data ? JSON.parse(data) : null;
-    })
-    .then((data) => {
+      })
+      .then((data) => {
         const mappedFriends = data.map((friend: any) => ({
-            id: friend.id,
-            username: friend.username,
-            userImage: friend.image,
-            userLogin: friend.login,
+          id: friend.id,
+          username: friend.username,
+          userImage: friend.image,
+          userLogin: friend.login,
         }));
-        
-        setUserFriends([...mappedFriends]);
-    })
-    .catch((error) => console.error("Fetch error:", error));
 
-    fetch(`http://localhost:3000/user/blockable-users`, {
+        setUserFriends([...mappedFriends]);
+      })
+      .catch((error) => console.error("Fetch error:", error));
+
+    fetch(`http://10.12.8.6:3000/user/blockable-users`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,
         "Content-Type": "application/json",
       },
     })
-    .then(async (response) => {
+      .then(async (response) => {
         if (!response.ok) {
           if (response.status === 401) {
-            navigate('/login');
+            navigate("/login");
           }
-            throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
         return data ? JSON.parse(data) : null;
-    })
-    .then((data) => {
+      })
+      .then((data) => {
         const mappedBlockableUsers = data.map((friend: any) => ({
-            id: friend.id,
-            username: friend.username,
-            userImage: friend.image,
+          id: friend.id,
+          username: friend.username,
+          userImage: friend.image,
         }));
-        
+
         setBlockableUsers([...mappedBlockableUsers]);
-    })
-    .catch((error) => console.error("Fetch error:", error));
-
+      })
+      .catch((error) => console.error("Fetch error:", error));
   }, [auth, ProfileContext]);
-
 
   const contextValue: ProfileContextProps = {
     userFriends: userFriends,
-    blockableUsers: blockableUsers
+    blockableUsers: blockableUsers,
   };
 
   return (
@@ -178,4 +174,9 @@ function ProfileProvider({ children }: ProfileProviderProps) {
   );
 }
 
-export { ProfileContext, ProfileProvider, updateUserFriends, updateBlockableUsers };
+export {
+  ProfileContext,
+  ProfileProvider,
+  updateBlockableUsers,
+  updateUserFriends,
+};

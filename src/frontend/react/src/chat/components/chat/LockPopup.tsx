@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { navigate } from "wouter/use-location";
 import { useApi } from "../../../apiStore";
 import { updateChatRooms } from "../../context/ChatContext";
-import { navigate } from "wouter/use-location";
 
 interface LockPopupProps {
   isVisible: boolean;
@@ -32,7 +32,7 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
 
-  fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
+  fetch(`http://10.12.8.6:3000/user/chatRoom/${props.channelId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${tk}`,
@@ -64,44 +64,46 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
   };
 
   const handleClickYes = (mode: string) => {
-    if (mode === "remove")
-    {
+    if (mode === "remove") {
       const tk = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
-      fetch(`http://localhost:3000/user/update-room-privacy/${props.channelId}`, {
-        method: "POST",
-        headers: {
-        Authorization: `Bearer ${tk}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        type: "PRIVATE",
-        password: "",
-      }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          if (response.status === 401) {
-            navigate("/login");
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1];
+      fetch(
+        `http://10.12.8.6:3000/user/update-room-privacy/${props.channelId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tk}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "PRIVATE",
+            password: "",
+          }),
+        }
+      )
+        .then(async (response) => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              navigate("/login");
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.text();
-        return data ? JSON.parse(data) : null;
-      })
-      .then((data) => {
-        if (data) {
-          console.log("Room updated", JSON.stringify(data));
-        } else {
-          console.log("No data received");
-        }
-      })
-      .then(updateChatRooms)
-      .catch((error) => console.error("Fetch error:", error));
-      
-      ////////////////////////////////// 
+          const data = await response.text();
+          return data ? JSON.parse(data) : null;
+        })
+        .then((data) => {
+          if (data) {
+            console.log("Room updated", JSON.stringify(data));
+          } else {
+            console.log("No data received");
+          }
+        })
+        .then(updateChatRooms)
+        .catch((error) => console.error("Fetch error:", error));
+
+      //////////////////////////////////
     } else {
       if (inputPassword === "") {
         toggleVisibility(true);
@@ -111,44 +113,45 @@ const LockPopup: React.FC<LockPopupProps> = (props: LockPopupProps) => {
         .split("; ")
         .find((row) => row.startsWith("token="))
         ?.split("=")[1];
-        fetch(`http://localhost:3000/user/update-room-privacy/${props.channelId}`, {
+      fetch(
+        `http://10.12.8.6:3000/user/update-room-privacy/${props.channelId}`,
+        {
           method: "POST",
-      headers: {
-        Authorization: `Bearer ${tk}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        type: "PROTECTED",
-        password: inputPassword,
-      }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          if (response.status === 401) {
-            navigate("/login");
+          headers: {
+            Authorization: `Bearer ${tk}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "PROTECTED",
+            password: inputPassword,
+          }),
+        }
+      )
+        .then(async (response) => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              navigate("/login");
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.text();
-        return data ? JSON.parse(data) : null;
-      })
-      .then((data) => {
-        if (data) {
-          console.log("Room updated", JSON.stringify(data));
-        } else {
-          console.log("No data received");
-        }
-      })
-      .then(updateChatRooms)
-      .catch((error) => console.error("Fetch error:", error));
-      }
+          const data = await response.text();
+          return data ? JSON.parse(data) : null;
+        })
+        .then((data) => {
+          if (data) {
+            console.log("Room updated", JSON.stringify(data));
+          } else {
+            console.log("No data received");
+          }
+        })
+        .then(updateChatRooms)
+        .catch((error) => console.error("Fetch error:", error));
+    }
     props.handleClose();
-    };
-    
-    
+  };
 
-    const toggleVisibility = (visibility: boolean) => {
-      setIsVisibleWarning(visibility);
+  const toggleVisibility = (visibility: boolean) => {
+    setIsVisibleWarning(visibility);
   };
 
   const handleInputChangePassword = (

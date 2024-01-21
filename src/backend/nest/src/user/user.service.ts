@@ -976,4 +976,12 @@ export class UserService {
   async deleteMessage(messageId: string) {
     await this.prisma.message.delete({ where: { id: messageId } });
   }
+
+  async deleteAllInvites(id: string) {
+    this.logger.debug('entrei no seu cu');
+    const teste = await this.prisma.message.deleteMany({
+      where: { id, invite: true },
+    });
+    this.logger.debug(teste);
+  }
 }

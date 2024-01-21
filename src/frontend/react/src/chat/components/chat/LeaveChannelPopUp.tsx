@@ -24,7 +24,7 @@ const LeaveChannelPopUp: React.FC<LeaveChannelProps> = (
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
-    fetch(`http://localhost:3000/user/leave-room`, {
+    fetch(`http://10.12.8.6:3000/user/leave-room`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,

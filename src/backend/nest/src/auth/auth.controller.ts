@@ -52,14 +52,15 @@ export class AuthController {
         }
 
         const token = await this.authService.sign2FAToken(user.id);
+        // this.logger.debug('CENA DE TEXTO ' + token);
 
         res
           .cookie('token2fa', token, {
             expires: new Date(Date.now() + 2 * 60 * 1000),
-            domain: 'localhost',
+            domain: '10.12.8.6',
             path: '/',
-            sameSite: 'none',
-            secure: true,
+            // sameSite: false,
+            // secure: true,
           })
           .redirect(`${process.env.FRONTEND_URL}`);
         return;
@@ -71,15 +72,17 @@ export class AuthController {
 
     // Execute login without 2FA
     const data = await this.authService.signup(dto);
+    this.logger.debug('CENA DE TEXTO ' + data);
     res
       .cookie('token', data.accessToken, {
         expires: new Date(Date.now() + 14 * 60 * 1000),
-        domain: 'localhost',
+        domain: '10.12.8.6',
         path: '/',
-        sameSite: 'none',
-        secure: true,
+        // sameSite: 'none',
+        // secure: true,
       })
-      .redirect(`${process.env.FRONTEND_URL}`);
+      .send();
+    // .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
@@ -98,15 +101,16 @@ export class AuthController {
       if (!user.twoFactorAuthSecret) {
         // generate 2FA secret
         const secret = this.authService.generate2FASecret();
+        this.logger.debug('GENERATING 2FA SECRET ', secret);
         // update user data
         await this.userService.set2FASecret(user.id, secret);
       }
 
-      const user2 = await this.userService.getUserById(user.id);
+      // const user2 = await this.userService.getUserById(user.id);
 
-    const User2 = await this.userService.getUserById(user.id);
+      const User2 = await this.userService.getUserById(user.id);
 
-    const otpAuthURL = await this.authService.generate2FAKeyURI(User2);
+      const otpAuthURL = await this.authService.generate2FAKeyURI(User2);
 
       // generate QR code
       return res.json(await this.authService.generateQrCodeURL(otpAuthURL));
@@ -178,25 +182,26 @@ export class AuthController {
         .status(HttpStatus.FORBIDDEN)
         .json({ message: 'Wrong 2FA code' });
     }
-    const tokenPerm = await this.authService.signAccessToken(Number(user.id));
+    const token = await this.authService.signAccessToken(Number(user.id));
 
-    if (!tokenPerm) {
+    this.logger.debug('ENTROU', token);
+    if (!token) {
+      this.logger.debug('token unauthorized');
       return res
         .status(HttpStatus.UNAUTHORIZED)
         .json({ message: 'Bad token' })
         .send();
     }
-
+    this.logger.debug('ACCESS TOKEN ', token);
+    // return (
     res
-      .cookie('token', tokenPerm, {
+      .cookie('token', token, {
         expires: new Date(Date.now() + 14 * 60 * 1000),
-        domain: 'localhost',
+        domain: '10.12.8.6',
         path: '/',
-        sameSite: 'none',
-        secure: true,
       })
-      .status(200)
       .send();
+    // .redirect(`${process.env.FRONTEND_URL}`);
     return;
   }
 
@@ -215,10 +220,10 @@ export class AuthController {
     return res
       .cookie('token', token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        domain: 'localhost',
+        domain: '10.12.8.6',
         path: '/',
-        sameSite: 'none',
-        secure: true,
+        // sameSite: 'none',
+        // secure: true,
       })
       .status(200)
       .redirect(`${process.env.FRONTEND_URL}`);
@@ -239,10 +244,10 @@ export class AuthController {
     return res
       .cookie('token', token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        domain: 'localhost',
+        domain: '10.12.8.6',
         path: '/',
-        sameSite: 'none',
-        secure: true,
+        // sameSite: 'none',
+        // secure: true,
       })
       .status(200)
       .redirect(`${process.env.FRONTEND_URL}`);

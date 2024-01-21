@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { navigate } from "wouter/use-location";
 import "./Profile.css";
 import { updateUserFriends } from "./ProfileContext";
 import { useApi } from "./apiStore";
-import { navigate } from "wouter/use-location";
 
 interface AddFriendPopupProps {
   isVisible: boolean;
@@ -31,11 +31,11 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
 
   useEffect(() => {
     const token = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
     if (auth === false || token === undefined) return;
-    fetch(`http://localhost:3000/user/not-friends`, {
+    fetch(`http://10.12.8.6:3000/user/not-friends`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -87,11 +87,11 @@ const AddFriendPopup: React.FC<AddFriendPopupProps> = ({
       return;
     }
     const token = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('token='))
-    ?.split('=')[1];
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
     if (auth === false || token === undefined) return;
-    fetch(`http://localhost:3000/user/create-friend-request`, {
+    fetch(`http://10.12.8.6:3000/user/create-friend-request`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

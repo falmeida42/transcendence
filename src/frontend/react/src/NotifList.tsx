@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { navigate } from "wouter/use-location";
 import Notif from "./Notif";
 import { useApi } from "./apiStore";
-import { navigate } from "wouter/use-location";
 
 interface NotifListProps {}
 
@@ -25,7 +25,7 @@ const NotifList: React.FC<NotifListProps> = () => {
       ?.split("=")[1];
     if (token === undefined) return;
 
-    fetch(`http://localhost:3000/user/friend-requests`, {
+    fetch(`http://10.12.8.6:3000/user/friend-requests`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

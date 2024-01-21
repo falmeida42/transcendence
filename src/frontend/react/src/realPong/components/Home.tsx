@@ -5,7 +5,6 @@ import {
   createRoom,
   joinQueue,
   leaveQueue,
-  leaveRoom,
   set_name,
 } from "../context/SocketContext";
 import "../game.css";
@@ -65,10 +64,10 @@ const Home = () => {
           name="name"
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") set_name(name);
+            if (e.key === "Enter") set_name(name, user);
           }}
         />
-        <button onClick={() => set_name(name)}>Set Name</button>
+        <button onClick={() => set_name(name, user)}>Set Name</button>
       </div>
     );
   }
