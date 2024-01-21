@@ -101,6 +101,7 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
                         <span>&times;</span>
                         </button>
                     </div>
+                    { blockableUsers?.length !== 0 && ( 
                     <div>
                         <div className="modal-body">
                             <p>Select a user from the list to block:</p>
@@ -129,7 +130,13 @@ const BlockPopup: React.FC<BlockPopupProps> = ({ isVisible, handleClose }) => {
                             <button type="button" className="btn btn-clear" onClick={handleClickYes}>Submit</button>
                             <button type="button" className="btn btn-secondary" onClick={handleClickClose}>Cancel</button>
                         </div>
-                    </div>                   
+                    </div>
+                    )}
+                    {blockableUsers?.length === 0 && (
+                        <p style={{ color: "red", padding: "25px" }}>
+                        There are no eligible users to block
+                        </p>
+                     )}                                        
                     </div>
                 </div>
                 </div>
