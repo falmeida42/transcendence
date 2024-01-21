@@ -22,7 +22,7 @@ const Notif: React.FC<NotifProps> = (props) => {
 
   const acceptRequest = (requestor_id: string, id: string) => {
     if (requestor_id !== "" && id !== "") {
-      fetch("http://localhost:3000/user/handle-friend-request", {
+      fetch("http://10.12.8.6:3000/user/handle-friend-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ const Notif: React.FC<NotifProps> = (props) => {
 
   const rejectRequest = (requestor_id: string, id: string) => {
     if (requestor_id !== "" && id !== "") {
-      fetch("http://localhost:3000/user/handle-friend-request", {
+      fetch("http://10.12.8.6:3000/user/handle-friend-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { test } from "../../context/ChatContext";
 import { navigate } from "wouter/use-location";
+import { test } from "../../context/ChatContext";
 
 interface BanPopupProps {
   isVisible: boolean;
@@ -47,7 +47,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
     if (tk === undefined) return;
-    fetch(`http://localhost:3000/user/ban-user`, {
+    fetch(`http://10.12.8.6:3000/user/ban-user`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -84,7 +84,7 @@ const BanPopup: React.FC<BanPopupProps> = (props: BanPopupProps) => {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
     if (tk === undefined) return;
-    fetch(`http://localhost:3000/user/can-kick?roomId=${props.channelId}`, {
+    fetch(`http://10.12.8.6:3000/user/can-kick?roomId=${props.channelId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,

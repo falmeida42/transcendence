@@ -209,6 +209,14 @@ export class GamerGateway
     }
   }
 
+  @SubscribeMessage('DeclinedInvite')
+  declineInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('roomId') roomId,
+  ) {
+    this.gameInvite[roomId] = [];
+  }
+
   createRoomFromInvite(socket1: Socket, socket2: Socket) {
     const player1 = this.players[socket1.id];
     const player2 = this.players[socket2.id];

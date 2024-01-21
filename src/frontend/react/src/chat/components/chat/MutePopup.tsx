@@ -48,7 +48,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
 
     // console.log(props.channelId);
 
-    fetch(`http://localhost:3000/user/mute-user`, {
+    fetch(`http://10.12.8.6:3000/user/mute-user`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -89,7 +89,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
 
-  fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
+  fetch(`http://10.12.8.6:3000/user/chatRoom/${props.channelId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${tk}`,

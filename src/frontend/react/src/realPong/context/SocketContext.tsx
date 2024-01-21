@@ -32,7 +32,7 @@ const initialState: state = {
   socketId: "",
 };
 
-const socket = io("http://localhost:3000/gamer", { autoConnect: false });
+const socket = io("http://10.12.8.6:3000/gamer", { autoConnect: false });
 
 const disconnect = () => {
   socket.off("connect");
@@ -169,8 +169,8 @@ const joinRoomSpec = (roomId: string) => {
   socket.emit("JoinRoomSpec", { roomId });
 };
 
-const leaveRoom = () => {
-  socket.emit("LeaveRoom");
+const declinedInvite = (roomId: string) => {
+  socket.emit("DeclinedInvite", { roomId });
 };
 
 const joinRoomInvite = (roomId: string) => {
@@ -183,12 +183,12 @@ export {
   SocketProvider,
   clearRoom,
   createRoom,
+  declinedInvite,
   gameLoaded,
   joinQueue,
   joinRoomInvite,
   joinRoomSpec,
   leaveQueue,
-  leaveRoom,
   pauseGame,
   sendKey,
   set_name,

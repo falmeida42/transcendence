@@ -46,7 +46,9 @@ function ChatProvider({ children }: ChatProviderProps) {
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
-    fetch(`http://localhost:3000/user/chatRooms`, {
+    if (!tk) return;
+
+    fetch(`http://10.12.8.6:3000/user/chatRooms`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -55,9 +57,9 @@ function ChatProvider({ children }: ChatProviderProps) {
     })
       .then(async (response) => {
         if (!response.ok) {
-          if (response.status === 401) {
-            navigate("/login");
-          }
+          // if (response.status === 401) {
+          //   navigate("/login");
+          // }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.text();
@@ -79,7 +81,7 @@ function ChatProvider({ children }: ChatProviderProps) {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
     if (channelSelected) {
-      fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
+      fetch(`http://10.12.8.6:3000/user/chatHistory/${channelSelected}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${tk}`,
@@ -124,7 +126,7 @@ function ChatProvider({ children }: ChatProviderProps) {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
     if (channelSelected) {
-      fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
+      fetch(`http://10.12.8.6:3000/user/chatHistory/${channelSelected}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${tk}`,
@@ -162,7 +164,7 @@ function ChatProvider({ children }: ChatProviderProps) {
   };
 
   useEffect(() => {
-    socketInstance = io("http://localhost:3000/chat").connect();
+    socketInstance = io("http://10.12.8.6:3000/chat").connect();
 
     socketInstance.on("connect", () => {
       socketInstance.emit("userConnected", {

@@ -1,6 +1,6 @@
-import React, { useEffect, ReactNode } from 'react';
-import { useApi } from './apiStore';
-import { navigate } from 'wouter/use-location';
+import React, { ReactNode, useEffect } from "react";
+import { navigate } from "wouter/use-location";
+import { useApi } from "./apiStore";
 
 interface ApiQrProps {
   children?: ReactNode;
@@ -8,7 +8,7 @@ interface ApiQrProps {
 
 const ApiQr: React.FC<ApiQrProps> = (props) => {
   const { setqrcode, auth } = useApi();
-  useEffect(() => {},[auth]);
+  useEffect(() => {}, [auth]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,15 +19,18 @@ const ApiQr: React.FC<ApiQrProps> = (props) => {
       if (token === undefined) return;
 
       try {
-        const response = await fetch('http://localhost:3000/auth/2fa/generate', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok){
-          navigate('/login');
+        const response = await fetch(
+          "http://10.12.8.6:3000/auth/2fa/generate",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) {
+          navigate("/login");
           return;
         }
 

@@ -21,7 +21,7 @@ const Topbar = () => {
 
   const handleClickLogout = () => {
     if (token !== undefined) {
-      document.cookie = `${"token"}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
+      document.cookie = `${"token"}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=10.12.8.6;`;
       navigate("/login");
     }
   };

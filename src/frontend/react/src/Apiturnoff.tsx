@@ -6,7 +6,7 @@ interface UsetwofaProps {
 }
 
 const Usetwofa = ({ handleClose }: UsetwofaProps) => {
-  const {twofa} = useApi();
+  const { twofa } = useApi();
 
   const { settwofa } = useApi();
 
@@ -18,17 +18,16 @@ const Usetwofa = ({ handleClose }: UsetwofaProps) => {
         ?.split("=")[1];
       if (token === undefined) return;
 
-
-      const response = await fetch('http://localhost:3000/auth/2fa/turn-off', {
-        method: 'POST',
+      const response = await fetch("http://10.12.8.6:3000/auth/2fa/turn-off", {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      })
-      if (!response.ok){
+      });
+      if (!response.ok) {
         if (response.status === 401) {
-          navigate('/login');
+          navigate("/login");
         }
         return;
       }
@@ -42,9 +41,11 @@ const Usetwofa = ({ handleClose }: UsetwofaProps) => {
 
   return (
     <div>
-      <p>Disable two-factor authentication.</p>      
+      <p>Disable two-factor authentication.</p>
       <div className="modal-footer">
-        <button className="btn btn-secondary" onClick={handleSendClick}>Disable 2FA</button>
+        <button className="btn btn-secondary" onClick={handleSendClick}>
+          Disable 2FA
+        </button>
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ export class TwoFAStrategy extends PassportStrategy(Strategy, '2fa') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_2FA_SECRET,
+      secretOrKey: process.env.JWT_SECRET,
       session: false, // disable sessions
     });
   }

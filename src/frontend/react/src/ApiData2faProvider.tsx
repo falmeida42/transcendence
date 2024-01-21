@@ -20,7 +20,7 @@ const ApiData2faProvider: React.FC<ApiData2faProviderProps> = (props) => {
 
         // console.log('token: ', token, 'cus: ', document.cookie);
 
-        const UpResponse = await fetch("http://localhost:3000/user/auth", {
+        const UpResponse = await fetch("http://10.12.8.6:3000/user/auth", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

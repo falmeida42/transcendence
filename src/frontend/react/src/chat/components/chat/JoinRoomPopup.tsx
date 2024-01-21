@@ -37,7 +37,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
-    fetch(`http://localhost:3000/user/joinable-rooms`, {
+    fetch(`http://10.12.8.6:3000/user/joinable-rooms`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -97,7 +97,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
 
-    fetch(`http://localhost:3000/user/join-room`, {
+    fetch(`http://10.12.8.6:3000/user/join-room`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

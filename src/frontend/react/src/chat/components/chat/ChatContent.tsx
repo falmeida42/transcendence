@@ -96,7 +96,7 @@ const ChatContent = (props: ChatContentProps) => {
           .find((row) => row.startsWith("token="))
           ?.split("=")[1];
         const response = await fetch(
-          `http://localhost:3000/user/chatRoom/${props.selectedChatData.id}`,
+          `http://10.12.8.6:3000/user/chatRoom/${props.selectedChatData.id}`,
           {
             method: "GET",
             headers: {
@@ -196,13 +196,13 @@ const ChatContent = (props: ChatContentProps) => {
               className="fa fa-sign-out fa-lg clickable"
             ></i>
           )}
-          { isDirectMessage && (           
-          <i
-            onClick={handleClickMatch}
-            onMouseEnter={() => handleMouseEnter("invite user to match")}
-            onMouseLeave={() => handleMouseLeave()}
-            className="fa fa-gamepad fa-lg clickable"
-          ></i>
+          {isDirectMessage && (
+            <i
+              onClick={handleClickMatch}
+              onMouseEnter={() => handleMouseEnter("invite user to match")}
+              onMouseLeave={() => handleMouseLeave()}
+              className="fa fa-gamepad fa-lg clickable"
+            ></i>
           )}
           {(userIsAdmin || userIsOwner) && !isDirectMessage && (
             <i
