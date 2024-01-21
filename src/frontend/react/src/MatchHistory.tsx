@@ -23,9 +23,10 @@ const handleNavigate = (friendId: string) => {
 
 interface props {
   id: string;
+  prof: string;
 }
 
-const MatchHistory = ({ id }: props) => {
+const MatchHistory = ({ id, prof }: props) => {
   const [matchHistory, setMatchHistory] = useState<Match[]>([]);
 
   const getMatchHistory = async () => {
@@ -84,15 +85,22 @@ const MatchHistory = ({ id }: props) => {
               <span>
                 <a
                   onClick={() => {
-                    handleNavigate(match.winner.login);
-                  }}
+                   {prof !== "AI" && handleNavigate(match.winner.login);
+                  } {prof === "AI" && handleNavigate(match.loser.login);
+                }}}
                 >
-                  <img
+                  {(prof !== "AI" || match.winner.login !== "AI") && <img
                     src={match.winner.image}
                     className="img-responsive"
                     title={`See the ${match.winner.login} profile`}
                     alt="#"
-                  ></img>
+                  ></img>}
+                  {(prof === "AI" || match.loser.login === "AI") && <img
+                    src={match.loser.image}
+                    className="img-responsive"
+                    title={`See the ${match.loser.login} profile`}
+                    alt="#"
+                  ></img>}
                 </a>
               </span>
               <span>

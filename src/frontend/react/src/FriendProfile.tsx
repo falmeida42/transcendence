@@ -131,7 +131,7 @@ const FriendProfile = ({ login }: props) => {
           </div>
         </nav>
         <div className="tab-content" id="nav-tabContent">
-          <MatchHistory id={id} />
+          <MatchHistory id={id} prof={login}/>
           <div
             className="tab-pane fade"
             id="project_worked"

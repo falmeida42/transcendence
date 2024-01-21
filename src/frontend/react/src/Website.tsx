@@ -16,9 +16,8 @@ function Website() {
     <div>
       {/* <ApiData2faProvider/> */}
       <ApiDataProvider />
-      <ProfileProvider>
+        <ProfileProvider>
         <SocketProvider>
-          <ChatProvider>
             <Bars />
             <Switch>
               <Route path="/Game">
@@ -38,11 +37,12 @@ function Website() {
               </Route>
               <Route path="/Chat">
                 <div className="game">
+          <ChatProvider>
                   <Chat />
+          </ChatProvider>
                 </div>
               </Route>
             </Switch>
-          </ChatProvider>
         </SocketProvider>
       </ProfileProvider>
     </div>
