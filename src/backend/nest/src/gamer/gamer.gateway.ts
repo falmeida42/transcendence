@@ -197,6 +197,8 @@ export class GamerGateway
   @SubscribeMessage('joinRoom')
   joinRoom(@ConnectedSocket() client: Socket, @MessageBody('roomId') roomId) {
     const room = this.gameInvite[roomId] || [];
+    const player = this.players[client.id];
+    if (room.length === 1 && player.username === roomId) return;
     this.gameInvite[roomId] = [...room, client];
     if (this.gameInvite[roomId].length === 2) {
       this.createRoomFromInvite(
