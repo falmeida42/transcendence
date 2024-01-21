@@ -1,6 +1,7 @@
 export interface playerConfig {
   ready: boolean;
   name: string;
+  username: string;
   x: number;
   y: number;
   height: number;

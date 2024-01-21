@@ -1,9 +1,10 @@
+/* eslint-disable react-refresh/only-export-components */
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import React, { ReactNode, createContext, useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
+import { navigate } from "wouter/use-location";
 import { useApi } from "../../apiStore";
 import { MessageData } from "../components/chat/Messages";
-import { navigate } from "wouter/use-location";
 
 interface ChatContextProps {
   socket: SocketIoReference.Socket | null;
@@ -28,6 +29,7 @@ let socketInstance: Socket<DefaultEventsMap, DefaultEventsMap>;
 let test: (id?: string) => void;
 let kick: (usernameId: string, roomId: string) => void;
 let updateStatus: (id: string, status: number) => void;
+let getNewMessages: () => void;
 
 function ChatProvider({ children }: ChatProviderProps) {
   const [socket, setSocket] = useState<SocketIoReference.Socket | null>(null);
@@ -103,6 +105,7 @@ function ChatProvider({ children }: ChatProviderProps) {
                 username: message.sender.username,
                 userImage: message.sender.image,
                 message: message.content,
+                type: message.invite,
               })),
             }));
           } else {
@@ -115,10 +118,51 @@ function ChatProvider({ children }: ChatProviderProps) {
     updateChatRooms();
   }, [channelSelected]);
 
+  getNewMessages = () => {
+    const tk = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+    if (channelSelected) {
+      fetch(`http://localhost:3000/user/chatHistory/${channelSelected}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${tk}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              navigate("/login");
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          return data ? JSON.parse(data) : null;
+        })
+        .then((data) => {
+          if (data) {
+            setChannelMessages((prevChannelMessages) => ({
+              ...prevChannelMessages,
+              [channelSelected]: data.map((message: any) => ({
+                id: message.id,
+                username: message.sender.username,
+                userImage: message.sender.image,
+                message: message.content,
+                type: message.invite,
+              })),
+            }));
+          } else {
+            console.log("No data received");
+          }
+        })
+        .catch();
+    }
+  };
+
   useEffect(() => {
-    socketInstance = io("http://localhost:3000/chat", {
-      withCredentials: true,
-    }).connect();
+    socketInstance = io("http://localhost:3000/chat").connect();
 
     socketInstance.on("connect", () => {
       socketInstance.emit("userConnected", {
@@ -133,7 +177,11 @@ function ChatProvider({ children }: ChatProviderProps) {
 
     socketInstance.on("UpdateRooms", () => {
       updateChatRooms();
-      socketInstance.emit("joinAllRooms", { id: id });
+      socketInstance.emit("joinAllRooms", { id });
+    });
+
+    socketInstance.on("cu", () => {
+      getNewMessages();
     });
 
     setSocket(socketInstance);
@@ -159,6 +207,7 @@ function ChatProvider({ children }: ChatProviderProps) {
             username: payload.sender,
             message: payload.message,
             userImage: payload.senderImage,
+            type: payload.type,
           },
         ];
         // console.log("newChannelMessages during: ", newChannelMessages)
@@ -211,4 +260,12 @@ function ChatProvider({ children }: ChatProviderProps) {
   );
 }
 
-export { ChatContext, ChatProvider, kick, test, updateChatRooms, updateStatus };
+export {
+  ChatContext,
+  ChatProvider,
+  getNewMessages,
+  kick,
+  test,
+  updateChatRooms,
+  updateStatus,
+};

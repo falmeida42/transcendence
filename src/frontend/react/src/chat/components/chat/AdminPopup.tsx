@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { navigate } from "wouter/use-location";
 import { useApi } from "../../../apiStore";
 import { test } from "../../context/ChatContext";
-import { navigate } from "wouter/use-location";
 
 interface AdminPopupProps {
   isVisible: boolean;
@@ -33,7 +33,6 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
   };
 
   const handleClickYes = async () => {
-
     if (userToInvite.login === "") {
       toggleVisibility(true);
       return;
