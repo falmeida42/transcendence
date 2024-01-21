@@ -1,12 +1,11 @@
 import { useEffect } from "react";
-import "./App.css";
-import Website from "./Website.tsx";
-import { useApi } from "./apiStore.tsx";
-import { Redirect, Route, Switch, useLocation } from 'wouter';
+import { Redirect, Route, Switch, useLocation } from "wouter";
 import { navigate } from "wouter/use-location";
 import AuthApi from "./ApiAuth.tsx";
 import ApiData2faProvider from "./ApiData2faProvider.tsx";
-
+import "./App.css";
+import Website from "./Website.tsx";
+import { useApi } from "./apiStore.tsx";
 
 function App() {
   const { auth, setauth } = useApi();
@@ -24,21 +23,22 @@ function App() {
 
   useEffect(() => {
     if (token && token2fa) {
-      document.cookie = `${'token2fa'}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost;`;
-      navigate('/');
+      document.cookie = `${"token2fa"}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=10.12.8.6;`;
+      navigate("/");
     } else if (token2fa) {
-      <ApiData2faProvider />
-      navigate('/2fa');
+      <ApiData2faProvider />;
+      navigate("/2fa");
     } else if (token) {
       navigate(location);
-        if (auth === false) {
-          setauth(true);
-    }} else {
-      navigate('/login');
+      if (auth === false) {
+        setauth(true);
+      }
+    } else {
+      navigate("/login");
     }
   }, [token, token2fa, navigate, auth]);
   const handleButtonClick = () => {
-    window.location.href = "http://localhost:3000/auth/login";
+    window.location.href = "http://10.12.8.6:3000/auth/login";
   };
 
   return (
@@ -53,14 +53,9 @@ function App() {
         </div>
       </Route>
       <Route path="/2fa">
-        {auth ? (
-          <Redirect to="/"/>
-        ) : (<AuthApi code="" />
-        )}
-        </Route>
-      <Route>
-        <Website />
+        {auth ? <Redirect to="/" /> : <AuthApi code="" />}
       </Route>
+      <Route>{auth && <Website />}</Route>
     </Switch>
   );
 }

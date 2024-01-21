@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { updateUserFriends } from "./ProfileContext";
-import { test } from "./chat/context/ChatContext";
 import { navigate } from "wouter/use-location";
+import { updateBlockableUsers, updateUserFriends } from "./ProfileContext";
+import { test } from "./chat/context/ChatContext";
 
 interface NotifProps {
   requestor_image: string;
@@ -22,7 +22,7 @@ const Notif: React.FC<NotifProps> = (props) => {
 
   const acceptRequest = (requestor_id: string, id: string) => {
     if (requestor_id !== "" && id !== "") {
-      fetch("http://localhost:3000/user/handle-friend-request", {
+      fetch("http://10.12.8.6:3000/user/handle-friend-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,7 +46,12 @@ const Notif: React.FC<NotifProps> = (props) => {
         })
         .then(() => {
           updateUserFriends();
+        })
+        .then(() => {
           test();
+        })
+        .then(() => {
+          updateBlockableUsers();
         })
         .catch((error) => console.error("Fetch error:", error));
     }
@@ -55,7 +60,7 @@ const Notif: React.FC<NotifProps> = (props) => {
 
   const rejectRequest = (requestor_id: string, id: string) => {
     if (requestor_id !== "" && id !== "") {
-      fetch("http://localhost:3000/user/handle-friend-request", {
+      fetch("http://10.12.8.6:3000/user/handle-friend-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

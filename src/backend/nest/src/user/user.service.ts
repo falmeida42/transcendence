@@ -162,10 +162,7 @@ export class UserService {
     return filteredList.length > 0 ? filteredList : null;
   }
 
-  async addFriendRequest(
-    requesterId: string,
-    requesteeId: string,
-  ): Promise<{ message: string; friendRequest?: any }> {
+  async addFriendRequest(requesterId: string, requesteeId: string) {
     try {
       // Check if both users exist
       const requestor = await this.prisma.user.findUnique({
@@ -236,7 +233,7 @@ export class UserService {
         this.insertFriend(requesterId, requesteeId);
 
         // Create the chat room
-        const chatRoom = await this.prisma.chatRoom.create({
+        await this.prisma.chatRoom.create({
           data: {
             id: crypto.randomUUID().toString(),
             name: requesterId + requesteeId,
@@ -250,6 +247,18 @@ export class UserService {
             },
           },
         });
+        // unblock user if blocked
+        await this.prisma.user.update({
+          where: {
+            id: requesterId,
+          },
+          data: {
+            blockedUsers: {
+              disconnect: { id: requesteeId },
+            },
+          },
+        });
+
         return { message: 'Friend request accepted', friendRequest };
       } else {
         const friendRequest = await this.prisma.friendRequest.update({
@@ -317,6 +326,36 @@ export class UserService {
           friends: {
             disconnect: { id: blockedId },
           },
+        },
+      });
+
+      const toRemove = await this.prisma.chatRoom.findFirst({
+        where: {
+          AND: [
+            { type: 'DIRECT_MESSAGE' },
+            {
+              participants: {
+                some: { id: id },
+              },
+            },
+            {
+              participants: {
+                some: { id: blockedId },
+              },
+            },
+          ],
+        },
+      });
+
+      this.logger.debug('Removed DM: ', toRemove);
+
+      await this.prisma.message.deleteMany({
+        where: { chat_id: toRemove.id },
+      });
+
+      await this.prisma.chatRoom.delete({
+        where: {
+          id: toRemove.id,
         },
       });
     } catch (error) {
@@ -520,10 +559,10 @@ export class UserService {
     return filteredList;
   }
 
-  async insertFriend(userId: string, friend: any) {
+  async insertFriend(userId: string, friendId: string) {
     return await this.prisma.user.update({
       where: { id: userId },
-      data: { friends: { connect: { id: friend } } },
+      data: { friends: { connect: { id: friendId } } },
     });
   }
 
@@ -655,7 +694,12 @@ export class UserService {
     return filteredRooms;
   }
 
-  async addMessage(userId: string, chatId: string, content: string) {
+  async addMessage(
+    userId: string,
+    chatId: string,
+    content: string,
+    type: boolean,
+  ) {
     try {
       // Check if the chat room exists
       const chatRoom = await this.prisma.chatRoom.findUnique({
@@ -664,7 +708,7 @@ export class UserService {
 
       if (!chatRoom) {
         this.logger.error('Chat room not found.', {
-          data: { user: userId, chat: chatId, content: content },
+          data: { user: userId, chat: chatId, content: content, type: type },
         });
         throw new NotFoundException('Chat room not found');
       }
@@ -688,6 +732,7 @@ export class UserService {
           chat_id: chatId,
           sender_id: userId,
           userId: userId,
+          invite: type,
         },
       });
 
@@ -926,5 +971,9 @@ export class UserService {
         },
       })
       .then((blocked) => blocked.blockedBy.length > 0);
+  }
+
+  async deleteMessage(messageId: string) {
+    await this.prisma.message.delete({ where: { id: messageId } });
   }
 }

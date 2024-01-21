@@ -21,7 +21,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
   const { user } = useApi();
   const [checkboxValues, setCheckboxValues] = useState<string[]>([user]);
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
-  const [id] = useState(crypto.randomUUID().toString());
+  const [id] = useState();
   const { userFriends } = useContext(ProfileContext) ?? {};
 
   const toggleVisibility = (visibility: boolean) => {
@@ -148,7 +148,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
         .find((row) => row.startsWith("token="))
         ?.split("=")[1];
 
-      fetch(`http://localhost:3000/user/add-room`, {
+      fetch(`http://10.12.8.6:3000/user/add-room`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -192,7 +192,7 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
                   <span>&times;</span>
                 </button>
               </div>
-              {modal === 1 && (
+              {modal === 1 && userFriends.length !== 0 && (
                 <div>
                   <div className="modal-body">
                     <p>Please insert a name:</p>
@@ -229,6 +229,11 @@ const CreateRoomPopup: React.FC<CreateRoomPopupProps> = ({
                     </button>
                   </div>
                 </div>
+              )}
+              {modal === 1 && userFriends.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  You need to have at least 1 friend to create a chat room.
+                </p>
               )}
               {modal === 2 && (
                 <div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useApi } from "../../../apiStore";
 import { navigate } from "wouter/use-location";
+import { useApi } from "../../../apiStore";
 
 interface MutePopupProps {
   isVisible: boolean;
@@ -46,9 +46,9 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
 
-    console.log(props.channelId);
+    // console.log(props.channelId);
 
-    fetch(`http://localhost:3000/user/mute-user`, {
+    fetch(`http://10.12.8.6:3000/user/mute-user`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -68,7 +68,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
         if (!data) {
           console.log("No data received");
         }
-        console.log(data);
+        // console.log(data);
       })
       .catch(() => {
         console.log("cu");
@@ -89,7 +89,7 @@ const MutePopup: React.FC<MutePopupProps> = (props: MutePopupProps) => {
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
 
-  fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
+  fetch(`http://10.12.8.6:3000/user/chatRoom/${props.channelId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${tk}`,

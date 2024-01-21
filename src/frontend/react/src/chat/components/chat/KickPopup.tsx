@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { kick, test } from "../../context/ChatContext";
 import { navigate } from "wouter/use-location";
+import { kick, test } from "../../context/ChatContext";
 
 interface KickPopupProps {
   isVisible: boolean;
@@ -47,7 +47,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
 
-    fetch(`http://localhost:3000/user/kick`, {
+    fetch(`http://10.12.8.6:3000/user/kick`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -86,7 +86,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
-    fetch(`http://localhost:3000/user/can-kick?roomId=${props.channelId}`, {
+    fetch(`http://10.12.8.6:3000/user/can-kick?roomId=${props.channelId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -134,7 +134,7 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
                   <span>&times;</span>
                 </button>
               </div>
-              {!kickError && (
+              {!kickError && chatData?.length !== 0 && (
                 <div>
                   <div className="modal-body">
                     <p>Select a user to kick out of the chatroom:</p>
@@ -175,6 +175,11 @@ const KickPopup: React.FC<KickPopupProps> = (props: KickPopupProps) => {
                     </button>
                   </div>
                 </div>
+              )}
+              {chatData?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible participants to kick
+                </p>
               )}
             </div>
           </div>

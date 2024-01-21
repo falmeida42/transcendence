@@ -11,7 +11,6 @@ import {
   ParseIntPipe,
   Post,
   Query,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -94,10 +93,9 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('friends/:id')
-  async getFriendfriend(@Param('id') id: string) {
+  async getFriendfriend(@Param('id', InputStringValidationPipe) id: string) {
     const user = await this.userService.getFriends(id);
-    if (user)
-      return user;
+    if (user) return user;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -115,7 +113,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('create-friend-request')
   async addFriendRequest(
-    @Req() req: Request,
     @Body('requesterId', InputStringValidationPipe) requesterId: string,
     @Body('requesteeId', InputStringValidationPipe) requesteeId: string,
     @Res() res: Response,
@@ -502,8 +499,8 @@ export class UserController {
   @Post('mute-user')
   async muteUser(
     @GetMe() user: User,
-    @Body('participantId') participantId: string,
-    @Body('roomId') roomId: string,
+    @Body('participantId', InputStringValidationPipe) participantId: string,
+    @Body('roomId', InputStringValidationPipe) roomId: string,
     @Body('duration', ParseIntPipe) duration: number,
     @Res() res: Response,
   ) {
@@ -547,8 +544,8 @@ export class UserController {
 
   @Get('check-mute/:userId/:roomId')
   async checkUserMute(
-    @Param('userId') userId: string,
-    @Param('roomId') roomId: string,
+    @Param('userId', InputStringValidationPipe) userId: string,
+    @Param('roomId', InputStringValidationPipe) roomId: string,
   ) {
     const isMuted = await this.userService.isUserMutedInRoom(userId, roomId);
     if (!isMuted) {
@@ -561,8 +558,8 @@ export class UserController {
   @Post('unmute-user')
   async unmuteUser(
     @GetMe() user: User,
-    @Body('participantId') participantId: string,
-    @Body('roomId') roomId: string,
+    @Body('participantId', InputStringValidationPipe) participantId: string,
+    @Body('roomId', InputStringValidationPipe) roomId: string,
     @Res() res: Response,
   ) {
     if (!roomId || !participantId) {
@@ -587,7 +584,7 @@ export class UserController {
   @Post('update-room-privacy/:roomId')
   async updateRoomPrivacy(
     @Body('type') type: any,
-    @Body('password') password: string,
+    @Body('password', InputStringValidationPipe) password: string,
     @Param('roomId', InputStringValidationPipe) roomId: string,
   ) {
     if (type && password) {

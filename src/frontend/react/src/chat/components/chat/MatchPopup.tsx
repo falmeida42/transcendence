@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { useApi } from "../../../apiStore";
+import { useContext, useState } from "react";
 import { navigate } from "wouter/use-location";
+import { useApi } from "../../../apiStore";
+import { joinRoomInvite } from "../../../realPong/context/SocketContext";
+import { ChatContext } from "../../context/ChatContext";
 
 interface MatchPopupProps {
   isVisible: boolean;
@@ -18,7 +20,8 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
   });
   const [isVisibleWarning, setIsVisibleWarning] = useState<boolean>(false);
   const [warningText, setWarningText] = useState("This field is mandatory");
-  const { login } = useApi();
+  const { user, id, image, login } = useApi();
+  const { socket } = useContext(ChatContext) ?? {};
 
   interface Participant {
     id: string;
@@ -40,6 +43,16 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
       toggleVisibility(true);
       return;
     }
+    socket.emit("messageToServer", {
+      to: props.channelId,
+      message: "Let's play Pong!",
+      senderId: id,
+      sender: user,
+      senderImage: image,
+      type: true,
+    });
+    joinRoomInvite(user);
+    navigate("/Game");
     //send invite to user: component <MatchInvite />
     // console.log("Sending invite to user: ", userToInvite.login);
     props.handleClose();
@@ -57,7 +70,7 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
     .split("; ")
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
-  fetch(`http://localhost:3000/user/chatRoom/${props.channelId}`, {
+  fetch(`http://10.12.8.6:3000/user/chatRoom/${props.channelId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${tk}`,
@@ -100,52 +113,59 @@ const MatchPopup: React.FC<MatchPopupProps> = (props: MatchPopupProps) => {
                   <span>&times;</span>
                 </button>
               </div>
-              <div>
-                <div className="modal-body">
-                  <p>Select a user to challenge to a match of Pong:</p>
-                  <ul className="popup-input">
-                    {chatData?.participants.map(
-                      (data) =>
-                        login !== data.login && (
-                          <li key={data.id}>
-                            <label>
-                              <input
-                                type="radio"
-                                value="public"
-                                name="group"
-                                onChange={() => handleRadioChange(data)}
-                              />
-                              <img src={data.image}></img>
-                              {data.login}
-                            </label>
-                          </li>
-                        )
+              {chatData?.participants.length !== 1 && (
+                <div>
+                  <div className="modal-body">
+                    <p>Select a user to challenge to a match of Pong:</p>
+                    <ul className="popup-input">
+                      {chatData?.participants.map(
+                        (data) =>
+                          login !== data.login && (
+                            <li key={data.id}>
+                              <label>
+                                <input
+                                  type="radio"
+                                  value="public"
+                                  name="group"
+                                  onChange={() => handleRadioChange(data)}
+                                />
+                                <img src={data.image}></img>
+                                {data.login}
+                              </label>
+                            </li>
+                          )
+                      )}
+                    </ul>
+                    {isVisibleWarning && (
+                      <p style={{ color: "red" }}>{warningText}</p>
                     )}
-                  </ul>
-                  {isVisibleWarning && (
-                    <p style={{ color: "red" }}>{warningText}</p>
-                  )}
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-clear"
+                      onClick={handleClickYes}
+                    >
+                      Send Invite
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleClickClose}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-clear"
-                    onClick={handleClickYes}
-                  >
-                    Send Invite
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleClickClose}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
+      )}
+      {chatData?.participants.length === 1 && (
+        <p style={{ color: "red", padding: "25px" }}>
+          There are no eligible participants to invite
+        </p>
       )}
     </div>
   );

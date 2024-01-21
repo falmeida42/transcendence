@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { navigate } from "wouter/use-location";
 import { useApi } from "../../../apiStore";
 import { test, updateChatRooms } from "../../context/ChatContext";
-import { navigate } from "wouter/use-location";
 
 interface JoinRoomPopupProps {
   isVisible: boolean;
@@ -37,7 +37,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       .split("; ")
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
-    fetch(`http://localhost:3000/user/joinable-rooms`, {
+    fetch(`http://10.12.8.6:3000/user/joinable-rooms`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -97,7 +97,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
 
-    fetch(`http://localhost:3000/user/join-room`, {
+    fetch(`http://10.12.8.6:3000/user/join-room`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -111,7 +111,7 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       }),
     })
       .then(async (response) => {
-        console.log("some response received: ", response);
+        // console.log("some response received: ", response);
         if (!response.ok) {
           if (response.status === 401) {
             navigate("/login");
@@ -128,13 +128,13 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
       })
       .then((data) => {
         if (data) {
-          console.log("Join status: ", JSON.stringify(data));
+          // console.log("Join status: ", JSON.stringify(data));
           if (data.success === false) {
             setWarningText("Wrong password");
             toggleVisibility(true);
             setInputPassword("");
           } else if (data.success === true) {
-            console.log("sucess handle close");
+            // console.log("sucess handle close");
             handleClose();
           }
         } else {
@@ -164,62 +164,69 @@ const JoinRoomPopup: React.FC<JoinRoomPopupProps> = ({
                   <span>&times;</span>
                 </button>
               </div>
-              <div>
-                <div className="modal-body">
-                  <p>Select a room from the list:</p>
-                  <ul className="popup-input" style={{ padding: "4px 0" }}>
-                    {channels.map((channel) => (
-                      <li key={channel.id}>
+              {channels.length !== 0 && (
+                <div>
+                  <div className="modal-body">
+                    <p>Select a room from the list:</p>
+                    <ul className="popup-input" style={{ padding: "4px 0" }}>
+                      {channels.map((channel) => (
+                        <li key={channel.id}>
+                          <label>
+                            <input
+                              type="radio"
+                              value="public"
+                              name="group"
+                              onChange={() => handleRadioChange(channel)}
+                            />
+                            <img src={channel.image}></img>
+                            {channel.name}
+                          </label>
+                        </li>
+                      ))}
+                      {roomToJoin?.type === "PROTECTED" && (
                         <label>
                           <input
-                            type="radio"
-                            value="public"
-                            name="group"
-                            onChange={() => handleRadioChange(channel)}
+                            className="popup-input"
+                            type="password"
+                            maxLength={12}
+                            onClick={() => {
+                              setPlaceHolder(""), toggleVisibility(false);
+                            }}
+                            onBlur={() => setPlaceHolder("Password")}
+                            value={inputPassword}
+                            onChange={handleInputChangePassword}
+                            placeholder={placeholder}
                           />
-                          <img src={channel.image}></img>
-                          {channel.name}
                         </label>
-                      </li>
-                    ))}
-                    {roomToJoin?.type === "PROTECTED" && (
-                      <label>
-                        <input
-                          className="popup-input"
-                          type="password"
-                          maxLength={12}
-                          onClick={() => {
-                            setPlaceHolder(""), toggleVisibility(false);
-                          }}
-                          onBlur={() => setPlaceHolder("Password")}
-                          value={inputPassword}
-                          onChange={handleInputChangePassword}
-                          placeholder={placeholder}
-                        />
-                      </label>
+                      )}
+                    </ul>
+                    {isVisibleWarning && (
+                      <p style={{ color: "red" }}>{warningText}</p>
                     )}
-                  </ul>
-                  {isVisibleWarning && (
-                    <p style={{ color: "red" }}>{warningText}</p>
-                  )}
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-clear"
+                      onClick={handleClickYes}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleClickClose}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-clear"
-                    onClick={handleClickYes}
-                  >
-                    Submit
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleClickClose}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+              )}
+              {channels?.length === 0 && (
+                <p style={{ color: "red", padding: "25px" }}>
+                  There are no eligible rooms to join
+                </p>
+              )}
             </div>
           </div>
         </div>

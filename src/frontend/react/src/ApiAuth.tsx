@@ -22,14 +22,14 @@ const UseAuth = ({ code }: UseAuthProps) => {
       if (token === undefined) return;
 
       const UpResponse = await fetch(
-        "http://localhost:3000/auth/2fa/authentication",
+        "http://10.12.8.6:3000/auth/2fa/authentication",
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          credentials: "include",
+          // credentials: "include",
           body: JSON.stringify({ code: newUserData }),
         }
       );
@@ -44,7 +44,9 @@ const UseAuth = ({ code }: UseAuthProps) => {
       document.cookie = `${"token2fa"}'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
       setauth(true);
       navigate("/");
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // useEffect(() => {},[auth]);

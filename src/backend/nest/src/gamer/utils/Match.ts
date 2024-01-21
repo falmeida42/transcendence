@@ -3,6 +3,7 @@ import { gameConfig } from './gameConfig';
 export interface playerConfig {
   id: string;
   name: string;
+  username: string;
   ready: boolean;
   x: number;
   y: number;

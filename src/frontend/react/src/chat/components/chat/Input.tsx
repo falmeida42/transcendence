@@ -9,7 +9,7 @@ function validInput(str: string) {
 const Input = (content: any) => {
   const [text, setText] = useState("");
   const [placeholder, setPlaceHolder] = useState("Type your message");
-  const { login, image } = useApi();
+  const { login, image , id, user} = useApi();
   const { socket } = useContext(ChatContext) ?? {};
 
   const sendMessage = () => {
@@ -18,7 +18,8 @@ const Input = (content: any) => {
       socket.emit("messageToServer", {
         to: content.content.selectedChatData.id,
         message: text,
-        sender: login,
+        senderId: id,
+        sender: user,
         senderImage: image,
       });
       setText("");

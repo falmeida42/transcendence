@@ -27,7 +27,7 @@ const Friendfriend = ({ id }: props) => {
       ?.split("=")[1];
     if (token === undefined || id === undefined || id === "") return;
 
-    fetch(`http://localhost:3000/user/friends/${id}`, {
+    fetch(`http://10.12.8.6:3000/user/friends/${id}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -44,16 +44,16 @@ const Friendfriend = ({ id }: props) => {
         return data ? JSON.parse(data) : null;
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         const mappedFriends = data.map((friend: any) => ({
-            id: friend.id,
-            username: friend.username,
-            image: friend.image,
-            login: friend.login,
+          id: friend.id,
+          username: friend.username,
+          image: friend.image,
+          login: friend.login,
         }));
-        
+
         setUserFriends([...mappedFriends]);
-    })
+      })
       .catch((error) => console.error("Fetch error:", error));
   };
 
@@ -69,29 +69,29 @@ const Friendfriend = ({ id }: props) => {
       aria-labelledby="nav-home-tab"
     >
       <div className="msg_list_main">
-              <ul className="msg_list">
-                {userFriends.map((friend: User) => (
-                  <li key={friend.id}>
-                    <span>
-                      <a
-                        onClick={() => {
-                          handleNavigate(friend.login);
-                        }}
-                      >
-                        <img
-                          src={friend.image}
-                          className="img-responsive"
-                          alt="#"
-                        ></img>
-                      </a>
-                    </span>
-                    <span>
-                      <span className="name_user">{friend.username}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <ul className="msg_list">
+          {userFriends.map((friend: User) => (
+            <li key={friend.id}>
+              <span>
+                <a
+                  onClick={() => {
+                    handleNavigate(friend.login);
+                  }}
+                >
+                  <img
+                    src={friend.image}
+                    className="img-responsive"
+                    alt="#"
+                  ></img>
+                </a>
+              </span>
+              <span>
+                <span className="name_user">{friend.username}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

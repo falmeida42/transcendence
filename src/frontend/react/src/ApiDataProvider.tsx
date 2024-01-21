@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect } from "react";
-import { useApi } from "./apiStore";
-import { navigate } from "wouter/use-location";
 import { useParams } from "wouter";
+import { navigate } from "wouter/use-location";
+import { useApi } from "./apiStore";
 
 interface ApiDataProviderProps {
   children?: ReactNode;
@@ -9,7 +9,7 @@ interface ApiDataProviderProps {
 
 const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
   const { auth, setInfo } = useApi();
-  const {  } = useParams();
+  const {} = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,8 +20,8 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
           ?.split("=")[1];
         if (token === undefined || auth === false) return;
 
-        const response = await fetch('http://localhost:3000/user/me', {
-          method: 'GET',
+        const response = await fetch("http://10.12.8.6:3000/user/me", {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -29,11 +29,11 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         });
         if (!response.ok) {
           if (response.status === 401) {
-            navigate('/login');
+            navigate("/login");
           }
           return;
         }
-        const friends = await fetch("http://localhost:3000/user/friends", {
+        const friends = await fetch("http://10.12.8.6:3000/user/friends", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ const ApiDataProvider: React.FC<ApiDataProviderProps> = (props) => {
         });
         if (!friends.ok) {
           if (friends.status === 401) {
-            navigate('/login');
+            navigate("/login");
           }
         }
 

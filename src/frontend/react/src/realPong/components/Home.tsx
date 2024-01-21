@@ -5,7 +5,6 @@ import {
   createRoom,
   joinQueue,
   leaveQueue,
-  leaveRoom,
   set_name,
 } from "../context/SocketContext";
 import "../game.css";
@@ -16,7 +15,7 @@ const Home = () => {
     useContext(SocketContext);
   const [page, setPage] = useState<number>(0);
   const [name, setName] = useState<string>("");
-  const { user } = useApi();
+  const { login, user } = useApi();
 
   useEffect(() => {
     const changePage = () => {
@@ -25,10 +24,9 @@ const Home = () => {
         return;
       }
       if (!username) {
-        set_name(user);
+        set_name(login, user);
         setPage(2);
 
-        // setPage(1);
         return;
       }
       if (onQueue) {
@@ -48,7 +46,7 @@ const Home = () => {
       setPage(5);
     };
     changePage();
-  }, [isConnected, room, username, onQueue, rooms, user, match]);
+  }, [isConnected, room, username, onQueue, rooms, match, login]);
 
   if (page === 0) {
     return (
@@ -66,10 +64,10 @@ const Home = () => {
           name="name"
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") set_name(name);
+            if (e.key === "Enter") set_name(name, user);
           }}
         />
-        <button onClick={() => set_name(name)}>Set Name</button>
+        <button onClick={() => set_name(name, user)}>Set Name</button>
       </div>
     );
   }

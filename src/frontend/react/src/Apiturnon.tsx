@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useApi } from './apiStore';
-import { navigate } from 'wouter/use-location';
-import "./Profile.css"
+import { useState } from "react";
+import { navigate } from "wouter/use-location";
+import "./Profile.css";
+import { useApi } from "./apiStore";
 
 interface UseturnoffProps {
   code: string;
@@ -22,32 +22,32 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
         ?.split("=")[1];
       if (token === undefined) return;
 
-
-      const res = await fetch("http://localhost:3000/auth/2fa/turn-on", {
+      const res = await fetch("http://10.12.8.6:3000/auth/2fa/turn-on", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({code: newUserData}),
-      })
+        body: JSON.stringify({ code: newUserData }),
+      });
       if (!res.ok) {
         if (res.status === 401) {
-        // console.log('401');
-        setErr("WRONG!");
-        // const data = await res.json();
-        // console.log('401', JSON.stringify(data));
-        return; }
+          // console.log('401');
+          setErr("WRONG!");
+          // const data = await res.json();
+          // console.log('401', JSON.stringify(data));
+          return;
+        }
       }
       setauth(true);
       settwofa(true);
       // navigate('/Profile');
       handleClose();
-      setErr("DONE!")
-      } catch {
-        navigate('/Profile');
-        return;
-      }
+      setErr("DONE!");
+    } catch {
+      navigate("/Profile");
+      return;
+    }
   };
 
   return (
@@ -55,7 +55,7 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
       <input
         type="string"
         name="name"
-        className='password-input popup-input'
+        className="password-input popup-input"
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => {
@@ -65,7 +65,9 @@ const Useturnoff = ({ code, handleClose }: UseturnoffProps) => {
         }}
       />
       <div className="modal-footer">
-        <button className="btn btn-secondary" onClick={handleSendClick}>{err}</button>
+        <button className="btn btn-secondary" onClick={handleSendClick}>
+          {err}
+        </button>
       </div>
     </div>
   );

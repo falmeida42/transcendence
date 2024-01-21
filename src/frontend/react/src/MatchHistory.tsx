@@ -36,7 +36,7 @@ const MatchHistory = ({ id, prof }: props) => {
       ?.split("=")[1];
     if (token === undefined || id === undefined || id === "") return;
 
-    fetch(`http://localhost:3000/user/matches/${id}`, {
+    fetch(`http://10.12.8.6:3000/user/matches/${id}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

@@ -19,7 +19,7 @@ import { gameConfig } from './utils/gameConfig';
 
 @WebSocketGateway({
   namespace: '/gamer',
-  cors: { origin: 'http://localhost:5173', credentials: true },
+  cors: { origin: '*' },
 })
 export class GamerGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -31,6 +31,7 @@ export class GamerGateway
   constructor(private prisma: PrismaService) {}
 
   // data
+  private gameInvite: Record<string, Socket[]> = {};
   private players: Record<string, Player> = {};
   private rooms: Record<string, Room> = {};
   private match: Record<string, Match> = {};
@@ -42,7 +43,10 @@ export class GamerGateway
   }
 
   handleConnection(client: Socket) {
-    this.players[client.id] = { socket: client.id, onQueue: false };
+    this.players[client.id] = {
+      socket: client.id,
+      onQueue: false,
+    };
   }
 
   handleDisconnect(client: Socket) {
@@ -66,8 +70,10 @@ export class GamerGateway
   handleLogin(
     @ConnectedSocket() client: Socket,
     @MessageBody('name') name: string,
+    @MessageBody('username') username: string,
   ) {
     this.players[client.id].name = name;
+    this.players[client.id].username = username;
   }
 
   @SubscribeMessage('CreateRoomAgainstAi')
@@ -188,26 +194,72 @@ export class GamerGateway
     }
   }
 
-  @SubscribeMessage('LeaveRoom')
-  leaveRoomEvent(@ConnectedSocket() client: Socket) {
+  @SubscribeMessage('joinRoom')
+  joinRoom(@ConnectedSocket() client: Socket, @MessageBody('roomId') roomId) {
+    const room = this.gameInvite[roomId] || [];
     const player = this.players[client.id];
-    const roomId = player && player.room;
-
-    const room = this.rooms[roomId];
-
-    if (room) {
-      player.room = undefined;
-
-      const playerNumber = 'player' + (client.id === room.player1 ? 1 : 2);
-      room[playerNumber] = undefined;
-
-      delete this.rooms[roomId];
+    if (room.length === 1 && player.username === roomId) return;
+    this.gameInvite[roomId] = [...room, client];
+    if (this.gameInvite[roomId].length === 2) {
+      this.createRoomFromInvite(
+        this.gameInvite[roomId][0],
+        this.gameInvite[roomId][1],
+      );
+      this.gameInvite[roomId] = [];
     }
+  }
 
-    if (roomId) {
-      client.leave(roomId);
-      client.emit('GameOver');
-    }
+  @SubscribeMessage('DeclinedInvite')
+  declineInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('roomId') roomId,
+  ) {
+    this.gameInvite[roomId] = [];
+  }
+
+  createRoomFromInvite(socket1: Socket, socket2: Socket) {
+    const player1 = this.players[socket1.id];
+    const player2 = this.players[socket2.id];
+    const roomId = player1.name + ' vs ' + player2.name;
+    player1.onQueue = false;
+    player2.onQueue = false;
+    socket1.join(roomId);
+    socket2.join(roomId);
+    this.rooms[roomId] = {
+      id: roomId,
+      name: roomId,
+      player1: socket1.id,
+      player2: socket2.id,
+      againstAi: false,
+    };
+    player1.room = roomId;
+    player2.room = roomId;
+    this.match[roomId] = this.createMatch(socket1.id, false, socket2.id);
+    socket1.emit('RoomCreated', this.rooms[roomId]);
+    socket2.emit('RoomCreated', this.rooms[roomId]);
+    this.runGame(roomId, false);
+  }
+
+  @SubscribeMessage('CreateRoom')
+  createRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('player2name') player2name: string,
+  ) {
+    const player = this.players[client.id];
+    const roomId = player.name;
+    client.join(roomId);
+
+    this.rooms[roomId] = {
+      id: roomId,
+      name: roomId,
+      player1: client.id,
+      player2: undefined,
+      againstAi: false,
+      user2name: player2name,
+    };
+
+    this.players[roomId].room = roomId;
+    client.emit('RoomCreated', this.rooms[roomId]);
   }
 
   removePlayer(playerId: string) {
@@ -258,6 +310,7 @@ export class GamerGateway
       player1: {
         id: player1Id,
         name: this.players[player1Id].name,
+        username: this.players[player1Id].username,
         ready: false,
         x: 5,
         y: gameConfig.height / 2 - 50,
@@ -268,9 +321,8 @@ export class GamerGateway
       },
       player2: {
         id: againstAi ? 'AI' : player2Id,
-        name: againstAi
-          ? 'Artificial Intelligence'
-          : this.players[player2Id].name,
+        name: againstAi ? 'AI' : this.players[player2Id].name,
+        username: againstAi ? 'AI' : this.players[player2Id].username,
         ready: false,
         x: gameConfig.width - 20,
         y: gameConfig.height / 2 - 50,
@@ -461,14 +513,16 @@ export class GamerGateway
 
   async saveMatchOnDatabase(match: Match) {
     try {
+      this.logger.debug(match.player1.name);
+      this.logger.debug(match.player2.name);
       const user1Id = await this.prisma.user.findUniqueOrThrow({
         where: {
-          username: match.player1.name,
+          login: match.player1.name,
         },
       });
       const user2Id = await this.prisma.user.findUniqueOrThrow({
         where: {
-          username: match.player2.name,
+          login: match.player2.name,
         },
       });
       const winnerScore =

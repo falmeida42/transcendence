@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { navigate } from "wouter/use-location";
 import { useApi } from "../../../apiStore";
 import { test } from "../../context/ChatContext";
-import { navigate } from "wouter/use-location";
 
 interface AdminPopupProps {
   isVisible: boolean;
@@ -33,10 +33,6 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
   };
 
   const handleClickYes = async () => {
-    // console.log("handle yes: ", userToInvite);
-    // console.log("handle yes: ", props.channelId);
-    // console.log("handle yes: ", userToInvite.id);
-    // console.log("handle yes: ", userToInvite.login);
     if (userToInvite.login === "") {
       toggleVisibility(true);
       return;
@@ -47,7 +43,7 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
       ?.split("=")[1];
     if (tk === undefined) return;
     // Set User as Admin
-    fetch("http://localhost:3000/user/add-admin", {
+    fetch("http://10.12.8.6:3000/user/add-admin", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tk}`,
@@ -87,7 +83,7 @@ const AdminPopup: React.FC<AdminPopupProps> = (props: AdminPopupProps) => {
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
   if (tk === undefined) return;
-  fetch(`http://localhost:3000/user/channelParticipants/${props.channelId}`, {
+  fetch(`http://10.12.8.6:3000/user/channelParticipants/${props.channelId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${tk}`,
